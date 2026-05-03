@@ -3,12 +3,12 @@ import { type QueryClient } from "@tanstack/react-query";
 import { useState, useEffect, lazy, Suspense } from "react";
 
 import { AppSidebar } from "../components/AppSidebar";
-import MapViewer from "../components/map/MapViewer";
-import SearchBar from "../components/map/SearchBar";
-import LocationDetailPanel from "../components/panels/LocationDetailPanel";
-import FilmDetailPanel from "../components/panels/FilmDetailPanel";
-import CollectionDetailPanel from "../components/panels/CollectionDetailPanel";
 
+const MapViewer = lazy(() => import("../components/map/MapViewer"));
+const SearchBar = lazy(() => import("../components/map/SearchBar"));
+const LocationDetailPanel = lazy(() => import("../components/panels/LocationDetailPanel"));
+const FilmDetailPanel = lazy(() => import("../components/panels/FilmDetailPanel"));
+const CollectionDetailPanel = lazy(() => import("../components/panels/CollectionDetailPanel"));
 const SavedPageDirect = lazy(() => import("../pages/SavedPage"));
 
 interface RouterContext {
@@ -70,18 +70,20 @@ function RootComponent() {
       <div style={contentStyle}>
 
         {/* Persistent map layer — visible on /map and /saved */}
-        <div style={{
+<div style={{
           position: "absolute",
           top: 0, left: 0, right: 0, bottom: 0,
           visibility: (isMapRoute || isSavedRoute) ? "visible" : "hidden",
           pointerEvents: (isMapRoute || isSavedRoute) ? "auto" : "none",
           zIndex: (isMapRoute || isSavedRoute) ? 1 : 0,
         }}>
-          <MapViewer />
-          {isMapRoute && <SearchBar />}
-          {isMapRoute && <LocationDetailPanel />}
-          {isMapRoute && <FilmDetailPanel />}
-          {isMapRoute && <CollectionDetailPanel />}
+          <Suspense fallback={null}>
+            <MapViewer />
+            {isMapRoute && <SearchBar />}
+            {isMapRoute && <LocationDetailPanel />}
+            {isMapRoute && <FilmDetailPanel />}
+            {isMapRoute && <CollectionDetailPanel />}
+          </Suspense>
         </div>
 
         {/* SavedPage sidebar overlay on /saved */}

@@ -11,8 +11,17 @@ export default defineConfig({
   ],
   build: {
     outDir: "dist",
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          maplibre: ["maplibre-gl"],
+          tanstack: ["@tanstack/react-query", "@tanstack/react-router"],
+          supabase: ["@supabase/supabase-js"],
+        },
+      },
+    },
   },
   server: {
-    allowedHosts: "all",
+    allowedHosts: true,
   },
 });
