@@ -165,19 +165,21 @@ const openTrailer = () => {
         >
           {film?.poster_url && (
             <img
-              src={`https://image.tmdb.org/t/p/w500${film.poster_url}`}
-              alt={film.title_lt ?? ""}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                display: "block",
-              }}
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-                e.currentTarget.parentElement?.classList.add("poster-fallback");
-              }}
-            />
+  src={`https://image.tmdb.org/t/p/w500${film.poster_url}`}
+  alt={film.title_lt ?? ""}
+  width={360}
+  height={540}
+  style={{
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    display: "block",
+  }}
+  onError={(e) => {
+    e.currentTarget.style.display = "none";
+    e.currentTarget.parentElement?.classList.add("poster-fallback");
+  }}
+/>
           )}
           <div
             style={{
@@ -438,24 +440,27 @@ const openTrailer = () => {
                   }}
                 >
                   {sceneImages.map((url, i) => (
-                    <img
-                      key={i}
-                      src={url}
-                      alt={`Kadras ${i + 1}`}
-                      className="cinemap-scene-thumb"
-                      onClick={() => setLightboxIndex(i)}
-                      style={{
-                        width: 140,
-                        height: 90,
-                        objectFit: "cover",
-                        borderRadius: 8,
-                        flexShrink: 0,
-                        cursor: "pointer",
-                      }}
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                      }}
-                    />
+                 <img
+  key={i}
+  src={url}
+  alt={`Kadras ${i + 1}`}
+  width={140}
+  height={90}
+  className="cinemap-scene-thumb"
+  onClick={() => setLightboxIndex(i)}
+  style={{
+    width: 140,
+    height: 90,
+    objectFit: "cover",
+    borderRadius: 8,
+    flexShrink: 0,
+    cursor: "pointer",
+    display: "block",
+  }}
+  onError={(e) => {
+    e.currentTarget.style.display = "none";
+  }}
+/>
                   ))}
                 </div>
                 {sceneImages.length > 2 && (
@@ -749,16 +754,17 @@ const openTrailer = () => {
             )}
 
             <img
-              src={sceneImages[lightboxIndex]}
-              alt={`Kadras ${lightboxIndex + 1}`}
-              onClick={(e) => e.stopPropagation()}
-              style={{
-                maxWidth: "90vw",
-                maxHeight: "80vh",
-                objectFit: "contain",
-                borderRadius: 8,
-              }}
-            />
+  src={sceneImages[lightboxIndex]}
+  alt={`Kadras ${lightboxIndex + 1}`}
+  onClick={(e) => e.stopPropagation()}
+  style={{
+    maxWidth: "90vw",
+    maxHeight: "80vh",
+    objectFit: "contain",
+    borderRadius: 8,
+    display: "block",
+  }}
+/>
             <div
               style={{
                 color: "#9ca3af",

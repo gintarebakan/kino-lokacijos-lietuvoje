@@ -289,15 +289,18 @@ export default function CollectionDetailPanel() {
               }}
             >
               {data.cover_url && (
-                <img
-                  src={data.cover_url}
-                  alt={data.title}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
+           <img
+  src={data.cover_url}
+  alt={data.title}
+  width={360}
+  height={202}
+  style={{
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    display: "block",
+  }}
+/>
               )}
               <div
                 style={{
@@ -437,15 +440,18 @@ export default function CollectionDetailPanel() {
                         }}
                       >
                         {loc!.image_url && (
-                          <img
-                            src={loc!.image_url}
-                            alt={loc!.name}
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              objectFit: "cover",
-                            }}
-                          />
+                        <img
+  src={loc!.image_url}
+  alt={loc!.name}
+  width={48}
+  height={48}
+  style={{
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    display: "block",
+  }}
+/>
                         )}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>

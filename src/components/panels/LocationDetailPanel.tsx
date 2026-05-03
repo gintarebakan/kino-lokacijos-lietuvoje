@@ -354,7 +354,9 @@ export default function LocationDetailPanel() {
                 <img
                   src={data.image_url}
                   alt={data.name}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  width={360}
+                  height={225}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                 />
               ) : null}
               <div
@@ -588,6 +590,8 @@ export default function LocationDetailPanel() {
                               <img
                                 src={`https://image.tmdb.org/t/p/w92${film.poster_url}`}
                                 alt={film.title_lt ?? ""}
+                                width={56}
+                                height={84}
                                 style={{
                                   width: "100%",
                                   height: "100%",
