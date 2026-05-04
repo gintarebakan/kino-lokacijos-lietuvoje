@@ -14,7 +14,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          react: ["react", "react-dom"],
           maplibre: ["maplibre-gl"],
           tanstack: ["@tanstack/react-query", "@tanstack/react-router"],
           supabase: ["@supabase/supabase-js"],
