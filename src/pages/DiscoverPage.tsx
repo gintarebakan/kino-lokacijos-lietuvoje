@@ -199,17 +199,19 @@ export default function DiscoverPage() {
                 background: "#1a1a1a",
               }}
             >
-              <ImageWithFallback
-                src={loc.image_url}
-                alt={loc.name}
-                fallbackType="location"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  display: "block",
-                }}
-              />
+             <ImageWithFallback
+  src={loc.image_url}
+  alt={loc.name}
+  fallbackType="location"
+  width={160}
+  height={200}
+  style={{
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    display: "block",
+  }}
+/>
               <div
                 style={{
                   position: "absolute",
@@ -292,22 +294,24 @@ export default function DiscoverPage() {
                   background: "#1a1a1a",
                 }}
               >
-                <ImageWithFallback
-                  src={
-                    film.poster_url
-                      ? `https://image.tmdb.org/t/p/w342${film.poster_url}`
-                      : null
-                  }
-                  alt={film.title_lt ?? ""}
-                  fallbackType="poster"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    objectPosition: "top center",
-                    display: "block",
-                  }}
-                />
+<ImageWithFallback
+  src={
+    film.poster_url
+      ? `https://image.tmdb.org/t/p/w342${film.poster_url}`
+      : null
+  }
+  alt={film.title_lt ?? ""}
+  fallbackType="poster"
+  width={120}
+  height={180}
+  style={{
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    objectPosition: "top center",
+    display: "block",
+  }}
+/>
               </div>
               <div
                 style={{
@@ -360,17 +364,19 @@ export default function DiscoverPage() {
                 }}
               >
                 {col.cover_url && (
-                  <ImageWithFallback
-                    src={col.cover_url}
-                    alt={col.title}
-                    fallbackType="location"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      display: "block",
-                    }}
-                  />
+<ImageWithFallback
+  src={col.cover_url}
+  alt={col.title}
+  fallbackType="location"
+  width={200}
+  height={140}
+  style={{
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    display: "block",
+  }}
+/>
                 )}
                 <div
                   style={{

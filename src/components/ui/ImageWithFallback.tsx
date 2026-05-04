@@ -7,6 +7,8 @@ interface ImageWithFallbackProps {
   style?: CSSProperties;
   fallbackType?: "poster" | "location";
   loading?: "lazy" | "eager";
+  width?: number;
+  height?: number;
 }
 
 const PosterFallback = () => (
@@ -69,6 +71,8 @@ export const ImageWithFallback = ({
   style,
   fallbackType = "poster",
   loading = "lazy",
+  width,
+  height,
 }: ImageWithFallbackProps) => {
   const [errored, setErrored] = useState(false);
 
@@ -83,6 +87,8 @@ export const ImageWithFallback = ({
       className={className}
       style={style}
       loading={loading}
+      width={width}
+      height={height}
       onError={() => setErrored(true)}
     />
   );
