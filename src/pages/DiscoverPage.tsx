@@ -1,21 +1,11 @@
-import { useEffect, useRef } from "react";
+import { lazy, Suspense, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import maplibregl from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
 import { supabase } from "../lib/supabase";
-import {
-  useMapStore,
-  DEFAULT_MAP_CENTER,
-  DEFAULT_MAP_ZOOM,
-} from "../stores/mapStore";
-import { useLocations } from "../hooks/useLocations";
-import { createCircleMarker } from "../components/map/markers";
+import { useMapStore } from "../stores/mapStore";
 import { ImageWithFallback } from "../components/ui/ImageWithFallback";
 
-const MAPTILER_KEY =
-  import.meta.env.VITE_MAPTILER_KEY ?? import.meta.env.MAPTILER_KEY ?? "";
-const STYLE_URL = `https://api.maptiler.com/maps/dataviz-dark/style.json?key=${MAPTILER_KEY}`;
+const MiniMapPreview = lazy(() => import("../components/map/MiniMapPreview"));
 
 interface PopularLocation {
   id: string;
@@ -53,132 +43,6 @@ interface CuratedCollection {
   is_route: boolean | null;
 }
 
-const filmReelSvg = (
-  <svg
-    width="36"
-    height="36"
-    viewBox="0 0 24 24"
-    fill="none"
-    aria-hidden="true"
-  >
-    <circle cx="12" cy="12" r="10" stroke="#c9a84c" strokeWidth="1.5" />
-    <circle cx="12" cy="12" r="3" fill="#c9a84c" />
-  </svg>
-);
-
-function ImageFallback() {
-  return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        background: "#1a1a1a",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      {filmReelSvg}
-    </div>
-  );
-}
-
-function MiniMapPreview() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<maplibregl.Map | null>(null);
-  const markersRef = useRef<maplibregl.Marker[]>([]);
-  const navigate = useNavigate();
-  const { data: locationsData } = useLocations();
-
-  useEffect(() => {
-    if (!containerRef.current || mapRef.current) return;
-    const store = useMapStore.getState();
-    const center = store.hasUserMoved ? store.center : DEFAULT_MAP_CENTER;
-    const zoom = store.hasUserMoved ? store.zoom : DEFAULT_MAP_ZOOM;
-
-    const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: STYLE_URL,
-      center,
-      zoom,
-      attributionControl: false,
-      dragPan: true,
-      scrollZoom: true,
-      doubleClickZoom: true,
-      touchZoomRotate: true,
-      keyboard: true,
-      dragRotate: true,
-      boxZoom: true,
-      interactive: true,
-    });
-    mapRef.current = map;
-
-    return () => {
-      for (const m of markersRef.current) m.remove();
-      markersRef.current = [];
-      map.remove();
-      mapRef.current = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !locationsData) return;
-
-    const renderMarkers = () => {
-      for (const m of markersRef.current) m.remove();
-      markersRef.current = [];
-      for (const feature of locationsData.features) {
-        const [lng, lat] = feature.geometry.coordinates as [number, number];
-        const props = feature.properties;
-        const el = createCircleMarker(false);
-
-el.addEventListener("click", (e) => {
-  e.stopPropagation();
-  navigate({ to: "/map" });
-  useMapStore.getState().setRouteGeoJSON(null);
-  useMapStore.getState().setPreviousCollection(null);
-  if (props.id) {
-    const slug = props.id;
-    setTimeout(() => {
-      useMapStore.getState().setPendingLocation(slug);
-      useMapStore.getState().setSelectedLocationFromDiscover(slug);
-    }, 150);
-  }
-});
-
-        const marker = new maplibregl.Marker({ element: el })
-          .setLngLat([lng, lat])
-          .addTo(map);
-        markersRef.current.push(marker);
-      }
-    };
-
-    if (map.loaded()) {
-      renderMarkers();
-    } else {
-      map.on("load", renderMarkers);
-    }
-  }, [locationsData, navigate]);
-
-  return (
-    <div
-      style={{
-        width: "100%",
-        height: 240,
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      <div
-        ref={containerRef}
-        style={{ position: "absolute", inset: 0 }}
-      />
-
-    </div>
-  );
-}
-
 const sectionHeaderStyle: React.CSSProperties = {
   textTransform: "uppercase",
   letterSpacing: "0.1em",
@@ -189,6 +53,13 @@ const sectionHeaderStyle: React.CSSProperties = {
   margin: 0,
 };
 
+const scrollRowStyle: React.CSSProperties = {
+  display: "flex",
+  gap: 12,
+  padding: "0 16px 16px",
+  overflowX: "auto",
+};
+
 function ScrollRow({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const scroll = (dir: number) => {
@@ -196,33 +67,38 @@ function ScrollRow({ children }: { children: React.ReactNode }) {
   };
   return (
     <div style={{ position: "relative" }}>
-      <button type="button" onClick={() => scroll(-1)} style={{
-        position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)",
-        zIndex: 10, background: "rgba(10,10,10,0.8)", border: "1px solid #333",
-        color: "#c9a84c", width: 32, height: 32, borderRadius: "50%",
-        cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 18, lineHeight: 1,
-      }}>‹</button>
+      <button
+        type="button"
+        onClick={() => scroll(-1)}
+        style={{
+          position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)",
+          zIndex: 10, background: "rgba(10,10,10,0.8)", border: "1px solid #333",
+          color: "#c9a84c", width: 32, height: 32, borderRadius: "50%",
+          cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 18, lineHeight: 1,
+        }}
+      >
+        ‹
+      </button>
       <div ref={ref} className="cinemap-scroll-row" style={scrollRowStyle}>
         {children}
       </div>
-      <button type="button" onClick={() => scroll(1)} style={{
-        position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)",
-        zIndex: 10, background: "rgba(10,10,10,0.8)", border: "1px solid #333",
-        color: "#c9a84c", width: 32, height: 32, borderRadius: "50%",
-        cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 18, lineHeight: 1,
-      }}>›</button>
+      <button
+        type="button"
+        onClick={() => scroll(1)}
+        style={{
+          position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)",
+          zIndex: 10, background: "rgba(10,10,10,0.8)", border: "1px solid #333",
+          color: "#c9a84c", width: 32, height: 32, borderRadius: "50%",
+          cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 18, lineHeight: 1,
+        }}
+      >
+        ›
+      </button>
     </div>
   );
 }
-
-const scrollRowStyle: React.CSSProperties = {
-  display: "flex",
-  gap: 12,
-  padding: "0 16px 16px",
-  overflowX: "auto",
-};
 
 export default function DiscoverPage() {
   const navigate = useNavigate();
@@ -264,18 +140,18 @@ export default function DiscoverPage() {
     },
   });
 
-const openLocation = (slug: string | null) => {
-  navigate({ to: "/map" });
-  // Clear collection context immediately before any pending location
-  useMapStore.getState().setSelectedLocationFromDiscover(null);
-  useMapStore.getState().setRouteGeoJSON(null);
-  if (slug) {
-    setTimeout(() => {
-      useMapStore.getState().setPendingLocation(slug);
-      useMapStore.getState().setSelectedLocationFromDiscover(slug);
-    }, 150);
-  }
-};
+  const openLocation = (slug: string | null) => {
+    navigate({ to: "/map" });
+    useMapStore.getState().setSelectedLocationFromDiscover(null);
+    useMapStore.getState().setRouteGeoJSON(null);
+    if (slug) {
+      setTimeout(() => {
+        useMapStore.getState().setPendingLocation(slug);
+        useMapStore.getState().setSelectedLocationFromDiscover(slug);
+      }, 150);
+    }
+  };
+
   return (
     <main
       style={{
@@ -297,13 +173,15 @@ const openLocation = (slug: string | null) => {
         }
       `}</style>
 
-      <MiniMapPreview />
+      <Suspense fallback={<div style={{ width: "100%", height: 240, background: "#1a1a1a" }} />}>
+        <MiniMapPreview />
+      </Suspense>
 
       {/* Section 1: Popular Locations */}
       <section>
         <h2 style={sectionHeaderStyle}>Populiarios lokacijos</h2>
-<ScrollRow>
-            {(locations ?? []).map((loc) => (
+        <ScrollRow>
+          {(locations ?? []).map((loc) => (
             <button
               key={loc.id}
               type="button"
@@ -336,8 +214,7 @@ const openLocation = (slug: string | null) => {
                 style={{
                   position: "absolute",
                   inset: 0,
-                  background:
-                    "linear-gradient(to top, rgba(0,0,0,0.85), transparent 50%)",
+                  background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent 50%)",
                 }}
               />
               {loc.film_count !== null && loc.film_count !== undefined && (
@@ -392,8 +269,8 @@ const openLocation = (slug: string | null) => {
               type="button"
               onClick={() => {
                 useMapStore.getState().setRouteGeoJSON(null);
-useMapStore.getState().setPreviousCollection(null);
-useMapStore.getState().setSelectedFilmDetail(film.id);
+                useMapStore.getState().setPreviousCollection(null);
+                useMapStore.getState().setSelectedFilmDetail(film.id);
                 navigate({ to: "/map" });
               }}
               style={{
@@ -434,26 +311,20 @@ useMapStore.getState().setSelectedFilmDetail(film.id);
               </div>
               <div
                 style={{
-                fontSize: 12,
-                color: "#f5f5f5",
-                marginTop: 6,
-                lineHeight: 1.3,
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                maxWidth: 120,
-              }}
+                  fontSize: 12,
+                  color: "#f5f5f5",
+                  marginTop: 6,
+                  lineHeight: 1.3,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  maxWidth: 120,
+                }}
               >
                 {film.title_lt ?? ""}
               </div>
               {film.imdb_rating !== null && film.imdb_rating !== undefined && (
-                <div
-                  style={{
-                    fontSize: 11,
-                    color: "#c9a84c",
-                    marginTop: 2,
-                  }}
-                >
+                <div style={{ fontSize: 11, color: "#c9a84c", marginTop: 2 }}>
                   ⭐ {Number(film.imdb_rating).toFixed(1)}
                 </div>
               )}
@@ -468,14 +339,13 @@ useMapStore.getState().setSelectedFilmDetail(film.id);
         <div className="cinemap-scroll-row" style={scrollRowStyle}>
           {collections && collections.length > 0 ? (
             collections.map((col) => (
-              
-<button
+              <button
                 key={col.id}
                 type="button"
                 onClick={() => {
-  useMapStore.getState().setSelectedCollection(col.id);
-  navigate({ to: "/map" });
-}}
+                  useMapStore.getState().setSelectedCollection(col.id);
+                  navigate({ to: "/map" });
+                }}
                 style={{
                   width: 200,
                   height: 140,
@@ -483,7 +353,6 @@ useMapStore.getState().setSelectedFilmDetail(film.id);
                   background: "transparent",
                   padding: 0,
                   border: "none",
-
                   borderRadius: 12,
                   overflow: "hidden",
                   flexShrink: 0,
@@ -507,8 +376,7 @@ useMapStore.getState().setSelectedFilmDetail(film.id);
                   style={{
                     position: "absolute",
                     inset: 0,
-                    background:
-                      "linear-gradient(to top, rgba(0,0,0,0.8), transparent 60%)",
+                    background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent 60%)",
                   }}
                 />
                 <div
