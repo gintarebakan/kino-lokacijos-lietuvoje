@@ -37,9 +37,9 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const RouteSlugRoute = RouteSlugRouteImport.update({
   id: '/route/$slug',
@@ -47,35 +47,35 @@ const RouteSlugRoute = RouteSlugRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/admin/login',
-  path: '/admin/login',
-  getParentRoute: () => rootRouteImport,
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminLocationsRoute = AdminLocationsRouteImport.update({
-  id: '/admin/locations',
-  path: '/admin/locations',
-  getParentRoute: () => rootRouteImport,
+  id: '/locations',
+  path: '/locations',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminFilmsRoute = AdminFilmsRouteImport.update({
-  id: '/admin/films',
-  path: '/admin/films',
-  getParentRoute: () => rootRouteImport,
+  id: '/films',
+  path: '/films',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminFilmLocationsRoute = AdminFilmLocationsRouteImport.update({
-  id: '/admin/film-locations',
-  path: '/admin/film-locations',
-  getParentRoute: () => rootRouteImport,
+  id: '/film-locations',
+  path: '/film-locations',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminCollectionsRoute = AdminCollectionsRouteImport.update({
-  id: '/admin/collections',
-  path: '/admin/collections',
-  getParentRoute: () => rootRouteImport,
+  id: '/collections',
+  path: '/collections',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminCollectionLocationsRoute =
   AdminCollectionLocationsRouteImport.update({
-    id: '/admin/collection-locations',
-    path: '/admin/collection-locations',
-    getParentRoute: () => rootRouteImport,
+    id: '/collection-locations',
+    path: '/collection-locations',
+    getParentRoute: () => AdminRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -164,14 +164,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MapRoute: typeof MapRoute
   SavedRoute: typeof SavedRoute
-  AdminCollectionLocationsRoute: typeof AdminCollectionLocationsRoute
-  AdminCollectionsRoute: typeof AdminCollectionsRoute
-  AdminFilmLocationsRoute: typeof AdminFilmLocationsRoute
-  AdminFilmsRoute: typeof AdminFilmsRoute
-  AdminLocationsRoute: typeof AdminLocationsRoute
-  AdminLoginRoute: typeof AdminLoginRoute
   RouteSlugRoute: typeof RouteSlugRoute
-  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -199,10 +192,10 @@ declare module '@tanstack/react-router' {
     }
     '/admin/': {
       id: '/admin/'
-      path: '/admin'
+      path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/route/$slug': {
       id: '/route/$slug'
@@ -213,45 +206,45 @@ declare module '@tanstack/react-router' {
     }
     '/admin/login': {
       id: '/admin/login'
-      path: '/admin/login'
+      path: '/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/locations': {
       id: '/admin/locations'
-      path: '/admin/locations'
+      path: '/locations'
       fullPath: '/admin/locations'
       preLoaderRoute: typeof AdminLocationsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/films': {
       id: '/admin/films'
-      path: '/admin/films'
+      path: '/films'
       fullPath: '/admin/films'
       preLoaderRoute: typeof AdminFilmsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/film-locations': {
       id: '/admin/film-locations'
-      path: '/admin/film-locations'
+      path: '/film-locations'
       fullPath: '/admin/film-locations'
       preLoaderRoute: typeof AdminFilmLocationsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/collections': {
       id: '/admin/collections'
-      path: '/admin/collections'
+      path: '/collections'
       fullPath: '/admin/collections'
       preLoaderRoute: typeof AdminCollectionsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/collection-locations': {
       id: '/admin/collection-locations'
-      path: '/admin/collection-locations'
+      path: '/collection-locations'
       fullPath: '/admin/collection-locations'
       preLoaderRoute: typeof AdminCollectionLocationsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
   }
 }
@@ -260,14 +253,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MapRoute: MapRoute,
   SavedRoute: SavedRoute,
-  AdminCollectionLocationsRoute: AdminCollectionLocationsRoute,
-  AdminCollectionsRoute: AdminCollectionsRoute,
-  AdminFilmLocationsRoute: AdminFilmLocationsRoute,
-  AdminFilmsRoute: AdminFilmsRoute,
-  AdminLocationsRoute: AdminLocationsRoute,
-  AdminLoginRoute: AdminLoginRoute,
   RouteSlugRoute: RouteSlugRoute,
-  AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

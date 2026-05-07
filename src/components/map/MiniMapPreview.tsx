@@ -64,6 +64,7 @@ export default function MiniMapPreview() {
         const props = feature.properties;
         const el = createCircleMarker(false);
 
+        //tiltas į pagrindinį
         el.addEventListener("click", (e) => {
           e.stopPropagation();
           navigate({ to: "/map" });

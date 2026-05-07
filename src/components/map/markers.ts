@@ -1,6 +1,6 @@
 /**
  * Pure DOM marker factories for MapLibre custom markers.
- * No icon libraries — all SVG inline.
+ * No icon libraries - all SVG inline
  */
 
 export type MarkerTier = "gold" | "gray";

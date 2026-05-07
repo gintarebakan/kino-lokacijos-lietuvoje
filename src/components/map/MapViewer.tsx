@@ -49,6 +49,8 @@ export default function MapViewer() {
     isLoading: isLoadingFiltered,
     error: errorFiltered,
   } = useFilteredLocations();
+
+  //--------------------------------------------------------------------------
   const locationsData = hasActiveFilters
     ? filteredLocationsData
     : allLocationsData;

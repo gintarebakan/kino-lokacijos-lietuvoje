@@ -1,15 +1,19 @@
+// ═══════════════════════════════════════════════
+// IMPORTAI
+// ═══════════════════════════════════════════════
 import { useEffect, useRef, useState } from "react";
-import { useSearch, type SearchResult } from "../../hooks/useSearch";
-import { useMapStore } from "../../stores/mapStore";
-import { useLocations } from "../../hooks/useLocations";
-import { useFilteredLocations } from "../../hooks/useFilteredLocations";
-import { useGenres } from "../../hooks/useGenres";
+import { useSearch, type SearchResult } from "../../hooks/useSearch"; // paieškos hook'as, kviečia supabase.rpc("search_all")
+import { useMapStore } from "../../stores/mapStore"; // žemėlapio būsena, kad galėtume centruoti žemėlapį ir atidaryti skydelį
+import { useLocations } from "../../hooks/useLocations"; // visos lokacijos GeoJSON, reikia koordinatėms kai pasirenkame lokaciją
+import { useFilteredLocations } from "../../hooks/useFilteredLocations"; // filtruotos lokacijos, tik filtro santraukai rodyti (kiek rasta)
+import { useGenres } from "../../hooks/useGenres"; // žanrų sąrašas iš DB, filtro "Žanras" pill'ams generuoti
+
 import {
-  useFilterStore,
-  COUNTIES,
-  LOCATION_TYPES,
-  MEDIA_TYPES,
-  formatMediaType,
+  useFilterStore, //filtro būsena (Zustand)
+  COUNTIES, //statinis apskričių sąrašas
+  LOCATION_TYPES, //statinis lokacijų tipų sąrašas
+  MEDIA_TYPES, //statinis media tipų sąrašas
+  formatMediaType, //"tv", "Serialas" formatavimas
 } from "../../stores/filterStore";
 
 interface PillProps {
@@ -18,14 +22,17 @@ interface PillProps {
   onClick: () => void;
 }
 
+// ═══════════════════════════════════════════════
+// FILTRO MYGTUKAS
+// ═══════════════════════════════════════════════
 function Pill({ label, active, onClick }: PillProps) {
   return (
     <button
       type="button"
       onClick={onClick}
       style={{
-        background: active ? "rgba(201,168,76,0.15)" : "#1a1a1a",
-        border: `1px solid ${active ? "#c9a84c" : "#222222"}`,
+        background: active ? "rgba(201,168,76,0.15)" : "#1a1a1a", //aktyvus filtras bus auksinė spalva, neaktyvus - tamsus
+        border: `1px solid ${active ? "#c9a84c" : "#222222"}`, //rėmelis keičiasi priklausomai nuo aktyvumo
         color: active ? "#c9a84c" : "#9ca3af",
         borderRadius: 999,
         padding: "4px 10px",
@@ -60,19 +67,26 @@ const labelStyle: React.CSSProperties = {
   display: "block",
 };
 
+// ═══════════════════════════════════════════════
+// SEARCHBAR KOMPONENTAS
+// ═══════════════════════════════════════════════
 export default function SearchBar() {
-  const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const { data: results, isLoading } = useSearch(query);
-  const { data: locationsData } = useLocations();
+  const [query, setQuery] = useState("");//vartotojo įvestas tekstas paieškos lauke
+  const [open, setOpen] = useState(false);//ar rodomas rezultatų dropdown
+  const [filtersOpen, setFiltersOpen] = useState(false);//ar atidarytas filtrų skydelis
+  const [mounted, setMounted] = useState(false);//React SSR apsauga, filtro būsena tikrinama tik po mount
+  const [isMobile, setIsMobile] = useState(false);//responsive (mobiliuose prietaisuose slėpiame SearchBar kai atidarytas panel)
+  const containerRef = useRef<HTMLDivElement>(null);//nuoroda į visą komponentą - reikia "klik lauke" aptikimui
+// ═══════════════════════════════════════════════
+// HOOK'AI
+// ═══════════════════════════════════════════════
+  const { data: results, isLoading } = useSearch(query);//kviečia search_all per supabase.rpc()
+// results = [{ type: "location", title: "Trakų pilis", ... }, ...]
+  const { data: locationsData } = useLocations();//GeoJSON FeatureCollection - reikia koordinatėms
+// locationsData.features[i].geometry.coordinates = [lng, lat]
   const { data: filteredData } = useFilteredLocations();
-  const filteredCount = filteredData?.features?.length ?? 0;
-  const { data: genres } = useGenres();
+  const filteredCount = filteredData?.features?.length ?? 0;//skaičius filtro santraukai: "Rastos lokacijos: 12"
+  const { data: genres } = useGenres();//žanrų sąrašas: ["Drama", "Komedija", "Trileris", ...]
   const setSelectedLocation = useMapStore((s) => s.setSelectedLocation);
   const mapInstance = useMapStore((s) => s.mapInstance);
   const selectedLocationId = useMapStore((s) => s.selectedLocationId);
@@ -99,46 +113,53 @@ export default function SearchBar() {
     document.addEventListener("mousedown", onDown);
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
-
+// ═══════════════════════════════════════════════
+// MOBILAUS SLĖPIMAS
+// ═══════════════════════════════════════════════
   const isPanelOpen =
     selectedLocationId !== null ||
     selectedFilmId !== null ||
     selectedFilmDetailId !== null;
-  if (mounted && isMobile && isPanelOpen) return null;
-
+  if (mounted && isMobile && isPanelOpen) return null;//mobiliame įrenginyje kai atidarytas informacinis skydelis
+//SearchBar visiškai išnyksta — ekrano nėra kur abu sutalpinti
+// ═══════════════════════════════════════════════
+// REZULTATO PASIRINKIMAS
+// ═══════════════════════════════════════════════
   const handlePick = (r: SearchResult) => {
-    setOpen(false);
+    setOpen(false);//uždaro dropdown
     if (r.type === "location") {
       const slug = r.slug ?? r.id;
-      setQuery(r.title);
+      setQuery(r.title);//užpildo paieškos laukelį pavadinimu
+      // Randa lokacijos koordinates iš GeoJSON cache
       const feature = locationsData?.features.find(
         (f) => f.properties.id === slug,
       );
       if (feature && mapInstance) {
         const [lng, lat] = feature.geometry.coordinates as [number, number];
         mapInstance.easeTo({
-          center: [lng, lat],
-          zoom: Math.max(mapInstance.getZoom(), 13),
-          offset: [-160, 0],
-          duration: 700,
+          center: [lng, lat],//centralizuoja žemėlapį
+          zoom: Math.max(mapInstance.getZoom(), 13),//priartina (ne mažiau 13)
+          offset: [-160, 0],//pastumia į dešinę dėl skydelio
+          duration: 700,//700ms animacija
         });
       }
-      setSelectedLocation(slug);
+      setSelectedLocation(slug);//Zustand atidarys LocationPanel
       return;
     }
     if (r.type === "film") {
       setQuery(r.title);
-      useMapStore.getState().setSelectedFilmDetail(r.id);
+      useMapStore.getState().setSelectedFilmDetail(r.id);//atidaro filmo detalių rodinį tiesiogiai (ne per lokaciją)
       return;
     }
   };
 
   const showResults = open && query.trim().length >= 2;
-
-  // Active filter summary parts
+// ═══════════════════════════════════════════════
+// FILTRO SANTRAUKA
+// ═══════════════════════════════════════════════
   const summaryParts: string[] = [];
   if (filter.selectedGenres.length)
-    summaryParts.push(filter.selectedGenres.join(", "));
+    summaryParts.push(filter.selectedGenres.join(", "));//["Drama", "Trileris"] į "Drama, Trileris"
   if (filter.selectedMediaTypes.length)
     summaryParts.push(
       filter.selectedMediaTypes.map(formatMediaType).join(", "),
@@ -147,7 +168,8 @@ export default function SearchBar() {
   if (filter.minRating > 0 || filter.maxRating < 10)
     summaryParts.push(
       `${filter.minRating.toFixed(1)}–${filter.maxRating.toFixed(1)} ⭐`,
-    );
+    );//"7.0–10.0 ⭐"
+    // Galutinis rezultatas: "Rastos lokacijos: 5 · Drama · 7.0–10.0 ⭐ · Vilniaus"
   if (filter.yearFrom !== null || filter.yearTo !== null)
     summaryParts.push(`${filter.yearFrom ?? ""}–${filter.yearTo ?? ""}`);
   if (filter.selectedCounties.length)
@@ -482,7 +504,9 @@ onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#222222"; e.currentT
           </button>
         </div>
       )}
-
+// ═══════════════════════════════════════════════
+// REZULTATŲ RENDERINIMAS
+// ═══════════════════════════════════════════════
       {showResults && (
         <div
           role="listbox"
@@ -538,8 +562,8 @@ onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#222222"; e.currentT
                   <img
                     src={
                       r.type === "film"
-                        ? `https://image.tmdb.org/t/p/w92${r.image_url}`
-                        : r.image_url
+                        ? `https://image.tmdb.org/t/p/w92${r.image_url}` //filmams: TMDB CDN URL + poster_url (pvz. "/abc123.jpg")
+                        : r.image_url //lokacijoms: pilnas Cloudinary URL
                     }
                     alt=""
                     style={{
@@ -559,7 +583,7 @@ onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#222222"; e.currentT
                       background: "#1a1a1a",
                       flexShrink: 0,
                     }}
-                  />
+                  /> //placeholder jei nėra nuotraukos
                 )}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
@@ -571,7 +595,7 @@ onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#222222"; e.currentT
                       textOverflow: "ellipsis",
                     }}
                   >
-                    {r.title}
+                    {r.title} //pavadinimas
                   </div>
                   {r.subtitle && (
                     <div
@@ -583,7 +607,7 @@ onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#222222"; e.currentT
                         textOverflow: "ellipsis",
                       }}
                     >
-                      {r.subtitle}
+                      {r.subtitle} //lokacijai: apskritis, filmui: "2023 · Filmas"
                     </div>
                   )}
                 </div>
@@ -596,11 +620,9 @@ onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#222222"; e.currentT
                     flexShrink: 0,
                   }}
                 >
-                  {r.type === "location"
-  ? "Lokacija"
-  : r.media_type === "tv" || r.media_type === "series"
-  ? "Serialas"
-  : "Filmas"}
+                  {r.type === "location" ? "Lokacija"
+                    : r.media_type === "tv" || r.media_type === "series" ? "Serialas"
+                    : "Filmas"} // dešinėje auksinė etiketė
                 </span>
               </button>
             ))}

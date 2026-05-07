@@ -1,3 +1,7 @@
+//useLocationDetail.ts - enciklopedija
+//Žemėlapyje atsirado taškas, vartotojas jį paspaudė 
+//reikia visų įmanomų detalių apie tą vietą
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 
@@ -44,6 +48,8 @@ export interface LocationDetail {
   film_locations: FilmLocation[] | null;
 }
 
+//Nested Join iš Supabase surenka informaciją iš 3 skirtingų lentelių
+//sukonstruoja gilų objektą Sidebar'ui/atskiram puslapiui
 async function fetchLocationDetail(slug: string): Promise<LocationDetail | null> {
   const { data, error } = await supabase
     .from("locations_lt")
@@ -56,8 +62,9 @@ async function fetchLocationDetail(slug: string): Promise<LocationDetail | null>
          )
        )`,
     )
-    .eq("slug", slug)
-    .maybeSingle();
+    //kai ieškojome lokacijų sąrašo, naudojome filtrus (.in(), .or()). čia mes ieškome tiksliai
+    .eq("slug", slug)//stabdom paiešką kai randam tą ID(slug) įrašą, kuris atitinka vartotojo paspaustą
+    .maybeSingle();//jei nėra-null, ir ''vieta nerasta''
 
   if (error) throw error;
   return (data as unknown as LocationDetail) ?? null;
@@ -67,7 +74,8 @@ export function useLocationDetail(slug: string | null) {
   return useQuery({
     queryKey: ["location-detail", slug],
     queryFn: () => fetchLocationDetail(slug as string),
-    enabled: !!slug,
+    enabled: !!slug,//hook'as miega kol vartotojas nepaspaudžia ant konkretaus žymeklio
+    //5min
     staleTime: 5 * 60 * 1000,
   });
 }

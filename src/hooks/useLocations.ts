@@ -1,10 +1,12 @@
+//useLocations.ts - kiek iš viso LT turi tų taškų
+
 import { useQuery } from "@tanstack/react-query";
 import type { FeatureCollection, Point } from "geojson";
 import { supabase } from "../lib/supabase";
 import type { LocationProperties } from "../types/locations";
 
 export type LocationsCollection = FeatureCollection<Point, LocationProperties>;
-
+//LocationRow yra taisyklė, aprašanti, kokie duomenys atkeliaus iš duomenų bazės
 interface LocationRow {
   id: string;
   name: string;
@@ -15,34 +17,40 @@ interface LocationRow {
   lng: number;
   lat: number;
 }
-
-async function fetchLocationsGeoJson(): Promise<LocationsCollection> {
+//paima duomenis iš Supabase ir juos perpakuoja žemėlapiui.
+async function fetchLocationsGeoJson(): Promise<LocationsCollection> {//sukurs standartinį žemėlapio taškų rinkinį
+  //kreipiamės į duomenų bazę
   const { data, error } = await supabase
-    .from("locations_geojson")
+    .from("locations_geojson") //imame iš View lentelės
     .select("id, name, slug, county, location_type, image_url, lng, lat");
 
   if (error) throw error;
 
   const rows = (data ?? []) as LocationRow[];
 
+  //^ paprašėme duomenų bazės atsiųsti visus Lietuvos taškus. 
+  // Grįžta paprastas sąrašas (lentelė).
+
   return {
-    type: "FeatureCollection",
+    type: "FeatureCollection", //taškų nurodyta kolekcija
     features: rows
+    //saugiklis - filtravimas, išmeta lokacijas jei neturi koordinačių
       .filter(
         (loc) =>
           typeof loc.lng === "number" &&
           typeof loc.lat === "number" &&
           !!loc.slug,
       )
+      //map - iš db eilutės suformuoja GeoJSON objektą
       .map((loc) => ({
         type: "Feature",
         geometry: {
           type: "Point",
           coordinates: [loc.lng, loc.lat],
+          //įdedame koordinates ten, kur žemėlapis jų ieško
         },
-        properties: {
-          // Use slug as the canonical id so map selection state matches what
-          // LocationDetailPanel queries by (locations_lt.slug).
+        properties: {//likusi informacija
+         
           id: loc.slug as string,
           name: loc.name,
           slug: loc.slug ?? undefined,
@@ -56,8 +64,8 @@ async function fetchLocationsGeoJson(): Promise<LocationsCollection> {
 
 export function useLocations() {
   return useQuery({
-    queryKey: ["locations", "geojson"],
-    queryFn: fetchLocationsGeoJson,
+    queryKey: ["locations", "geojson"],//užvadinam
+    queryFn: fetchLocationsGeoJson, //kviečiam ankstesnę f-ją
     staleTime: 5 * 60 * 1000,
   });
 }

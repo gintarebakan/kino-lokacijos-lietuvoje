@@ -1,13 +1,18 @@
+//mapStore.ts - navigatorius, konteksto valdymas
+
 import { create } from "zustand";
 import type maplibregl from "maplibre-gl";
+// importuojame Zustand ir MapLibre tipus
 
-export type LayerStyle = "streets" | "satellite";
+export type LayerStyle = "streets" | "satellite"; //žemėlapio stilius gali būti tik šie žodžiai
 
-interface MapState {
-  mapInstance: maplibregl.Map | null;
-  zoom: number;
+interface MapState { //griežtas brėžinys ką Navigatorius turi sekti
+  mapInstance: maplibregl.Map | null;//Kai žemėlapis pirmą kartą užsikrauna, jis įdeda save į šį Zustand store (per funkciją setMap).
+  //bet kuris mygtukas gali pasakyti: useMapStore.getState().mapInstance.flyTo({ center: [Vilnius] })
+  //saugome variklį, kad galėtume jį valdyti iš bet kurio programėlės kampo.
+  zoom: number;//ka dabar mato vartotojo akys
   center: [number, number];
-  selectedLocationId: string | null;
+  selectedLocationId: string | null;//Koks informacinis langas dabar atidarytas kairėje pusėje
   selectedFilmId: string | null;
   selectedFilmLocationId: string | null;
   savedLocationIds: string[];
@@ -17,7 +22,7 @@ interface MapState {
   selectedFilmDetailId: string | null;
   routeGeoJSON: number[][] | null;
   selectedCollectionId: string | null;
-  previousCollectionId: string | null;
+  previousCollectionId: string | null;//Iš kur vartotojas čia atėjo ir ar turime palikti nupieštą maršruto liniją?
   previousFilmDetailId: string | null;
   openLocationFromCollection: (locationSlug: string, collectionId: string) => void;
 
@@ -74,19 +79,9 @@ export const useMapStore = create<MapState>((set) => ({
       ...(id ? { selectedCollectionId: null } : {}),
     }),
 
-  // Location — clicked from map marker (keeps route line)
-  setSelectedLocationFromMap: (id) =>
-    set((state) => ({
-      selectedLocationId: id,
-      selectedFilmId: null,
-      selectedFilmLocationId: null,
-      selectedFilmDetailId: null,
-      ...(id ? { selectedCollectionId: null } : {}),
-      // Keep route only if coming from a collection context
-      routeGeoJSON: state.previousCollectionId ? state.routeGeoJSON : null,
-    })),
 
-  // Location — clicked from Discover page (clears everything)
+
+  // Atėjimas iš Atradimų puslapio (viską panaikina):
   setSelectedLocationFromDiscover: (id) =>
     set({
       selectedLocationId: id,
@@ -97,6 +92,19 @@ export const useMapStore = create<MapState>((set) => ({
       previousCollectionId: null,
       routeGeoJSON: null,
     }),
+    
+  // Paspaudimas tiesiogiai žemėlapyje:
+  setSelectedLocationFromMap: (id) =>
+    set((state) => ({
+      selectedLocationId: id,
+      selectedFilmId: null,
+      selectedFilmLocationId: null,
+      selectedFilmDetailId: null,
+      ...(id ? { selectedCollectionId: null } : {}),
+      // Keep route only if coming from a collection context
+      //Jei atidarome naują lokaciją, automatiškai uždarome atidarytas kolekcijas. Jei tik išvalome lokaciją, kolekcijų neliesti
+      routeGeoJSON: state.previousCollectionId ? state.routeGeoJSON : null,
+    })),
 
   // Film
   setSelectedFilm: (filmId, filmLocationId) =>
@@ -124,7 +132,7 @@ export const useMapStore = create<MapState>((set) => ({
         previousCollectionId: null,
       } : {}),
     }),
-
+//Atidarymas iš Maršruto (Kolekcijos) sąrašo:
 openLocationFromCollection: (locationSlug, collectionId) =>
   set({
     selectedLocationId: locationSlug,
@@ -142,13 +150,15 @@ openLocationFromCollection: (locationSlug, collectionId) =>
   // Route
   setRouteGeoJSON: (coords) => set({ routeGeoJSON: coords }),
 
-  // Saved
+  // Išsaugoto mygtuko logika
   toggleSaved: (id) =>
     set((state) => ({
       savedLocationIds: state.savedLocationIds.includes(id)
         ? state.savedLocationIds.filter((s) => s !== id)
         : [...state.savedLocationIds, id],
     })),
+    //Jei lokacijos ID jau yra išsaugotų sąraše (includes(id)), mes naudojame .filter(), kad sukurtume naują sąrašą be šio ID (nuimame PATIKIMĄ)
+    //Jei jo ten nėra, mes paimame visus senus ID (...state.savedLocationIds) ir į sąrašo galą pridedame naują (uždedame PATIKIMĄ)
   setSavedLocationIds: (ids) => set({ savedLocationIds: ids }),
 
   // Layer
