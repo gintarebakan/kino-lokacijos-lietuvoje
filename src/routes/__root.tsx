@@ -45,6 +45,7 @@ function RootComponent() {
   const location = useLocation();
   const isMapRoute = location.pathname === "/map";
   const isSavedRoute = location.pathname === "/saved";
+  const isAdminRoute = location.pathname.startsWith("/admin");
   const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 768);
 
   useEffect(() => {
@@ -54,6 +55,11 @@ function RootComponent() {
     setIsDesktop(mq.matches);
     return () => mq.removeEventListener("change", handler);
   }, []);
+
+  // Admin routes render without the main app layout
+  if (isAdminRoute) {
+    return <Outlet />;
+  }
 
   const contentStyle: React.CSSProperties = {
     position: "fixed",
@@ -70,7 +76,7 @@ function RootComponent() {
       <div style={contentStyle}>
 
         {/* Persistent map layer — visible on /map and /saved */}
-<div style={{
+        <div style={{
           position: "absolute",
           top: 0, left: 0, right: 0, bottom: 0,
           visibility: (isMapRoute || isSavedRoute) ? "visible" : "hidden",

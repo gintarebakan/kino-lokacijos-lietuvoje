@@ -2,17 +2,19 @@ import { createFileRoute, useNavigate, Outlet, Link, useLocation } from "@tansta
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 
-export const Route = createFileRoute("/admin/")({
-  component: AdminLayout,
-});
+
 
 const NAV_ITEMS = [
   { to: "/admin/locations", label: "Lokacijos" },
   { to: "/admin/films", label: "Filmai" },
   { to: "/admin/film-locations", label: "Filmo lokacijos" },
   { to: "/admin/collections", label: "Kolekcijos" },
-  { to: "/admin/collection-locations", label: "Kolekcijų lokacijos" },
+  { to: "/admin/collection-locations", label: "Kolekciju lokacijos" },
 ];
+
+export const Route = createFileRoute("/admin")({
+  component: AdminLayout,
+});
 
 export default function AdminLayout() {
   const navigate = useNavigate();
