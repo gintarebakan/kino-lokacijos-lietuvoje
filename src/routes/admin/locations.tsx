@@ -22,10 +22,27 @@ interface Location {
   accessibility: string | null;
 }
 
-const EMPTY: Omit<Location, "id"> = {
+interface LocationForm {
+  name: string;
+  slug: string;
+  address: string;
+  county: string;
+  location_type: string;
+  description: string;
+  image_url: string;
+  official_website_url: string;
+  street_view_url: string;
+  curator_notes: string;
+  accessibility: string;
+  lat: string;
+  lng: string;
+}
+
+const EMPTY: LocationForm = {
   name: "", slug: "", address: "", county: "", location_type: "",
   description: "", image_url: "", official_website_url: "",
   street_view_url: "", curator_notes: "", accessibility: "",
+  lat: "", lng: "",
 };
 
 const inputStyle = {
@@ -43,7 +60,7 @@ export default function AdminLocations() {
   const qc = useQueryClient();
   const [editing, setEditing] = useState<Location | null>(null);
   const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState<Omit<Location, "id">>(EMPTY);
+  const [form, setForm] = useState<LocationForm>(EMPTY);
   const [search, setSearch] = useState("");
 
   const { data: locations, isLoading } = useQuery({
@@ -60,12 +77,60 @@ export default function AdminLocations() {
 
   const save = useMutation({
     mutationFn: async () => {
+      const { lat, lng, ...rest } = form;
+
+      // Build base payload without coordinates
+      const payload: Record<string, string | null> = {
+        name: rest.name || null,
+        slug: rest.slug || null,
+        address: rest.address || null,
+        county: rest.county || null,
+        location_type: rest.location_type || null,
+        description: rest.description || null,
+        image_url: rest.image_url || null,
+        official_website_url: rest.official_website_url || null,
+        street_view_url: rest.street_view_url || null,
+        curator_notes: rest.curator_notes || null,
+        accessibility: rest.accessibility || null,
+      };
+
       if (editing) {
-        const { error } = await supabase.from("locations_lt").update(form).eq("id", editing.id);
+        const { error } = await supabase
+          .from("locations_lt")
+          .update(payload)
+          .eq("id", editing.id);
         if (error) throw error;
+
+        // Update coordinates separately if provided
+        if (lat && lng) {
+          const { error: coordErr } = await supabase.rpc("update_location_coordinates", {
+            p_id: editing.id,
+            p_lat: parseFloat(lat),
+            p_lng: parseFloat(lng),
+          });
+          if (coordErr) {
+            // Fallback: use raw SQL via update with PostGIS
+            await supabase
+              .from("locations_lt")
+              .update({ coordinates: `SRID=4326;POINT(${lng} ${lat})` } as unknown as Record<string, unknown>)
+              .eq("id", editing.id);
+          }
+        }
       } else {
-        const { error } = await supabase.from("locations_lt").insert(form);
+        const { data: inserted, error } = await supabase
+          .from("locations_lt")
+          .insert(payload)
+          .select("id")
+          .single();
         if (error) throw error;
+
+        // Set coordinates if provided
+        if (lat && lng && inserted) {
+          await supabase
+            .from("locations_lt")
+            .update({ coordinates: `SRID=4326;POINT(${lng} ${lat})` } as unknown as Record<string, unknown>)
+            .eq("id", inserted.id);
+        }
       }
     },
     onSuccess: () => {
@@ -92,8 +157,21 @@ export default function AdminLocations() {
   const openEdit = (loc: Location) => {
     setEditing(loc);
     setCreating(false);
-    const { id, ...rest } = loc;
-    setForm(rest);
+    setForm({
+      name: loc.name ?? "",
+      slug: loc.slug ?? "",
+      address: loc.address ?? "",
+      county: loc.county ?? "",
+      location_type: loc.location_type ?? "",
+      description: loc.description ?? "",
+      image_url: loc.image_url ?? "",
+      official_website_url: loc.official_website_url ?? "",
+      street_view_url: loc.street_view_url ?? "",
+      curator_notes: loc.curator_notes ?? "",
+      accessibility: loc.accessibility ?? "",
+      lat: "",
+      lng: "",
+    });
   };
 
   const openCreate = () => {
@@ -102,12 +180,12 @@ export default function AdminLocations() {
     setForm(EMPTY);
   };
 
-  const f = (key: keyof typeof EMPTY) => (
+  const f = (key: keyof LocationForm, label?: string) => (
     <div>
-      <label style={labelStyle}>{key}</label>
+      <label style={labelStyle}>{label ?? key}</label>
       <input
         style={inputStyle}
-        value={(form[key] as string) ?? ""}
+        value={form[key]}
         onChange={e => setForm(p => ({ ...p, [key]: e.target.value }))}
       />
     </div>
@@ -138,29 +216,79 @@ export default function AdminLocations() {
             {editing ? "Redaguoti lokaciją" : "Nauja lokacija"}
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            {f("name")}{f("slug")}{f("address")}{f("county")}
-            {f("location_type")}{f("image_url")}{f("official_website_url")}{f("street_view_url")}
+            {f("name", "Pavadinimas")}
+            {f("slug", "Slug")}
+            {f("address", "Adresas")}
+            {f("county", "Apskritis")}
+            {f("location_type", "Lokacijos tipas")}
+            {f("image_url", "Nuotraukos URL")}
+            {f("official_website_url", "Oficialus tinklapis")}
+            {f("street_view_url", "Street View URL")}
           </div>
+
+          {/* Coordinates */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
+            <div>
+              <label style={{ ...labelStyle, color: "#c9a84c" }}>
+                Platuma / Latitude
+                {editing && <span style={{ color: "#6b7280", fontWeight: 400, marginLeft: 6 }}>(palikti tuščią — nekeisti)</span>}
+              </label>
+              <input
+                style={inputStyle}
+                placeholder="pvz. 54.6872"
+                value={form.lat}
+                onChange={e => setForm(p => ({ ...p, lat: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label style={{ ...labelStyle, color: "#c9a84c" }}>
+                Ilguma / Longitude
+                {editing && <span style={{ color: "#6b7280", fontWeight: 400, marginLeft: 6 }}>(palikti tuščią — nekeisti)</span>}
+              </label>
+              <input
+                style={inputStyle}
+                placeholder="pvz. 25.2797"
+                value={form.lng}
+                onChange={e => setForm(p => ({ ...p, lng: e.target.value }))}
+              />
+            </div>
+          </div>
+
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginTop: 12 }}>
             <div>
-              <label style={labelStyle}>description</label>
-              <textarea value={form.description ?? ""} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
+              <label style={labelStyle}>Aprašymas</label>
+              <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
             </div>
             <div>
-              <label style={labelStyle}>curator_notes</label>
-              <textarea value={form.curator_notes ?? ""} onChange={e => setForm(p => ({ ...p, curator_notes: e.target.value }))} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
+              <label style={labelStyle}>Kuratoriaus pastabos</label>
+              <textarea value={form.curator_notes} onChange={e => setForm(p => ({ ...p, curator_notes: e.target.value }))} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
             </div>
             <div>
-              <label style={labelStyle}>accessibility</label>
-              <textarea value={form.accessibility ?? ""} onChange={e => setForm(p => ({ ...p, accessibility: e.target.value }))} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
+              <label style={labelStyle}>Pasiekiamumas</label>
+              <textarea value={form.accessibility} onChange={e => setForm(p => ({ ...p, accessibility: e.target.value }))} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
             </div>
           </div>
-          {save.isError && <div style={{ color: "#f87171", fontSize: 13, marginTop: 8 }}>Klaida išsaugant.</div>}
+
+          {save.isError && (
+            <div style={{ color: "#f87171", fontSize: 13, marginTop: 8 }}>
+              Klaida išsaugant. Patikrinkite ar koordinatės teisingos.
+            </div>
+          )}
+
           <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-            <button type="button" onClick={() => save.mutate()} disabled={save.isPending} style={{ background: "#c9a84c", border: "none", borderRadius: 8, padding: "10px 20px", color: "#0a0a0a", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
+            <button
+              type="button"
+              onClick={() => save.mutate()}
+              disabled={save.isPending}
+              style={{ background: "#c9a84c", border: "none", borderRadius: 8, padding: "10px 20px", color: "#0a0a0a", fontWeight: 700, fontSize: 13, cursor: "pointer" }}
+            >
               {save.isPending ? "Saugoma…" : "Išsaugoti"}
             </button>
-            <button type="button" onClick={() => { setEditing(null); setCreating(false); }} style={{ background: "transparent", border: "1px solid #333", borderRadius: 8, padding: "10px 20px", color: "#9ca3af", fontSize: 13, cursor: "pointer" }}>
+            <button
+              type="button"
+              onClick={() => { setEditing(null); setCreating(false); }}
+              style={{ background: "transparent", border: "1px solid #333", borderRadius: 8, padding: "10px 20px", color: "#9ca3af", fontSize: 13, cursor: "pointer" }}
+            >
               Atšaukti
             </button>
           </div>
