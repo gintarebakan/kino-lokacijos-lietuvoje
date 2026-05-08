@@ -620,7 +620,7 @@ onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#222222"; e.currentT
                 >
                   {r.type === "location" ? "Lokacija"
                     : r.media_type === "tv" || r.media_type === "series" ? "Serialas"
-                    : "Filmas"} // dešinėje auksinė etiketė
+                    : "Filmas"}
                 </span>
               </button>
             ))}

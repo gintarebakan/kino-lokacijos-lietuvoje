@@ -71,13 +71,14 @@ export default function MapViewer() {
     const initialCenter = store.hasUserMoved ? store.center : DEFAULT_MAP_CENTER;
     const initialZoom = store.hasUserMoved ? store.zoom : DEFAULT_MAP_ZOOM;
 
-    const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: STYLE_URLS[store.layerStyle],
-      center: initialCenter,
-      zoom: initialZoom,
-      attributionControl: false,
-    });
+const map = new maplibregl.Map({
+  container: containerRef.current,
+  style: STYLE_URLS[store.layerStyle],
+  center: initialCenter,
+  zoom: initialZoom,
+  attributionControl: false,
+  renderWorldCopies: false, 
+});
 
     map.addControl(
       new maplibregl.AttributionControl({ compact: true }),
