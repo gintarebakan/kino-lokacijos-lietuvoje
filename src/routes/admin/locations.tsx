@@ -79,7 +79,6 @@ export default function AdminLocations() {
     mutationFn: async () => {
       const { lat, lng, ...rest } = form;
 
-      // Build base payload without coordinates
       const payload: Record<string, string | null> = {
         name: rest.name || null,
         slug: rest.slug || null,
@@ -101,20 +100,13 @@ export default function AdminLocations() {
           .eq("id", editing.id);
         if (error) throw error;
 
-        // Update coordinates separately if provided
         if (lat && lng) {
           const { error: coordErr } = await supabase.rpc("update_location_coordinates", {
             p_id: editing.id,
             p_lat: parseFloat(lat),
             p_lng: parseFloat(lng),
           });
-          if (coordErr) {
-            // Fallback: use raw SQL via update with PostGIS
-            await supabase
-              .from("locations_lt")
-              .update({ coordinates: `SRID=4326;POINT(${lng} ${lat})` } as unknown as Record<string, unknown>)
-              .eq("id", editing.id);
-          }
+          if (coordErr) throw coordErr;
         }
       } else {
         const { data: inserted, error } = await supabase
@@ -124,12 +116,13 @@ export default function AdminLocations() {
           .single();
         if (error) throw error;
 
-        // Set coordinates if provided
         if (lat && lng && inserted) {
-          await supabase
-            .from("locations_lt")
-            .update({ coordinates: `SRID=4326;POINT(${lng} ${lat})` } as unknown as Record<string, unknown>)
-            .eq("id", inserted.id);
+          const { error: coordErr } = await supabase.rpc("update_location_coordinates", {
+            p_id: inserted.id,
+            p_lat: parseFloat(lat),
+            p_lng: parseFloat(lng),
+          });
+          if (coordErr) throw coordErr;
         }
       }
     },
@@ -209,7 +202,6 @@ export default function AdminLocations() {
 
       {isLoading && <div style={{ color: "#9ca3af" }}>Kraunama…</div>}
 
-      {/* Form panel */}
       {(editing || creating) && (
         <div style={{ background: "#111111", border: "1px solid #222", borderRadius: 12, padding: 24, marginBottom: 24 }}>
           <h2 style={{ margin: "0 0 20px", color: "#c9a84c", fontSize: 16 }}>
@@ -226,7 +218,6 @@ export default function AdminLocations() {
             {f("street_view_url", "Street View URL")}
           </div>
 
-          {/* Coordinates */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
             <div>
               <label style={{ ...labelStyle, color: "#c9a84c" }}>
@@ -295,7 +286,6 @@ export default function AdminLocations() {
         </div>
       )}
 
-      {/* Table */}
       <div style={{ background: "#111111", border: "1px solid #222", borderRadius: 12, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
