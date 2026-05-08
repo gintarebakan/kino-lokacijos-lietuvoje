@@ -504,9 +504,7 @@ onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#222222"; e.currentT
           </button>
         </div>
       )}
-// ═══════════════════════════════════════════════
-// REZULTATŲ RENDERINIMAS
-// ═══════════════════════════════════════════════
+
       {showResults && (
         <div
           role="listbox"
