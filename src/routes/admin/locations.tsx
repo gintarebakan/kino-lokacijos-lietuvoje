@@ -90,12 +90,15 @@ const labelStyle = {
   marginBottom: 4, textTransform: "uppercase" as const, letterSpacing: "0.08em",
 };
 
+const required = <span style={{ color: "#f87171", marginLeft: 4 }}>*</span>;
+
 export default function AdminLocations() {
   const qc = useQueryClient();
   const [editing, setEditing] = useState<Location | null>(null);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<LocationForm>(EMPTY);
   const [search, setSearch] = useState("");
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const { data: locations, isLoading } = useQuery({
     queryKey: ["admin-locations"],
@@ -142,8 +145,6 @@ export default function AdminLocations() {
           if (coordErr) throw coordErr;
         }
       } else {
-        if (!lat || !lng) throw new Error("Koordinatės privalomos kuriant naują lokaciją.");
-
         const { error: coordInsertErr } = await supabase.rpc("insert_location_with_coordinates", {
           p_name: payload.name,
           p_slug: payload.slug,
@@ -166,8 +167,20 @@ export default function AdminLocations() {
       setEditing(null);
       setCreating(false);
       setForm(EMPTY);
+      setValidationError(null);
     },
   });
+
+  const handleSave = () => {
+    setValidationError(null);
+    if (!form.name.trim()) { setValidationError("Pavadinimas privalomas."); return; }
+    if (!form.slug.trim()) { setValidationError("Slug privalomas."); return; }
+    if (creating && (!form.lat.trim() || !form.lng.trim())) {
+      setValidationError("Koordinatės privalomos kuriant naują lokaciją.");
+      return;
+    }
+    save.mutate();
+  };
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
@@ -185,6 +198,7 @@ export default function AdminLocations() {
   const openEdit = (loc: Location) => {
     setEditing(loc);
     setCreating(false);
+    setValidationError(null);
     setForm({
       name: loc.name ?? "",
       slug: loc.slug ?? "",
@@ -201,17 +215,6 @@ export default function AdminLocations() {
     });
   };
 
-  const f = (key: keyof LocationForm, label: string) => (
-    <div>
-      <label style={labelStyle}>{label}</label>
-      <input
-        style={inputStyle}
-        value={form[key]}
-        onChange={e => setForm(p => ({ ...p, [key]: e.target.value }))}
-      />
-    </div>
-  );
-
   const sel = (key: keyof LocationForm, label: string, options: string[]) => (
     <div>
       <label style={labelStyle}>{label}</label>
@@ -226,11 +229,22 @@ export default function AdminLocations() {
     </div>
   );
 
+  const f = (key: keyof LocationForm, label: string) => (
+    <div>
+      <label style={labelStyle}>{label}</label>
+      <input
+        style={inputStyle}
+        value={form[key]}
+        onChange={e => setForm(p => ({ ...p, [key]: e.target.value }))}
+      />
+    </div>
+  );
+
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <h1 style={{ margin: 0, color: "#f5f5f5", fontSize: 22, fontFamily: "Georgia, serif" }}>Lokacijos</h1>
-        <button type="button" onClick={() => { setEditing(null); setCreating(true); setForm(EMPTY); }}
+        <button type="button" onClick={() => { setEditing(null); setCreating(true); setForm(EMPTY); setValidationError(null); }}
           style={{ background: "#c9a84c", border: "none", borderRadius: 8, padding: "10px 20px", color: "#0a0a0a", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
           + Pridėti
         </button>
@@ -248,8 +262,20 @@ export default function AdminLocations() {
           </h2>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            {f("name", "Pavadinimas")}
-            {f("slug", "Slug")}
+            {/* Name — required */}
+            <div>
+              <label style={labelStyle}>Pavadinimas {required}</label>
+              <input style={inputStyle} value={form.name}
+                onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
+            </div>
+
+            {/* Slug — required */}
+            <div>
+              <label style={labelStyle}>Slug {required}</label>
+              <input style={inputStyle} value={form.slug}
+                onChange={e => setForm(p => ({ ...p, slug: e.target.value }))} />
+            </div>
+
             {f("address", "Adresas")}
             {sel("county", "Apskritis", COUNTIES)}
             {sel("location_type", "Lokacijos tipas", LOCATION_TYPES)}
@@ -263,8 +289,8 @@ export default function AdminLocations() {
             <div>
               <label style={{ ...labelStyle, color: "#c9a84c" }}>
                 Platuma / Latitude
+                {creating && <span style={{ color: "#f87171", marginLeft: 4 }}>*</span>}
                 {editing && <span style={{ color: "#6b7280", fontWeight: 400, marginLeft: 6 }}>(palikti tuščią — nekeisti)</span>}
-                {creating && <span style={{ color: "#f87171", marginLeft: 6 }}>*privaloma</span>}
               </label>
               <input style={inputStyle} placeholder="pvz. 54.6872"
                 value={form.lat} onChange={e => setForm(p => ({ ...p, lat: e.target.value }))} />
@@ -272,8 +298,8 @@ export default function AdminLocations() {
             <div>
               <label style={{ ...labelStyle, color: "#c9a84c" }}>
                 Ilguma / Longitude
+                {creating && <span style={{ color: "#f87171", marginLeft: 4 }}>*</span>}
                 {editing && <span style={{ color: "#6b7280", fontWeight: 400, marginLeft: 6 }}>(palikti tuščią — nekeisti)</span>}
-                {creating && <span style={{ color: "#f87171", marginLeft: 6 }}>*privaloma</span>}
               </label>
               <input style={inputStyle} placeholder="pvz. 25.2797"
                 value={form.lng} onChange={e => setForm(p => ({ ...p, lng: e.target.value }))} />
@@ -293,18 +319,18 @@ export default function AdminLocations() {
             </div>
           </div>
 
-          {save.isError && (
+          {(validationError || save.isError) && (
             <div style={{ color: "#f87171", fontSize: 13, marginTop: 8 }}>
-              {(save.error as Error)?.message ?? "Klaida išsaugant."}
+              {validationError ?? (save.error as Error)?.message ?? "Klaida išsaugant."}
             </div>
           )}
 
           <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-            <button type="button" onClick={() => save.mutate()} disabled={save.isPending}
+            <button type="button" onClick={handleSave} disabled={save.isPending}
               style={{ background: "#c9a84c", border: "none", borderRadius: 8, padding: "10px 20px", color: "#0a0a0a", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
               {save.isPending ? "Saugoma…" : "Išsaugoti"}
             </button>
-            <button type="button" onClick={() => { setEditing(null); setCreating(false); }}
+            <button type="button" onClick={() => { setEditing(null); setCreating(false); setValidationError(null); }}
               style={{ background: "transparent", border: "1px solid #333", borderRadius: 8, padding: "10px 20px", color: "#9ca3af", fontSize: 13, cursor: "pointer" }}>
               Atšaukti
             </button>
