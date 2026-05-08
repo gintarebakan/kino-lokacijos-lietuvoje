@@ -70,32 +70,24 @@ export default function AdminFilms() {
       setTmdbError("Įveskite TMDB ID pirmiau.");
       return;
     }
+    if (!form.media_type) {
+      setTmdbError("Pasirinkite tipą (Filmas arba Serialas) prieš užpildant.");
+      return;
+    }
     setTmdbLoading(true);
     setTmdbError(null);
     setTmdbSuccess(null);
 
     try {
       const id = form.tmdb_id.trim();
+      const endpoint = form.media_type === "series" ? "tv" : "movie";
 
-      // Auto-detect: try movie first, then TV
-      let data: Record<string, unknown> = {};
-      let detectedType = "film";
-
-      const movieRes = await fetch(
-        `https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}&language=lt-LT&append_to_response=credits,videos,external_ids`
+      const res = await fetch(
+        `https://api.themoviedb.org/3/${endpoint}/${id}?api_key=${TMDB_KEY}&language=lt-LT&append_to_response=credits,videos,external_ids`
       );
+      if (!res.ok) throw new Error(`TMDB ID ${id} nerastas ${form.media_type === "series" ? "serialų" : "filmų"} bazėje.`);
 
-      if (movieRes.ok) {
-        data = await movieRes.json();
-        detectedType = "film";
-      } else {
-        const tvRes = await fetch(
-          `https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_KEY}&language=lt-LT&append_to_response=credits,videos,external_ids`
-        );
-        if (!tvRes.ok) throw new Error("TMDB ID nerastas nei filmų, nei serialų bazėje.");
-        data = await tvRes.json();
-        detectedType = "series";
-      }
+      const data = await res.json() as Record<string, unknown>;
 
       // Extract crew/cast
       const credits = data.credits as { crew?: { job: string; name: string }[]; cast?: { name: string }[] } | undefined;
@@ -127,7 +119,7 @@ export default function AdminFilms() {
       const externalIds = data.external_ids as { imdb_id?: string } | undefined;
       const imdbId = externalIds?.imdb_id ?? "";
 
-      // Rating — TMDB vote_average (same source as IMDb)
+      // Rating
       const rating = data.vote_average as number | undefined;
 
       // Titles
@@ -136,7 +128,6 @@ export default function AdminFilms() {
 
       setForm(p => ({
         ...p,
-        media_type: detectedType,
         title_lt: titleLt || p.title_lt,
         title_orig: titleOrig || p.title_orig,
         year: year || p.year,
@@ -150,7 +141,7 @@ export default function AdminFilms() {
         imdb_rating: rating ? rating.toFixed(1) : p.imdb_rating,
       }));
 
-      setTmdbSuccess(`Rastas: ${detectedType === "film" ? "Filmas" : "Serialas"} — ${titleOrig || titleLt}`);
+      setTmdbSuccess(`✓ Rastas: ${titleOrig || titleLt} (${year})`);
     } catch (e) {
       setTmdbError((e as Error).message ?? "Klaida gaunant duomenis iš TMDB.");
     }
@@ -262,25 +253,38 @@ export default function AdminFilms() {
             <div style={{ fontSize: 11, color: "#c9a84c", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12, fontWeight: 600 }}>
               Automatinis užpildymas iš TMDB
             </div>
-            <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
-              <div style={{ flex: 1 }}>
-                <label style={labelStyle}>TMDB ID</label>
-                <input style={inputStyle} placeholder="pvz. 550" value={form.tmdb_id}
-                  onChange={e => setForm(p => ({ ...p, tmdb_id: e.target.value }))} />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 8, alignItems: "flex-end" }}>
+              <div>
+                <label style={labelStyle}>TMDB ID <span style={{ color: "#f87171" }}>*</span></label>
+                <input style={inputStyle} placeholder="pvz. 228034"
+                  value={form.tmdb_id}
+                  onChange={e => { setForm(p => ({ ...p, tmdb_id: e.target.value })); setTmdbError(null); setTmdbSuccess(null); }} />
+              </div>
+              <div>
+                <label style={labelStyle}>Tipas <span style={{ color: "#f87171" }}>*</span></label>
+                <select
+                  value={form.media_type}
+                  onChange={e => { setForm(p => ({ ...p, media_type: e.target.value })); setTmdbError(null); setTmdbSuccess(null); }}
+                  style={inputStyle}
+                >
+                  <option value="">— Pasirinkti —</option>
+                  <option value="film">Filmas (/movie/)</option>
+                  <option value="series">Serialas (/tv/)</option>
+                </select>
               </div>
               <button type="button" onClick={fetchFromTMDB} disabled={tmdbLoading}
-                style={{ background: "#c9a84c", border: "none", borderRadius: 8, padding: "9px 18px", color: "#0a0a0a", fontWeight: 700, fontSize: 13, cursor: tmdbLoading ? "not-allowed" : "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>
+                style={{ background: "#c9a84c", border: "none", borderRadius: 8, padding: "9px 18px", color: "#0a0a0a", fontWeight: 700, fontSize: 13, cursor: tmdbLoading ? "not-allowed" : "pointer", whiteSpace: "nowrap" }}>
                 {tmdbLoading ? "Kraunama…" : "⟳ Užpildyti"}
               </button>
             </div>
             {tmdbSuccess && (
-              <div style={{ color: "#4ade80", fontSize: 12, marginTop: 8 }}>✓ {tmdbSuccess}</div>
+              <div style={{ color: "#4ade80", fontSize: 12, marginTop: 8 }}>{tmdbSuccess}</div>
             )}
             {tmdbError && (
               <div style={{ color: "#f87171", fontSize: 12, marginTop: 8 }}>✗ {tmdbError}</div>
             )}
             <div style={{ color: "#6b7280", fontSize: 11, marginTop: 8 }}>
-              Tipas (filmas/serialas) nustatomas automatiškai. Reitingas imamas iš TMDB.
+              TMDB URL pavyzdys: themoviedb.org/<strong>tv</strong>/228034 → Tipas: Serialas
             </div>
           </div>
 
@@ -288,12 +292,13 @@ export default function AdminFilms() {
             {f("title_lt", "Pavadinimas (LT)")}
             {f("title_orig", "Originalus pavadinimas")}
             <div>
-              <label style={labelStyle}>Tipas (auto)</label>
+              <label style={labelStyle}>Tipas</label>
               <input style={{ ...inputStyle, color: form.media_type ? "#c9a84c" : "#6b7280" }}
-                value={form.media_type === "film" ? "Filmas" : form.media_type === "series" ? "Serialas" : "—"} readOnly />
+                value={form.media_type === "film" ? "Filmas" : form.media_type === "series" ? "Serialas" : "—"}
+                readOnly />
             </div>
             {f("year", "Metai")}
-            {f("imdb_rating", "Reitingas (auto)")}
+            {f("imdb_rating", "Reitingas")}
             {f("imdb_url", "IMDb URL")}
             {f("poster_url", "Plakato URL (TMDB kelias)")}
             {f("trailer_key", "YouTube trailer key")}
