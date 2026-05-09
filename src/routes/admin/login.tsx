@@ -32,7 +32,7 @@ navigate({ to: "/admin/locations" });
   return (
     <div style={{
       minHeight: "100dvh",
-      background: "#c9a84c",
+      background: "#111111",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
