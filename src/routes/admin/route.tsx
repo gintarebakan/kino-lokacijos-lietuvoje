@@ -2,8 +2,6 @@ import { createFileRoute, useNavigate, Outlet, Link, useLocation } from "@tansta
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 
-
-
 const NAV_ITEMS = [
   { to: "/admin/locations", label: "Lokacijos" },
   { to: "/admin/films", label: "Filmai" },
@@ -22,21 +20,25 @@ export default function AdminLayout() {
   const [checking, setChecking] = useState(true);
   const [authed, setAuthed] = useState(false);
 
+  const isLoginPage = location.pathname === "/admin/login";
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
-        navigate({ to: "/admin/login" });
+        if (!isLoginPage) {
+          navigate({ to: "/admin/login" });
+        }
       } else {
         setAuthed(true);
       }
       setChecking(false);
     });
-  }, []);
+  }, [isLoginPage]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate({ to: "/admin/login" });
-  };
+  // Login puslapis — renderinti be layout ir be sesijos tikrinimo blokavimo
+  if (isLoginPage) {
+    return <Outlet />;
+  }
 
   if (checking) return (
     <div style={{ minHeight: "100dvh", background: "#0a0a0a", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -94,7 +96,10 @@ export default function AdminLayout() {
         <div style={{ padding: "12px 8px 24px" }}>
           <button
             type="button"
-            onClick={handleLogout}
+            onClick={async () => {
+              await supabase.auth.signOut();
+              navigate({ to: "/admin/login" });
+            }}
             style={{
               width: "100%",
               padding: "10px 12px",
