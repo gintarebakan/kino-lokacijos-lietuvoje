@@ -82,14 +82,20 @@ export default function AdminFilms() {
       const id = form.tmdb_id.trim();
       const endpoint = form.media_type === "series" ? "tv" : "movie";
 
-      const res = await fetch(
-        `https://api.themoviedb.org/3/${endpoint}/${id}?api_key=${TMDB_KEY}&language=lt-LT&append_to_response=credits,videos,external_ids`
+      // 1. Angliškai — žanrai, aktoriai, metaduomenys, trailiai
+      const resEn = await fetch(
+        `https://api.themoviedb.org/3/${endpoint}/${id}?api_key=${TMDB_KEY}&language=en-US&append_to_response=credits,videos,external_ids`
       );
-      if (!res.ok) throw new Error(`TMDB ID ${id} nerastas ${form.media_type === "series" ? "serialų" : "filmų"} bazėje.`);
+      if (!resEn.ok) throw new Error(`TMDB ID ${id} nerastas ${form.media_type === "series" ? "serialų" : "filmų"} bazėje.`);
+      const data = await resEn.json() as Record<string, unknown>;
 
-      const data = await res.json() as Record<string, unknown>;
+      // 2. Lietuviškai — tik aprašymui (overview)
+      const resLt = await fetch(
+        `https://api.themoviedb.org/3/${endpoint}/${id}?api_key=${TMDB_KEY}&language=lt-LT`
+      );
+      const dataLt = resLt.ok ? await resLt.json() as Record<string, unknown> : null;
 
-      // Extract crew/cast
+      // Režisierius
       const credits = data.credits as { crew?: { job: string; name: string }[]; cast?: { name: string }[] } | undefined;
       const director = (credits?.crew ?? [])
         .filter(c => c.job === "Director")
@@ -97,21 +103,22 @@ export default function AdminFilms() {
         .slice(0, 2)
         .join(", ");
 
+      // Aktoriai
       const actors = (credits?.cast ?? [])
         .slice(0, 5)
         .map(c => c.name)
         .join(", ");
 
-      // Genres
+      // Žanrai — iš anglų kalbos duomenų
       const genres = data.genres as { name: string }[] | undefined;
       const genre = (genres ?? []).map(g => g.name).join(", ");
 
-      // Trailer
+      // Traileris
       const videos = data.videos as { results?: { type: string; site: string; key: string }[] } | undefined;
       const trailer = (videos?.results ?? [])
         .find(v => v.type === "Trailer" && v.site === "YouTube");
 
-      // Year
+      // Metai
       const releaseDate = (data.release_date as string) || (data.first_air_date as string) || "";
       const year = releaseDate ? releaseDate.split("-")[0] : "";
 
@@ -119,19 +126,24 @@ export default function AdminFilms() {
       const externalIds = data.external_ids as { imdb_id?: string } | undefined;
       const imdbId = externalIds?.imdb_id ?? "";
 
-      // Rating
+      // Reitingas
       const rating = data.vote_average as number | undefined;
 
-      // Titles
+      // Pavadinimai — iš anglų kalbos
       const titleLt = (data.title as string) || (data.name as string) || "";
       const titleOrig = (data.original_title as string) || (data.original_name as string) || "";
+
+      // Aprašymas — lietuviškai jei yra, kitaip angliškai
+      const descriptionLt = dataLt?.overview as string | undefined;
+      const descriptionEn = data.overview as string | undefined;
+      const description = (descriptionLt && descriptionLt.trim()) ? descriptionLt : (descriptionEn ?? "");
 
       setForm(p => ({
         ...p,
         title_lt: titleLt || p.title_lt,
         title_orig: titleOrig || p.title_orig,
         year: year || p.year,
-        description: (data.overview as string) || p.description,
+        description: description || p.description,
         poster_url: (data.poster_path as string) || p.poster_url,
         trailer_key: trailer?.key || p.trailer_key,
         director: director || p.director,
