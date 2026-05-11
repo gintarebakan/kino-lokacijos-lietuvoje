@@ -17,7 +17,7 @@ interface Collection {
 }
 
 const EMPTY = {
-  title: "", slug: "", description: "", cover_url: "", is_route: "false",
+  title: "", slug: "", description: "", cover_url: "", sort_order: "0",
 };
 
 const inputStyle = {
@@ -53,11 +53,11 @@ export default function AdminCollections() {
   const save = useMutation({
     mutationFn: async () => {
       const payload = {
-        title: form.title,
+        title: form.title || null,
         slug: form.slug || null,
         description: form.description || null,
         cover_url: form.cover_url || null,
-        is_route: form.is_route === "true",
+        is_route: true, // visada true — visos kolekcijos turi maršruto liniją
       };
       if (editing) {
         const { error } = await supabase.from("collections_curated").update(payload).eq("id", editing.id);
@@ -95,7 +95,7 @@ export default function AdminCollections() {
       slug: col.slug ?? "",
       description: col.description ?? "",
       cover_url: col.cover_url ?? "",
-      is_route: col.is_route ? "true" : "false",
+      sort_order: "0",
     });
   };
 
@@ -103,12 +103,14 @@ export default function AdminCollections() {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <h1 style={{ margin: 0, color: "#f5f5f5", fontSize: 22, fontFamily: "Georgia, serif" }}>Kolekcijos</h1>
-        <button type="button" onClick={() => { setEditing(null); setCreating(true); setForm(EMPTY); }} style={{ background: "#c9a84c", border: "none", borderRadius: 8, padding: "10px 20px", color: "#0a0a0a", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
+        <button type="button" onClick={() => { setEditing(null); setCreating(true); setForm(EMPTY); }}
+          style={{ background: "#c9a84c", border: "none", borderRadius: 8, padding: "10px 20px", color: "#0a0a0a", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
           + Pridėti
         </button>
       </div>
 
-      <input placeholder="Ieškoti..." value={search} onChange={e => setSearch(e.target.value)} style={{ ...inputStyle, marginBottom: 16, maxWidth: 320 }} />
+      <input placeholder="Ieškoti..." value={search} onChange={e => setSearch(e.target.value)}
+        style={{ ...inputStyle, marginBottom: 16, maxWidth: 320 }} />
 
       {isLoading && <div style={{ color: "#9ca3af" }}>Kraunama…</div>}
 
@@ -119,35 +121,57 @@ export default function AdminCollections() {
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div>
-              <label style={labelStyle}>Pavadinimas</label>
-              <input style={inputStyle} value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} />
+              <label style={labelStyle}>Pavadinimas <span style={{ color: "#f87171" }}>*</span></label>
+              <input style={inputStyle} value={form.title}
+                onChange={e => setForm(p => ({ ...p, title: e.target.value }))} />
             </div>
             <div>
-              <label style={labelStyle}>Slug</label>
-              <input style={inputStyle} value={form.slug} onChange={e => setForm(p => ({ ...p, slug: e.target.value }))} />
+              <label style={labelStyle}>Slug <span style={{ color: "#f87171" }}>*</span></label>
+              <input style={inputStyle} value={form.slug}
+                onChange={e => setForm(p => ({ ...p, slug: e.target.value }))} />
             </div>
             <div>
               <label style={labelStyle}>Viršelio nuotrauka (URL)</label>
-              <input style={inputStyle} value={form.cover_url} onChange={e => setForm(p => ({ ...p, cover_url: e.target.value }))} />
+              <input style={inputStyle} value={form.cover_url}
+                onChange={e => setForm(p => ({ ...p, cover_url: e.target.value }))} />
             </div>
             <div>
-              <label style={labelStyle}>Tipas</label>
-              <select value={form.is_route} onChange={e => setForm(p => ({ ...p, is_route: e.target.value }))} style={inputStyle}>
-                <option value="false">Kolekcija</option>
-                <option value="true">Maršrutas</option>
-              </select>
+              <label style={labelStyle}>
+                Eilės numeris
+                <span style={{ color: "#6b7280", fontWeight: 400, marginLeft: 6, textTransform: "none", fontSize: 10 }}>
+                  (mažesnis = aukščiau sąraše)
+                </span>
+              </label>
+              <input
+                type="number"
+                min={0}
+                style={inputStyle}
+                value={form.sort_order}
+                onChange={e => setForm(p => ({ ...p, sort_order: e.target.value }))}
+                placeholder="0"
+              />
             </div>
           </div>
           <div style={{ marginTop: 12 }}>
             <label style={labelStyle}>Aprašymas</label>
-            <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
+            <textarea value={form.description}
+              onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
+              rows={3} style={{ ...inputStyle, resize: "vertical" }} />
           </div>
+
+          {/* Info apie is_route */}
+          <div style={{ marginTop: 12, padding: "8px 12px", background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 8, fontSize: 12, color: "#9ca3af" }}>
+            Visos kolekcijos automatiškai rodo maršruto liniją tarp lokacijų žemėlapyje.
+          </div>
+
           {save.isError && <div style={{ color: "#f87171", fontSize: 13, marginTop: 8 }}>Klaida išsaugant.</div>}
           <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-            <button type="button" onClick={() => save.mutate()} disabled={save.isPending} style={{ background: "#c9a84c", border: "none", borderRadius: 8, padding: "10px 20px", color: "#0a0a0a", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
+            <button type="button" onClick={() => save.mutate()} disabled={save.isPending}
+              style={{ background: "#c9a84c", border: "none", borderRadius: 8, padding: "10px 20px", color: "#0a0a0a", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
               {save.isPending ? "Saugoma…" : "Išsaugoti"}
             </button>
-            <button type="button" onClick={() => { setEditing(null); setCreating(false); }} style={{ background: "transparent", border: "1px solid #333", borderRadius: 8, padding: "10px 20px", color: "#9ca3af", fontSize: 13, cursor: "pointer" }}>
+            <button type="button" onClick={() => { setEditing(null); setCreating(false); }}
+              style={{ background: "transparent", border: "1px solid #333", borderRadius: 8, padding: "10px 20px", color: "#9ca3af", fontSize: 13, cursor: "pointer" }}>
               Atšaukti
             </button>
           </div>
@@ -158,7 +182,7 @@ export default function AdminCollections() {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid #222" }}>
-              {["Pavadinimas", "Slug", "Tipas", ""].map(h => (
+              {["Pavadinimas", "Slug", ""].map(h => (
                 <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: "#6b7280", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>{h}</th>
               ))}
             </tr>
@@ -168,11 +192,12 @@ export default function AdminCollections() {
               <tr key={col.id} style={{ borderBottom: "1px solid #1a1a1a" }}>
                 <td style={{ padding: "12px 16px", color: "#f5f5f5", fontSize: 13 }}>{col.title}</td>
                 <td style={{ padding: "12px 16px", color: "#6b7280", fontSize: 12 }}>{col.slug ?? "—"}</td>
-                <td style={{ padding: "12px 16px", color: "#9ca3af", fontSize: 13 }}>{col.is_route ? "Maršrutas" : "Kolekcija"}</td>
                 <td style={{ padding: "12px 16px" }}>
                   <div style={{ display: "flex", gap: 6 }}>
-                    <button type="button" onClick={() => openEdit(col)} style={{ background: "transparent", border: "1px solid #333", borderRadius: 6, padding: "4px 10px", color: "#c9a84c", fontSize: 12, cursor: "pointer" }}>Redaguoti</button>
-                    <button type="button" onClick={() => { if (confirm("Ištrinti?")) remove.mutate(col.id); }} style={{ background: "transparent", border: "1px solid #333", borderRadius: 6, padding: "4px 10px", color: "#f87171", fontSize: 12, cursor: "pointer" }}>Ištrinti</button>
+                    <button type="button" onClick={() => openEdit(col)}
+                      style={{ background: "transparent", border: "1px solid #333", borderRadius: 6, padding: "4px 10px", color: "#c9a84c", fontSize: 12, cursor: "pointer" }}>Redaguoti</button>
+                    <button type="button" onClick={() => { if (confirm("Ištrinti?")) remove.mutate(col.id); }}
+                      style={{ background: "transparent", border: "1px solid #333", borderRadius: 6, padding: "4px 10px", color: "#f87171", fontSize: 12, cursor: "pointer" }}>Ištrinti</button>
                   </div>
                 </td>
               </tr>
