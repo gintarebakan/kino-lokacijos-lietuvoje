@@ -1,11 +1,14 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
-type NavItem = {
-  to: "/" | "/map" | "/saved";
+// Naudojame string vietoj union type — TanStack Router generuoja
+// tikslų route union automatiškai, bet papildomi puslapiai
+// gali nesutapti su auto-generated tipu.
+interface NavItem {
+  to: string;
   label: string;
   icon: React.ReactNode;
-};
+}
 
 const CompassIcon = (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -27,10 +30,19 @@ const BookmarkIcon = (
   </svg>
 );
 
+const InfoIcon = (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" />
+    <line x1="12" y1="8" x2="12" y2="8.5" strokeWidth="2" strokeLinecap="round" />
+    <line x1="12" y1="11" x2="12" y2="16" />
+  </svg>
+);
+
 const items: NavItem[] = [
   { to: "/", label: "Atradimai", icon: CompassIcon },
   { to: "/map", label: "Žemėlapis", icon: MapPinIcon },
   { to: "/saved", label: "Išsaugota", icon: BookmarkIcon },
+  { to: "/about", label: "Apie", icon: InfoIcon },
 ];
 
 export function AppSidebar() {
@@ -69,13 +81,13 @@ export function AppSidebar() {
           </span>
         </div>
         <div style={{ width: 32, height: 1, background: "#1a1a1a" }} />
-<nav style={{ display: "flex", flexDirection: "column", width: "100%", marginTop: 178 }}>
-              {items.map((item) => {
+        <nav style={{ display: "flex", flexDirection: "column", width: "100%", marginTop: 178 }}>
+          {items.map((item) => {
             const active = item.to === "/" ? currentPath === "/" : currentPath.startsWith(item.to);
             return (
               <Link
                 key={item.to}
-                to={item.to}
+                to={item.to as any}
                 style={{
                   height: "56px",
                   display: "flex",
@@ -120,7 +132,7 @@ export function AppSidebar() {
         return (
           <Link
             key={item.to}
-            to={item.to}
+            to={item.to as any}
             style={{
               flex: 1,
               display: "flex",
