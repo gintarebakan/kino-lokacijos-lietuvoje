@@ -383,7 +383,7 @@ export default function DiscoverPage() {
       <section>
         <SectionHeader
           title="Kino maršrutai"
-          description="Sudaryti maršrutai po svarbiausias Lietuvos filmavimo vietas. Nesvarbu, ar esate kino entuziastas, ar keliautojas - pajuskite istorijas, kurios slepiasi kiekvienoje scenoje."
+          description="Iš anksto paruošti maršrutai po svarbiausias Lietuvos filmavimo vietas. Nesvarbu, esate kino entuziastas, ar keliautojas - pajuskite istorijas, kurios slepiasi kiekvienoje scenoje."
           linkTo="/map"
           navigate={navigate}
         />
