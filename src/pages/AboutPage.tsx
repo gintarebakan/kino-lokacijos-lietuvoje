@@ -257,7 +257,7 @@ export default function AboutPage() {
             {
               n: "3",
               title: "Planuokite kelionę",
-              desc: "Naudokite kino maršrutus ir navigacijos funkcijas, kad aplankytumėte vietas asmeniškai arba sudarytumėte asmeninį maršrutą.",
+              desc: "Naudokite kino maršrutus ir navigacijos funkcijas, kad aplankytumėte vietas asmeniškai.",
             },
           ].map((step) => (
             <div key={step.n} style={{ textAlign: "center" }}>

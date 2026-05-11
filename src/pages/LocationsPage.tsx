@@ -112,7 +112,7 @@ export default function LocationsPage() {
           Visos lokacijos
         </h1>
         <p style={{ color: "#6b7280", fontSize: 13, margin: "0 0 24px" }}>
-          {locations.length} filmavimo vietos Lietuvoje
+          {locations.length} filmavimo vietų Lietuvoje
         </p>
 
         {/* Search */}

@@ -129,7 +129,7 @@ export default function FilmsPage() {
           Visas turinys
         </h1>
         <p style={{ color: "#6b7280", fontSize: 13, margin: "0 0 20px" }}>
-          {films.length} filmų ir serialų Lietuvoje
+          {films.length} filmų ir serialų įamžintų Lietuvoje
         </p>
 
         {/* Search */}

@@ -117,7 +117,7 @@ function SectionHeader({
         >
           {title}
         </h2>
-        <p style={{ color: "#6b7280", fontSize: 12, margin: 0, lineHeight: 1.6, maxWidth: 480 }}>
+        <p style={{ color: "#6b7280", fontSize: 12, margin: 0, lineHeight: 1.6 }}>
           {description}
         </p>
       </div>
@@ -227,7 +227,8 @@ export default function DiscoverPage() {
       <section>
         <SectionHeader
           title="Populiarios lokacijos"
-          description="Lietuvos filmavimo vietos, kurios dažniausiai įamžintos ekrane. Atraskite, kur buvo kuriami jūsų mėgstami filmai ir serialai."
+          description="Lietuvos filmavimo vietos, kurios dažniausiai įamžintos ekrane. 
+          Atraskite, kur buvo kuriami jūsų mėgstami filmai ir serialai."
           linkTo="/locations"
           navigate={navigate}
         />
