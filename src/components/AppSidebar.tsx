@@ -39,10 +39,11 @@ const InfoIcon = (
 );
 
 const items: NavItem[] = [
+  { to: "/about", label: "Apie", icon: InfoIcon },
   { to: "/", label: "Atradimai", icon: CompassIcon },
   { to: "/map", label: "Žemėlapis", icon: MapPinIcon },
   { to: "/saved", label: "Išsaugota", icon: BookmarkIcon },
-  { to: "/about", label: "Apie", icon: InfoIcon },
+  
 ];
 
 export function AppSidebar() {
