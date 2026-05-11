@@ -1,4 +1,8 @@
+import { useNavigate } from "@tanstack/react-router";
+
 export default function AboutPage() {
+  const navigate = useNavigate();
+
   return (
     <main
       style={{
@@ -9,17 +13,11 @@ export default function AboutPage() {
         paddingBottom: 80,
       }}
     >
-      {/* Hero */}
+      {/* ── Hero ── */}
       <section
         style={{
-          position: "relative",
           width: "100%",
-          minHeight: 260,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "48px 24px 40px",
+          padding: "64px 24px 48px",
           textAlign: "center",
           background: "linear-gradient(180deg, #111111 0%, #0a0a0a 100%)",
           borderBottom: "1px solid #1a1a1a",
@@ -29,10 +27,10 @@ export default function AboutPage() {
           style={{
             fontFamily: "Georgia, serif",
             color: "#c9a84c",
-            fontSize: 42,
+            fontSize: 48,
             letterSpacing: "0.15em",
             lineHeight: 1,
-            marginBottom: 12,
+            marginBottom: 16,
           }}
         >
           CM
@@ -41,9 +39,9 @@ export default function AboutPage() {
           style={{
             fontFamily: "Georgia, serif",
             color: "#f5f5f5",
-            fontSize: 28,
+            fontSize: 30,
             fontWeight: 700,
-            margin: "0 0 12px",
+            margin: "0 0 16px",
             letterSpacing: "0.02em",
           }}
         >
@@ -53,17 +51,17 @@ export default function AboutPage() {
           style={{
             color: "#9ca3af",
             fontSize: 14,
-            maxWidth: 480,
-            lineHeight: 1.7,
-            margin: 0,
+            maxWidth: 900,
+            lineHeight: 1.8,
+            margin: "0 auto",
           }}
         >
-          Interaktyvi Lietuvos kino lokacijų informacinė sistema — atraskite
-          vietas, kuriose buvo kuriami jūsų mėgstami filmai ir serialai.
+          Interaktyvi internetinė informacinė sistema Lietuvoje filmuotų
+          kino projektų lokacijų vizualizavimui ir paieškai.
         </p>
       </section>
 
-      {/* Stats */}
+      {/* ── Stats ── */}
       <section
         style={{
           display: "grid",
@@ -76,24 +74,20 @@ export default function AboutPage() {
         {[
           { value: "200+", label: "Filmavimo lokacijų" },
           { value: "50+", label: "Filmų ir serialų" },
-          { value: "5+", label: "Kurtuoti maršrutai" },
+          { value: "5+", label: "Kuruoti maršrutai" },
         ].map((stat) => (
           <div
             key={stat.label}
-            style={{
-              background: "#0a0a0a",
-              padding: "24px 16px",
-              textAlign: "center",
-            }}
+            style={{ background: "#0a0a0a", padding: "28px 16px", textAlign: "center" }}
           >
             <div
               style={{
                 fontFamily: "Georgia, serif",
                 color: "#c9a84c",
-                fontSize: 28,
+                fontSize: 32,
                 fontWeight: 700,
                 lineHeight: 1,
-                marginBottom: 6,
+                marginBottom: 8,
               }}
             >
               {stat.value}
@@ -105,202 +99,277 @@ export default function AboutPage() {
         ))}
       </section>
 
-      {/* Mission */}
-      <section style={{ padding: "32px 24px 24px" }}>
-        <h2
-          style={{
-            textTransform: "uppercase",
-            letterSpacing: "0.1em",
-            color: "#f5f5f5",
-            fontSize: 13,
-            fontWeight: 600,
-            margin: "0 0 16px",
-          }}
-        >
-          Misija
-        </h2>
-        <p style={{ color: "#9ca3af", fontSize: 14, lineHeight: 1.8, margin: 0 }}>
-          CineMap — tai informacinė sistema, skirta susieti kino gerbėjus su
-          realaus pasaulio vietomis, kuriose buvo filmuojami jų mėgstami kūriniai.
-          Mūsų tikslas — padėti žmonėms atrasti Lietuvos kino paveldą,
-          planuoti keliones į filmavimo vietas ir geriau pažinti šalies
-          kultūrinę geografiją per kino prizmę.
+      {/* ── Kontekstas ── */}
+      <section style={{ padding: "48px 48px", maxWidth: 900, margin: "0 auto" }}>
+        <p style={labelStyle}>Kontekstas</p>
+        <p style={{ ...bodyText, textAlign: "center" }}>
+          Kino industrija ir audiovizualinių projektų gamyba yra neatsiejama šiuolaikinės
+          kultūros dalis, turinti tiesioginę įtaką regionų ekonominiam aktyvumui bei turizmo
+          plėtrai. Šis reiškinys —{" "}
+          <span style={{ color: "#c9a84c" }}>kino turizmas</span> — transformuoja filmavimo
+          lokacijas į savarankiškus traukos objektus. Lietuvos kontekste informacija apie
+          šalyje filmuotus projektus yra išskaidyta skirtinguose registruose ir šaltiniuose —
+          šie nėra orientuoti į tikslią geografinę lokacijų analizę.
         </p>
       </section>
 
-      {/* Divider */}
-      <div style={{ height: 1, background: "#1a1a1a", margin: "0 24px" }} />
+      <div style={fullDivider} />
 
-      {/* Features */}
-      <section style={{ padding: "32px 24px 24px" }}>
-        <h2
+      {/* ── Tikslas ── */}
+      <section style={{ padding: "48px 48px", maxWidth: 900, margin: "0 auto" }}>
+        <p style={labelStyle}>Tikslas</p>
+        <p style={{ ...bodyText, textAlign: "center" }}>
+          Realizuoti interaktyvią internetinę informacinę sistemą Lietuvoje filmuotų kino
+          projektų lokacijų vizualizavimui ir paieškai, skirtą susieti kino gerbėjus su
+          realaus pasaulio vietomis, kuriose buvo filmuojami jų mėgstami kūriniai. Padėti
+          žmonėms atrasti Lietuvos kino paveldą, planuoti keliones į filmavimo vietas ir
+          geriau pažinti šalies kultūrinę geografiją per kino prizmę.
+        </p>
+      </section>
+
+      <div style={fullDivider} />
+
+      {/* ── Funkcijos ── */}
+      <section style={{ padding: "48px 24px" }}>
+        <p style={labelStyle}>Funkcijos</p>
+        <div
           style={{
-            textTransform: "uppercase",
-            letterSpacing: "0.1em",
-            color: "#f5f5f5",
-            fontSize: 13,
-            fontWeight: 600,
-            margin: "0 0 20px",
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: 12,
+            maxWidth: 680,
+            margin: "0 auto",
           }}
         >
-          Funkcijos
-        </h2>
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {[
             {
               icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 22s7-7.5 7-13a7 7 0 1 0-14 0c0 5.5 7 13 7 13Z" />
                   <circle cx="12" cy="9" r="2.5" />
                 </svg>
               ),
               title: "Interaktyvus žemėlapis",
-              desc: "Naršykite filmavimo lokacijas interaktyviame žemėlapyje su klasterizavimu ir filtravimo galimybėmis.",
+              desc: "Klasterizuotos lokacijos su filtravimo galimybėmis.",
             },
             {
               icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="7" />
                   <path d="m21 21-4.35-4.35" />
                 </svg>
               ),
-              title: "Išmani paieška",
-              desc: "Ieškokite pagal filmo pavadinimą, lokacijos pavadinimą ar žanrą su fuzzy paieškos palaikymu.",
+              title: "Hibridinė paieška",
+              desc: "Fuzzy paieška pagal filmą, lokaciją ar žanrą.",
             },
             {
               icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M3 12h18M3 6l9-3 9 3M3 18l9 3 9-3" />
                 </svg>
               ),
               title: "Kuruoti maršrutai",
-              desc: "Sekite ekspertų sudarytus maršrutus po svarbiausias filmavimo vietas su navigacijos palaikymu.",
+              desc: "Sisteminiai kino maršrutai su navigacijos palaikymu.",
             },
             {
               icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                 </svg>
               ),
               title: "Išsaugoti mėgstamiausius",
-              desc: "Išsaugokite įdomias lokacijas ir maršrutus, kad galėtumėte greitai juos rasti vėliau.",
+              desc: "Greita prieiga prie išsaugotų lokacijų ir maršrutų.",
             },
           ].map((feat) => (
             <div
               key={feat.title}
               style={{
-                display: "flex",
-                gap: 16,
-                alignItems: "flex-start",
                 background: "#111111",
                 border: "1px solid #1a1a1a",
-                borderRadius: 12,
-                padding: "16px",
+                borderRadius: 14,
+                padding: "20px 16px",
+                textAlign: "center",
               }}
             >
               <div
                 style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 10,
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
                   background: "rgba(201,168,76,0.08)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  flexShrink: 0,
+                  margin: "0 auto 12px",
                 }}
               >
                 {feat.icon}
               </div>
-              <div>
-                <div style={{ color: "#f5f5f5", fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
-                  {feat.title}
-                </div>
-                <div style={{ color: "#6b7280", fontSize: 13, lineHeight: 1.6 }}>
-                  {feat.desc}
-                </div>
+              <div style={{ color: "#f5f5f5", fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
+                {feat.title}
+              </div>
+              <div style={{ color: "#6b7280", fontSize: 12, lineHeight: 1.6 }}>
+                {feat.desc}
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Divider */}
-      <div style={{ height: 1, background: "#1a1a1a", margin: "0 24px" }} />
+      <div style={fullDivider} />
 
-      {/* How it works */}
-      <section style={{ padding: "32px 24px 24px" }}>
-        <h2
+      {/* ── Kaip naudotis ── */}
+      <section style={{ padding: "48px 24px" }}>
+        <p style={labelStyle}>Kaip naudotis</p>
+        <div
           style={{
-            textTransform: "uppercase",
-            letterSpacing: "0.1em",
-            color: "#f5f5f5",
-            fontSize: 13,
-            fontWeight: 600,
-            margin: "0 0 20px",
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: 16,
+            maxWidth: 680,
+            margin: "0 auto",
           }}
         >
-          Kaip naudotis
-        </h2>
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {[
-            { n: "1", title: "Ieškokite ir naršykite", desc: "Naudokite paiešką arba naršykite žemėlapį, kad rastumėte jus dominančius filmus ar lokacijas." },
-            { n: "2", title: "Atraskite lokacijas", desc: "Spustelėkite ant žymeklių, kad sužinotumėte apie konkrečias filmavimo vietas ir jose filmuotus kūrinius." },
-            { n: "3", title: "Planuokite kelionę", desc: "Naudokite kuruotus maršrutus ir navigacijos funkcijas, kad aplankytumėte vietas asmeniškai." },
+            {
+              n: "1",
+              title: "Ieškokite ir naršykite",
+              desc: "Naudokite paiešką arba naršykite žemėlapį, kad rastumėte jus dominančius filmus ar lokacijas.",
+            },
+            {
+              n: "2",
+              title: "Atraskite lokacijas",
+              desc: "Spustelėkite ant žymeklių, kad sužinotumėte apie filmavimo vietas ir jose filmuotus kūrinius.",
+            },
+            {
+              n: "3",
+              title: "Planuokite kelionę",
+              desc: "Naudokite kuruotus maršrutus ir navigacijos funkcijas, kad aplankytumėte vietas asmeniškai.",
+            },
           ].map((step) => (
-            <div key={step.n} style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+            <div key={step.n} style={{ textAlign: "center" }}>
               <div
                 style={{
-                  width: 32,
-                  height: 32,
+                  width: 40,
+                  height: 40,
                   borderRadius: "50%",
                   background: "rgba(201,168,76,0.12)",
                   border: "1px solid rgba(201,168,76,0.3)",
                   color: "#c9a84c",
                   fontFamily: "Georgia, serif",
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: 700,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  flexShrink: 0,
-                  marginTop: 2,
+                  margin: "0 auto 12px",
                 }}
               >
                 {step.n}
               </div>
-              <div>
-                <div style={{ color: "#f5f5f5", fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
-                  {step.title}
-                </div>
-                <div style={{ color: "#6b7280", fontSize: 13, lineHeight: 1.6 }}>
-                  {step.desc}
-                </div>
+              <div style={{ color: "#f5f5f5", fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
+                {step.title}
+              </div>
+              <div style={{ color: "#6b7280", fontSize: 12, lineHeight: 1.6 }}>
+                {step.desc}
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Divider */}
-      <div style={{ height: 1, background: "#1a1a1a", margin: "0 24px" }} />
+      <div style={fullDivider} />
 
-      {/* Tech stack */}
-      <section style={{ padding: "32px 24px 0" }}>
+      {/* ── Naujumas ── */}
+      <section style={{ padding: "48px 48px", maxWidth: 900, margin: "0 auto" }}>
+        <p style={labelStyle}>Naujumas ir vertė</p>
+        <p style={{ ...bodyText, textAlign: "center" }}>
+          Sistema grindžiama fragmentuotų Lietuvos kino lokacijų duomenų apjungimu ir šių
+          lokacijų intelektualiu kuravimų. Pirmą kartą nacionaliniu lygmeniu susisteminama
+          Lietuvos kino paveldo geografinė informacija, dinamiškai siejant lokalius istorinius
+          duomenis su globalia kino metaduomenų baze{" "}
+          <span style={{ color: "#c9a84c" }}>TMDB API</span>.
+        </p>
+        <p style={{ ...bodyText, textAlign: "center", marginTop: 16 }}>
+          Sukurta sistema leidžia vizualizuoti sudėtingus ryšius tarp kino lokacijų, filmų ir
+          jų istorinio konteksto. Suprojektuota architektūra yra universali — jos principai
+          gali būti pritaikomi kuriant kultūros paveldo sklaidos sprendimus kituose regionuose.
+        </p>
+      </section>
+
+      <div style={fullDivider} />
+
+      {/* ── CTA ── */}
+      <section
+        style={{
+          margin: "0 16px",
+          borderRadius: 16,
+          background: "linear-gradient(135deg, rgba(201,168,76,0.15) 0%, rgba(201,168,76,0.05) 100%)",
+          border: "1px solid rgba(201,168,76,0.2)",
+          padding: "40px 24px",
+          textAlign: "center",
+        }}
+      >
         <h2
           style={{
-            textTransform: "uppercase",
-            letterSpacing: "0.1em",
+            fontFamily: "Georgia, serif",
             color: "#f5f5f5",
-            fontSize: 13,
-            fontWeight: 600,
-            margin: "0 0 16px",
+            fontSize: 20,
+            fontWeight: 700,
+            margin: "0 0 12px",
           }}
         >
-          Techninė informacija
+          Pradėkite tyrinėti
         </h2>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {["React", "TypeScript", "MapLibre GL JS", "Supabase", "PostGIS", "TanStack Query", "Vercel"].map((tech) => (
+        <p style={{ color: "#9ca3af", fontSize: 13, lineHeight: 1.7, margin: "0 0 24px", maxWidth: 360, marginLeft: "auto", marginRight: "auto" }}>
+          Atraskite Lietuvos kino paveldą — realias vietas, kuriose gimė jūsų mėgstami filmai.
+        </p>
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/map" })}
+            style={{
+              background: "#c9a84c",
+              border: "none",
+              borderRadius: 10,
+              padding: "12px 24px",
+              color: "#0a0a0a",
+              fontWeight: 700,
+              fontSize: 13,
+              cursor: "pointer",
+              letterSpacing: "0.04em",
+            }}
+          >
+            Atidaryti žemėlapį
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/" })}
+            style={{
+              background: "transparent",
+              border: "1px solid #333",
+              borderRadius: 10,
+              padding: "12px 24px",
+              color: "#9ca3af",
+              fontSize: 13,
+              cursor: "pointer",
+              letterSpacing: "0.04em",
+            }}
+          >
+            Naršyti turinį
+          </button>
+        </div>
+      </section>
+
+      {/* ── Tech stack ── */}
+      <section style={{ padding: "48px 48px 0", textAlign: "center" }}>
+        <p style={labelStyle}>Techninė informacija</p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", maxWidth: 900, margin: "0 auto" }}>
+          {[
+            "React", "TypeScript", "Vite", "MapLibre GL JS", "Supercluster",
+            "MapTiler", "Zustand", "TanStack Query", "TanStack Router",
+            "Supabase", "PostGIS", "pg_trgm", "TMDB API", "OpenRouteService", "Vercel",
+          ].map((tech) => (
             <span
               key={tech}
               style={{
@@ -320,3 +389,27 @@ export default function AboutPage() {
     </main>
   );
 }
+
+// ── Shared styles ──────────────────────────────────────────────────────────────
+
+const labelStyle: React.CSSProperties = {
+  textTransform: "uppercase",
+  letterSpacing: "0.12em",
+  color: "#c9a84c",
+  fontSize: 11,
+  fontWeight: 600,
+  textAlign: "center",
+  marginBottom: 24,
+};
+
+const bodyText: React.CSSProperties = {
+  color: "#9ca3af",
+  fontSize: 14,
+  lineHeight: 1.9,
+  margin: 0,
+};
+
+const fullDivider: React.CSSProperties = {
+  height: 1,
+  background: "#1a1a1a",
+};
