@@ -80,9 +80,8 @@ export function CookieBanner() {
       }}
     >
       <p style={{ color: "#9ca3af", fontSize: 13, margin: 0, maxWidth: 600, lineHeight: 1.6 }}>
-        Mūsų svetainė naudoja slapukus (cookies). Šie slapukai naudojami statistikos ir
-        rinkodaros tikslais. Jei sutinkate su šiems tikslams naudojamais slapukais,
-        spauskite „Sutinku" ir toliau naudokitės svetaine.
+        Mūsų svetainė naudoja slapukus (cookies) jūsų patirčiai pagerinti - išsaugoti pasirinktus filtrus, maršrutus ir mėgstamiausias lokacijas. 
+        Duomenys saugomi tik jūsų naršyklėje ir nėra perduodami trečiosioms šalims.
       </p>
       <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
         <button
