@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as MapRouteImport } from './routes/map'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RouteSlugRouteImport } from './routes/route.$slug'
@@ -29,6 +30,11 @@ const SavedRoute = SavedRouteImport.update({
 const MapRoute = MapRouteImport.update({
   id: '/map',
   path: '/map',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
@@ -81,6 +87,7 @@ const AdminCollectionLocationsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/about': typeof AboutRoute
   '/map': typeof MapRoute
   '/saved': typeof SavedRoute
   '/admin/collection-locations': typeof AdminCollectionLocationsRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/about': typeof AboutRoute
   '/map': typeof MapRoute
   '/saved': typeof SavedRoute
   '/admin/collection-locations': typeof AdminCollectionLocationsRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/about': typeof AboutRoute
   '/map': typeof MapRoute
   '/saved': typeof SavedRoute
   '/admin/collection-locations': typeof AdminCollectionLocationsRoute
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/about'
     | '/map'
     | '/saved'
     | '/admin/collection-locations'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/about'
     | '/map'
     | '/saved'
     | '/admin/collection-locations'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/about'
     | '/map'
     | '/saved'
     | '/admin/collection-locations'
@@ -163,6 +175,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  AboutRoute: typeof AboutRoute
   MapRoute: typeof MapRoute
   SavedRoute: typeof SavedRoute
   RouteSlugRoute: typeof RouteSlugRoute
@@ -182,6 +195,13 @@ declare module '@tanstack/react-router' {
       path: '/map'
       fullPath: '/map'
       preLoaderRoute: typeof MapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -275,6 +295,7 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  AboutRoute: AboutRoute,
   MapRoute: MapRoute,
   SavedRoute: SavedRoute,
   RouteSlugRoute: RouteSlugRoute,
