@@ -14,7 +14,6 @@ interface CollectionLocation {
   collection_id: string | null;
   location_id: string | null;
   order_index: number | null;
-  // Supabase returns object (not array) for FK joins
   collections_curated: { title: string } | null;
   locations_lt: { name: string } | null;
 }
@@ -79,15 +78,15 @@ export default function AdminCollectionLocations() {
           collection_id,
           location_id,
           order_index,
-          collections_curated!collection_locations_collection_id_fkey ( title ),
-          locations_lt!collection_locations_location_id_fkey ( name )
+          collections_curated!fk_collection ( title ),
+          locations_lt!fk_location ( name )
         `)
         .order("collection_id", { ascending: true })
         .order("order_index", { ascending: true });
 
       if (error) throw error;
 
-      // Normalise: PostgREST may return array OR object depending on cardinality hint
+      // Normalise: PostgREST may return array OR object depending on version
       return (data ?? []).map((row: any) => ({
         ...row,
         collections_curated: Array.isArray(row.collections_curated)
@@ -138,7 +137,13 @@ export default function AdminCollectionLocations() {
         order_index: Number(r.order_index) || 0,
       }));
 
-      const { error } = await supabase.from("collection_locations").insert(payload);
+      // upsert — tyliai praleidžia jau egzistuojančias (collection_id, location_id) poras
+      const { error } = await supabase
+        .from("collection_locations")
+        .upsert(payload, {
+          onConflict: "collection_id,location_id",
+          ignoreDuplicates: true,
+        });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -223,7 +228,6 @@ export default function AdminCollectionLocations() {
           Pridėti lokacijas į kolekciją
         </h2>
 
-        {/* Collection selector */}
         <div style={{ marginBottom: 16 }}>
           <label style={labelStyle}>
             Kolekcija <span style={{ color: "#f87171" }}>*</span>
@@ -240,14 +244,12 @@ export default function AdminCollectionLocations() {
           </select>
         </div>
 
-        {/* Row header */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 120px 40px", gap: 8, marginBottom: 4 }}>
           <span style={labelStyle}>Lokacija</span>
           <span style={labelStyle}>Eiliškumas</span>
           <span />
         </div>
 
-        {/* Add rows */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
           {addRows.map((row, idx) => (
             <div
@@ -388,24 +390,20 @@ export default function AdminCollectionLocations() {
           <tbody>
             {filtered.map((cl, idx) => (
               <tr key={cl.id} style={{ borderBottom: "1px solid #1a1a1a" }}>
-                {/* Index */}
                 <td style={{ padding: "12px 16px", color: "#6b7280", fontSize: 12, width: 40 }}>
                   {idx + 1}
                 </td>
 
-                {/* Location name */}
                 <td style={{ padding: "12px 16px", color: "#f5f5f5", fontSize: 13 }}>
                   {cl.locations_lt?.name ?? "—"}
                 </td>
 
-                {/* Collection title */}
                 <td style={{ padding: "12px 16px", color: "#9ca3af", fontSize: 13 }}>
                   {cl.collections_curated?.title
                     ?? collections.find((c) => c.id === cl.collection_id)?.title
                     ?? "—"}
                 </td>
 
-                {/* Order — inline edit */}
                 <td style={{ padding: "12px 16px", width: 140 }}>
                   {editingOrderId === cl.id ? (
                     <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
@@ -479,7 +477,6 @@ export default function AdminCollectionLocations() {
                   )}
                 </td>
 
-                {/* Delete */}
                 <td style={{ padding: "12px 16px" }}>
                   <button
                     type="button"
