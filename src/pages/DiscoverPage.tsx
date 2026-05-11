@@ -129,7 +129,7 @@ function SectionHeader({
       </button>
 
       {/* Aprašymas — visas plotis */}
-      <p style={{ color: "#6b7280", fontSize: 12, margin: 0, lineHeight: 1.6 }}>
+      <p style={{ color: "#6b7280", fontSize: 14, margin: 0, lineHeight: 1.6 }}>
         {description}
       </p>
     </div>
