@@ -227,8 +227,8 @@ export default function DiscoverPage() {
       <section>
         <SectionHeader
           title="Populiarios lokacijos"
-          description="Lietuvos filmavimo vietos, kurios dažniausiai įamžintos ekrane. 
-          Atraskite, kur buvo kuriami jūsų mėgstami filmai ir serialai."
+          description="Filmavimo vietos Lietuvoje, kurios dažniausiai įamžintos ekrane. 
+          Atraskite lokacijas, kuriose buvo kuriami filmai ir serialai."
           linkTo="/locations"
           navigate={navigate}
         />
@@ -312,7 +312,7 @@ export default function DiscoverPage() {
       <section>
         <SectionHeader
           title="Populiarus turinys"
-          description="Geriausiai įvertinti kino projektai, kurių scenoms filmuoti buvo pasirinktos Lietuvos lokacijos."
+          description="Geriausiai įvertinti kino projektai, kurių scenoms filmuoti buvo pasirinktos Lietuvos lokacijos. Atraskite, kur buvo kuriami jūsų mėgstami filmai ir serialai."
           linkTo="/films"
           navigate={navigate}
         />
@@ -383,7 +383,7 @@ export default function DiscoverPage() {
       <section>
         <SectionHeader
           title="Kino maršrutai"
-          description="Eksperto sudaryti maršrutai po svarbiausias Lietuvos filmavimo vietas. Nesvarbu, ar esate kino entuziastas, ar keliautojas — pajuskite istorijas, slepiančias kiekvieną sceną."
+          description="Sudaryti maršrutai po svarbiausias Lietuvos filmavimo vietas. Nesvarbu, ar esate kino entuziastas, ar keliautojas - pajuskite istorijas, kurios slepiasi kiekvienoje scenoje."
           linkTo="/map"
           navigate={navigate}
         />
