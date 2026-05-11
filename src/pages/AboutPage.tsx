@@ -1,7 +1,26 @@
 import { useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "../lib/supabase";
 
 export default function AboutPage() {
   const navigate = useNavigate();
+
+  const { data: stats } = useQuery({
+    queryKey: ["about-stats"],
+    queryFn: async () => {
+      const [loc, films, routes] = await Promise.all([
+        supabase.from("locations_lt").select("id", { count: "exact", head: true }),
+        supabase.from("films_tmdb").select("id", { count: "exact", head: true }),
+        supabase.from("collections_curated").select("id", { count: "exact", head: true }),
+      ]);
+      return {
+        locations: loc.count ?? 0,
+        films: films.count ?? 0,
+        routes: routes.count ?? 0,
+      };
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
   return (
     <main
@@ -23,18 +42,6 @@ export default function AboutPage() {
           borderBottom: "1px solid #1a1a1a",
         }}
       >
-        <div
-          style={{
-            fontFamily: "Georgia, serif",
-            color: "#c9a84c",
-            fontSize: 48,
-            letterSpacing: "0.15em",
-            lineHeight: 1,
-            marginBottom: 16,
-          }}
-        >
-          CM
-        </div>
         <h1
           style={{
             fontFamily: "Georgia, serif",
@@ -45,7 +52,8 @@ export default function AboutPage() {
             letterSpacing: "0.02em",
           }}
         >
-          Apie <span style={{ color: "#c9a84c" }}>CineMap</span>
+          Apie{" "}
+          <span style={{ color: "#c9a84c" }}>KinoLokacijosLietuvoje</span>
         </h1>
         <p
           style={{
@@ -72,9 +80,9 @@ export default function AboutPage() {
         }}
       >
         {[
-          { value: "200+", label: "Filmavimo lokacijų" },
-          { value: "50+", label: "Filmų ir serialų" },
-          { value: "5+", label: "Kuruoti maršrutai" },
+          { value: stats?.locations, label: "Filmavimo lokacijų" },
+          { value: stats?.films,     label: "Filmų ir serialų" },
+          { value: stats?.routes,    label: "Kino maršrutai" },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -90,7 +98,14 @@ export default function AboutPage() {
                 marginBottom: 8,
               }}
             >
-              {stat.value}
+              {stat.value != null ? (
+                <>
+                  {stat.value}
+                  <span style={{ fontSize: 20, opacity: 0.7 }}>+</span>
+                </>
+              ) : (
+                <span style={{ fontSize: 20, opacity: 0.4 }}>…</span>
+              )}
             </div>
             <div style={{ color: "#6b7280", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em" }}>
               {stat.label}
@@ -168,7 +183,7 @@ export default function AboutPage() {
                   <path d="M3 12h18M3 6l9-3 9 3M3 18l9 3 9-3" />
                 </svg>
               ),
-              title: "Kuruoti maršrutai",
+              title: "Kino maršrutai",
               desc: "Sisteminiai kino maršrutai su navigacijos palaikymu.",
             },
             {
@@ -244,7 +259,7 @@ export default function AboutPage() {
             {
               n: "3",
               title: "Planuokite kelionę",
-              desc: "Naudokite kuruotus maršrutus ir navigacijos funkcijas, kad aplankytumėte vietas asmeniškai.",
+              desc: "Naudokite kino maršrutus ir navigacijos funkcijas, kad aplankytumėte vietas asmeniškai.",
             },
           ].map((step) => (
             <div key={step.n} style={{ textAlign: "center" }}>

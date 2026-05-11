@@ -43,16 +43,6 @@ interface CuratedCollection {
   is_route: boolean | null;
 }
 
-const sectionHeaderStyle: React.CSSProperties = {
-  textTransform: "uppercase",
-  letterSpacing: "0.1em",
-  color: "#f5f5f5",
-  fontSize: 13,
-  fontWeight: 600,
-  padding: "24px 16px 12px 16px",
-  margin: 0,
-};
-
 const scrollRowStyle: React.CSSProperties = {
   display: "flex",
   gap: 12,
@@ -95,6 +85,62 @@ function ScrollRow({ children }: { children: React.ReactNode }) {
         }}
       >
         ›
+      </button>
+    </div>
+  );
+}
+
+// Sekcijos antraštė su aprašymu ir "Daugiau" nuoroda
+function SectionHeader({
+  title,
+  description,
+  linkTo,
+  navigate,
+}: {
+  title: string;
+  description: string;
+  linkTo: string;
+  navigate: ReturnType<typeof useNavigate>;
+}) {
+  return (
+    <div style={{ padding: "24px 16px 8px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+      <div>
+        <h2
+          style={{
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+            color: "#f5f5f5",
+            fontSize: 13,
+            fontWeight: 600,
+            margin: "0 0 6px",
+          }}
+        >
+          {title}
+        </h2>
+        <p style={{ color: "#6b7280", fontSize: 12, margin: 0, lineHeight: 1.6, maxWidth: 480 }}>
+          {description}
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={() => navigate({ to: linkTo as any })}
+        style={{
+          background: "transparent",
+          border: "1px solid #2a2a2a",
+          borderRadius: 8,
+          padding: "5px 12px",
+          color: "#c9a84c",
+          fontSize: 11,
+          cursor: "pointer",
+          letterSpacing: "0.06em",
+          textTransform: "uppercase",
+          flexShrink: 0,
+          marginTop: 2,
+          transition: "border-color 0.15s",
+          whiteSpace: "nowrap",
+        }}
+      >
+        Daugiau →
       </button>
     </div>
   );
@@ -179,7 +225,12 @@ export default function DiscoverPage() {
 
       {/* Section 1: Popular Locations */}
       <section>
-        <h2 style={sectionHeaderStyle}>Populiarios lokacijos</h2>
+        <SectionHeader
+          title="Populiarios lokacijos"
+          description="Lietuvos filmavimo vietos, kurios dažniausiai įamžintos ekrane. Atraskite, kur buvo kuriami jūsų mėgstami filmai ir serialai."
+          linkTo="/locations"
+          navigate={navigate}
+        />
         <ScrollRow>
           {(locations ?? []).map((loc) => (
             <button
@@ -199,19 +250,14 @@ export default function DiscoverPage() {
                 background: "#1a1a1a",
               }}
             >
-             <ImageWithFallback
-  src={loc.image_url}
-  alt={loc.name}
-  fallbackType="location"
-  width={160}
-  height={200}
-  style={{
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    display: "block",
-  }}
-/>
+              <ImageWithFallback
+                src={loc.image_url}
+                alt={loc.name}
+                fallbackType="location"
+                width={160}
+                height={200}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
               <div
                 style={{
                   position: "absolute",
@@ -263,7 +309,12 @@ export default function DiscoverPage() {
 
       {/* Section 2: Popular Films */}
       <section>
-        <h2 style={sectionHeaderStyle}>Populiarus turinys</h2>
+        <SectionHeader
+          title="Populiarus turinys"
+          description="Geriausiai įvertinti kino projektai, kurių scenoms filmuoti buvo pasirinktos Lietuvos lokacijos."
+          linkTo="/films"
+          navigate={navigate}
+        />
         <div className="cinemap-scroll-row" style={scrollRowStyle}>
           {(films ?? []).map((film) => (
             <button
@@ -294,24 +345,14 @@ export default function DiscoverPage() {
                   background: "#1a1a1a",
                 }}
               >
-<ImageWithFallback
-  src={
-    film.poster_url
-      ? `https://image.tmdb.org/t/p/w342${film.poster_url}`
-      : null
-  }
-  alt={film.title_lt ?? ""}
-  fallbackType="poster"
-  width={120}
-  height={180}
-  style={{
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    objectPosition: "top center",
-    display: "block",
-  }}
-/>
+                <ImageWithFallback
+                  src={film.poster_url ? `https://image.tmdb.org/t/p/w342${film.poster_url}` : null}
+                  alt={film.title_lt ?? ""}
+                  fallbackType="poster"
+                  width={120}
+                  height={180}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }}
+                />
               </div>
               <div
                 style={{
@@ -339,7 +380,12 @@ export default function DiscoverPage() {
 
       {/* Section 3: Curated Routes */}
       <section>
-        <h2 style={sectionHeaderStyle}>Kuruoti maršrutai</h2>
+        <SectionHeader
+          title="Kino maršrutai"
+          description="Eksperto sudaryti maršrutai po svarbiausias Lietuvos filmavimo vietas. Nesvarbu, ar esate kino entuziastas, ar keliautojas — pajuskite istorijas, slepiančias kiekvieną sceną."
+          linkTo="/map"
+          navigate={navigate}
+        />
         <div className="cinemap-scroll-row" style={scrollRowStyle}>
           {collections && collections.length > 0 ? (
             collections.map((col) => (
@@ -364,19 +410,14 @@ export default function DiscoverPage() {
                 }}
               >
                 {col.cover_url && (
-<ImageWithFallback
-  src={col.cover_url}
-  alt={col.title}
-  fallbackType="location"
-  width={200}
-  height={140}
-  style={{
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    display: "block",
-  }}
-/>
+                  <ImageWithFallback
+                    src={col.cover_url}
+                    alt={col.title}
+                    fallbackType="location"
+                    width={200}
+                    height={140}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                  />
                 )}
                 <div
                   style={{

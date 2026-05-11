@@ -3,6 +3,7 @@ import { type QueryClient } from "@tanstack/react-query";
 import { useState, useEffect, lazy, Suspense } from "react";
 
 import { AppSidebar } from "../components/AppSidebar";
+import { CookieBanner } from "../components/CookieBanner";
 
 const MapViewer = lazy(() => import("../components/map/MapViewer"));
 const SearchBar = lazy(() => import("../components/map/SearchBar"));
@@ -56,7 +57,6 @@ function RootComponent() {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  // Admin routes render without the main app layout
   if (isAdminRoute) {
     return <Outlet />;
   }
@@ -64,7 +64,7 @@ function RootComponent() {
   const contentStyle: React.CSSProperties = {
     position: "fixed",
     top: 0,
-    left: isDesktop ? 72 : 0,
+    left: isDesktop ? 96 : 0,
     right: 0,
     bottom: isDesktop ? 0 : 64,
     overflow: "hidden",
@@ -75,7 +75,7 @@ function RootComponent() {
       <AppSidebar />
       <div style={contentStyle}>
 
-        {/* Persistent map layer — visible on /map and /saved */}
+        {/* Persistent map layer */}
         <div style={{
           position: "absolute",
           top: 0, left: 0, right: 0, bottom: 0,
@@ -92,7 +92,7 @@ function RootComponent() {
           </Suspense>
         </div>
 
-        {/* SavedPage sidebar overlay on /saved */}
+        {/* SavedPage sidebar overlay */}
         {isSavedRoute && (
           <Suspense fallback={null}>
             <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, width: 360, zIndex: 30, background: "#0a0a0a", borderRight: "1px solid #222222" }}>
@@ -101,7 +101,7 @@ function RootComponent() {
           </Suspense>
         )}
 
-        {/* Other routes — Atradimai etc */}
+        {/* Other routes */}
         <div style={{
           position: "absolute",
           top: 0, left: 0, right: 0, bottom: 0,
@@ -114,6 +114,9 @@ function RootComponent() {
         </div>
 
       </div>
+
+      {/* Cookie banner — virš visko, išskyrus admin */}
+      <CookieBanner />
     </div>
   );
 }

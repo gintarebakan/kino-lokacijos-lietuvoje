@@ -1,4 +1,4 @@
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 interface NavItem {
@@ -42,7 +42,6 @@ const HomeIcon = (
   </svg>
 );
 
-// Žemėlapio ikona — fold lines stilius
 const MapIcon = (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
@@ -66,8 +65,11 @@ const items: NavItem[] = [
   { to: "/saved",     label: "Išsaugota",  icon: BookmarkIcon },
 ];
 
+export const SIDEBAR_WIDTH = 96;
+
 export function AppSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
 
@@ -87,7 +89,7 @@ export function AppSidebar() {
           left: 0,
           top: 0,
           height: "100dvh",
-          width: "72px",
+          width: `${SIDEBAR_WIDTH}px`,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -96,13 +98,52 @@ export function AppSidebar() {
           borderRight: "1px solid var(--color-border)",
         }}
       >
-        <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 20, paddingBottom: 16 }}>
-          <span style={{ fontFamily: "Georgia, serif", color: "var(--color-gold)", fontSize: "28px", letterSpacing: "0.15em", lineHeight: 1 }}>
-            CM
+        {/* Logo */}
+        <div
+          onClick={() => navigate({ to: "/" })}
+          style={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            padding: "20px 8px 16px",
+            cursor: "pointer",
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "Georgia, serif",
+              color: "var(--color-gold)",
+              fontSize: "12px",
+              fontWeight: 700,
+              letterSpacing: "0.1em",
+              lineHeight: 1.4,
+              textAlign: "center",
+              textTransform: "uppercase",
+            }}
+          >
+            Kino
+            <br />
+            Lokacijos
+          </span>
+          <span
+            style={{
+              fontFamily: "Georgia, serif",
+              color: "var(--color-gold)",
+              fontSize: "10px",
+              letterSpacing: "0.3em",
+              marginTop: 3,
+              opacity: 0.6,
+            }}
+          >
+            LT
           </span>
         </div>
-        <div style={{ width: 32, height: 1, background: "#1a1a1a" }} />
-        <nav style={{ display: "flex", flexDirection: "column", width: "100%", marginTop: 50 }}>
+
+        <div style={{ width: 48, height: 1, background: "#1a1a1a" }} />
+
+        {/* Nav */}
+        <nav style={{ display: "flex", flexDirection: "column", width: "100%", marginTop: 24 }}>
           {items.map((item) => {
             const active = item.to === "/" ? currentPath === "/" : currentPath.startsWith(item.to);
             return (
@@ -110,11 +151,12 @@ export function AppSidebar() {
                 key={item.to}
                 to={item.to as any}
                 style={{
-                  height: "56px",
+                  height: "60px",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
+                  gap: 4,
                   borderLeft: active ? "2px solid var(--color-gold)" : "2px solid transparent",
                   background: active ? "rgba(201,168,76,0.08)" : "transparent",
                   color: active ? "var(--color-gold)" : "#6b7280",
@@ -123,7 +165,7 @@ export function AppSidebar() {
                 }}
               >
                 {item.icon}
-                <span style={{ marginTop: 4, fontSize: "9px", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                <span style={{ fontSize: "9px", letterSpacing: "0.08em", textTransform: "uppercase" }}>
                   {item.label}
                 </span>
               </Link>
@@ -160,6 +202,7 @@ export function AppSidebar() {
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
+              gap: 2,
               borderTop: active ? "2px solid var(--color-gold)" : "2px solid transparent",
               background: active ? "rgba(201,168,76,0.08)" : "transparent",
               color: active ? "var(--color-gold)" : "#6b7280",
@@ -167,7 +210,7 @@ export function AppSidebar() {
             }}
           >
             {item.icon}
-            <span style={{ marginTop: 2, fontSize: "9px", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            <span style={{ fontSize: "8px", letterSpacing: "0.08em", textTransform: "uppercase" }}>
               {item.label}
             </span>
           </Link>
