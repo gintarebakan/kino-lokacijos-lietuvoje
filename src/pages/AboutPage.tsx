@@ -114,7 +114,7 @@ export default function AboutPage() {
         ))}
       </section>
 
-      {/* ── Kontekstas ── */}
+      {/*  Kontekstas  */}
       <section style={{ padding: "48px 48px", maxWidth: 900, margin: "0 auto" }}>
         <p style={labelStyle}>Kontekstas</p>
         <p style={{ ...bodyText, textAlign: "center" }}>
@@ -128,7 +128,7 @@ export default function AboutPage() {
 
       <div style={fullDivider} />
 
-      {/* ── Tikslas ── */}
+      {/*  Tikslas  */}
       <section style={{ padding: "48px 48px", maxWidth: 900, margin: "0 auto" }}>
         <p style={labelStyle}>Tikslas</p>
         <p style={{ ...bodyText, textAlign: "center" }}>
@@ -173,7 +173,7 @@ export default function AboutPage() {
                 </svg>
               ),
               title: "Hibridinė paieška",
-              desc: "Fuzzy paieška pagal filmą, lokaciją ar žanrą.",
+              desc: "Fuzzy paieška pagal filmą, lokaciją ar adresą.",
             },
             {
               icon: (
@@ -182,7 +182,7 @@ export default function AboutPage() {
                 </svg>
               ),
               title: "Kino maršrutai",
-              desc: "Sisteminiai kino maršrutai su navigacijos palaikymu.",
+              desc: "Paruošti kino maršrutai su navigacijos palaikymu.",
             },
             {
               icon: (
@@ -247,7 +247,7 @@ export default function AboutPage() {
             {
               n: "1",
               title: "Ieškokite ir naršykite",
-              desc: "Naudokite paiešką arba naršykite žemėlapį, kad rastumėte jus dominančius filmus ar lokacijas.",
+              desc: "Naudokite paiešką, naršykite žemėlapį ar katalogą, kad rastumėte jus dominančius filmus ar lokacijas.",
             },
             {
               n: "2",
@@ -257,7 +257,7 @@ export default function AboutPage() {
             {
               n: "3",
               title: "Planuokite kelionę",
-              desc: "Naudokite kino maršrutus ir navigacijos funkcijas, kad aplankytumėte vietas asmeniškai.",
+              desc: "Naudokite kino maršrutus ir navigacijos funkcijas, kad aplankytumėte vietas asmeniškai arba sudarytumėte asmeninį maršrutą.",
             },
           ].map((step) => (
             <div key={step.n} style={{ textAlign: "center" }}>
@@ -297,16 +297,15 @@ export default function AboutPage() {
       <section style={{ padding: "48px 48px", maxWidth: 900, margin: "0 auto" }}>
         <p style={labelStyle}>Naujumas ir vertė</p>
         <p style={{ ...bodyText, textAlign: "center" }}>
-          Sistema grindžiama fragmentuotų Lietuvos kino lokacijų duomenų apjungimu ir šių
-          lokacijų intelektualiu kuravimų. Pirmą kartą nacionaliniu lygmeniu susisteminama
+          Sistema grindžiama Lietuvos kino lokacijų duomenų apjungimu ir šių
+          lokacijų intelektualiu kuravimu. Pirmą kartą nacionaliniu lygmeniu susisteminama
           Lietuvos kino paveldo geografinė informacija, dinamiškai siejant lokalius istorinius
           duomenis su globalia kino metaduomenų baze{" "}
           <span style={{ color: "#c9a84c" }}>TMDB API</span>.
         </p>
         <p style={{ ...bodyText, textAlign: "center", marginTop: 16 }}>
           Sukurta sistema leidžia vizualizuoti sudėtingus ryšius tarp kino lokacijų, filmų ir
-          jų istorinio konteksto. Suprojektuota architektūra yra universali — jos principai
-          gali būti pritaikomi kuriant kultūros paveldo sklaidos sprendimus kituose regionuose.
+          jų istorinio konteksto.
         </p>
       </section>
 
@@ -335,7 +334,7 @@ export default function AboutPage() {
           Pradėkite tyrinėti
         </h2>
         <p style={{ color: "#9ca3af", fontSize: 13, lineHeight: 1.7, margin: "0 0 24px", maxWidth: 360, marginLeft: "auto", marginRight: "auto" }}>
-          Atraskite Lietuvos kino paveldą — realias vietas, kuriose gimė jūsų mėgstami filmai.
+          Atraskite kino lokacijas Lietuvoje: realias vietas, kurios įamžintos didžiuosiuose ekranuose.
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
           <button

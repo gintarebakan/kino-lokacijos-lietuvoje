@@ -79,7 +79,7 @@ export function CookieBanner() {
         flexWrap: "wrap",
       }}
     >
-      <p style={{ color: "#9ca3af", fontSize: 13, margin: 0, maxWidth: 780, lineHeight: 1.6 }}>
+      <p style={{ color: "#9ca3af", fontSize: 13, margin: 0, maxWidth: 680, lineHeight: 1.6 }}>
         Mūsų svetainė naudoja slapukus (cookies) jūsų patirčiai pagerinti - išsaugoti pasirinktus filtrus, maršrutus ir mėgstamiausias lokacijas. 
         Duomenys saugomi tik jūsų naršyklėje ir nėra perduodami trečiosioms šalims.
       </p>
