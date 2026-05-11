@@ -1,44 +1,24 @@
-import { useCookieStore } from "../stores/cookieStore";
-
-export function CookieBanner() {
-  const { consent, setConsent } = useCookieStore();
-  if (consent !== null) return null;
-
+if (consent !== "accepted" && consent !== null) {
   return (
     <div style={{
-      position: "fixed", bottom: 0, left: 0, right: 0,
-      zIndex: 9999, background: "#111111",
-      borderTop: "1px solid #222", padding: "16px 24px",
-      display: "flex", alignItems: "center",
-      justifyContent: "space-between", gap: 16, flexWrap: "wrap",
+      position: "fixed", inset: 0, background: "#0a0a0a",
+      zIndex: 9999, display: "flex", alignItems: "center",
+      justifyContent: "center", textAlign: "center", padding: 24,
     }}>
-      <p style={{ color: "#9ca3af", fontSize: 13, margin: 0, maxWidth: 600, lineHeight: 1.6 }}>
-        Mūsų svetainė naudoja slapukus (cookies). Šie slapukai naudojami statistikos ir
-        rinkodaros tikslais. Jei sutinkate su šiems tikslams naudojamais slapukais,
-        spauskite „Sutinku" ir toliau naudokitės svetaine.
-      </p>
-      <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+      <div>
+        <p style={{ color: "#9ca3af", fontSize: 14, marginBottom: 16 }}>
+          Norint naudotis svetaine, būtina sutikti su slapukų naudojimu.
+        </p>
         <button
           type="button"
           onClick={() => setConsent("accepted")}
           style={{
             background: "#c9a84c", border: "none", borderRadius: 8,
-            padding: "8px 20px", color: "#0a0a0a", fontWeight: 700,
+            padding: "10px 24px", color: "#0a0a0a", fontWeight: 700,
             fontSize: 13, cursor: "pointer",
           }}
         >
           Sutinku
-        </button>
-        <button
-          type="button"
-          onClick={() => setConsent("declined")}
-          style={{
-            background: "transparent", border: "1px solid #333",
-            borderRadius: 8, padding: "8px 16px", color: "#6b7280",
-            fontSize: 13, cursor: "pointer",
-          }}
-        >
-          Atmesti
         </button>
       </div>
     </div>
