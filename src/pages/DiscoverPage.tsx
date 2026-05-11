@@ -125,7 +125,7 @@ function SectionHeader({
         }}
       >
         {title}
-        <span style={{ fontSize: 13, opacity: 0.7 }}>→</span>
+        <span style={{ fontSize: 13, opacity: 0.7 }}>›</span>
       </button>
 
       {/* Aprašymas — visas plotis */}
