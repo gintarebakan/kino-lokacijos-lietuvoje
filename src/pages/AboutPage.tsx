@@ -120,11 +120,9 @@ export default function AboutPage() {
         <p style={{ ...bodyText, textAlign: "center" }}>
           Kino industrija ir audiovizualinių projektų gamyba yra neatsiejama šiuolaikinės
           kultūros dalis, turinti tiesioginę įtaką regionų ekonominiam aktyvumui bei turizmo
-          plėtrai. Šis reiškinys —{" "}
-          <span style={{ color: "#c9a84c" }}>kino turizmas</span> — transformuoja filmavimo
-          lokacijas į savarankiškus traukos objektus. Lietuvos kontekste informacija apie
-          šalyje filmuotus projektus yra išskaidyta skirtinguose registruose ir šaltiniuose —
-          šie nėra orientuoti į tikslią geografinę lokacijų analizę.
+          plėtrai. Šis reiškinys -{" "}
+          <span style={{ color: "#c9a84c" }}>kino turizmas</span>, transformuoja filmavimo
+          lokacijas į savarankiškus traukos objektus.
         </p>
       </section>
 
