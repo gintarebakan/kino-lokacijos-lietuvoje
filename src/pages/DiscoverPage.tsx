@@ -90,7 +90,6 @@ function ScrollRow({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Sekcijos antraštė su aprašymu ir "Daugiau" nuoroda
 function SectionHeader({
   title,
   description,
@@ -103,45 +102,36 @@ function SectionHeader({
   navigate: ReturnType<typeof useNavigate>;
 }) {
   return (
-    <div style={{ padding: "24px 16px 8px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
-      <div>
-        <h2
-          style={{
-            textTransform: "uppercase",
-            letterSpacing: "0.1em",
-            color: "#f5f5f5",
-            fontSize: 13,
-            fontWeight: 600,
-            margin: "0 0 6px",
-          }}
-        >
-          {title}
-        </h2>
-        <p style={{ color: "#6b7280", fontSize: 12, margin: 0, lineHeight: 1.6 }}>
-          {description}
-        </p>
-      </div>
+    <div style={{ padding: "24px 16px 8px" }}>
+      {/* Antraštė — paspaudus nukreipia */}
       <button
         type="button"
         onClick={() => navigate({ to: linkTo as any })}
         style={{
           background: "transparent",
-          border: "1px solid #2a2a2a",
-          borderRadius: 8,
-          padding: "5px 12px",
-          color: "#c9a84c",
-          fontSize: 11,
+          border: "none",
+          padding: 0,
           cursor: "pointer",
-          letterSpacing: "0.06em",
           textTransform: "uppercase",
-          flexShrink: 0,
-          marginTop: 2,
-          transition: "border-color 0.15s",
-          whiteSpace: "nowrap",
+          letterSpacing: "0.12em",
+          color: "#c9a84c",
+          fontSize: 15,
+          fontWeight: 700,
+          margin: "0 0 8px",
+          textAlign: "left",
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
         }}
       >
-        Daugiau →
+        {title}
+        <span style={{ fontSize: 13, opacity: 0.7 }}>→</span>
       </button>
+
+      {/* Aprašymas — visas plotis */}
+      <p style={{ color: "#6b7280", fontSize: 12, margin: 0, lineHeight: 1.6 }}>
+        {description}
+      </p>
     </div>
   );
 }
@@ -227,8 +217,7 @@ export default function DiscoverPage() {
       <section>
         <SectionHeader
           title="Populiarios lokacijos"
-          description="Filmavimo vietos Lietuvoje, kurios dažniausiai įamžintos ekrane. 
-          Atraskite lokacijas, kuriose buvo kuriami filmai ir serialai."
+          description="Filmavimo vietos Lietuvoje, kurios dažniausiai įamžintos ekrane. Atraskite lokacijas, kuriose buvo kuriami filmai ir serialai."
           linkTo="/locations"
           navigate={navigate}
         />
@@ -379,11 +368,11 @@ export default function DiscoverPage() {
         </div>
       </section>
 
-      {/* Section 3: Curated Routes */}
+      {/* Section 3: Kino maršrutai */}
       <section>
         <SectionHeader
           title="Kino maršrutai"
-          description="Iš anksto paruošti maršrutai po svarbiausias Lietuvos filmavimo vietas. Nesvarbu, esate kino entuziastas, ar keliautojas - pajuskite istorijas, kurios slepiasi kiekvienoje scenoje."
+          description="Iš anksto paruošti maršrutai po svarbiausias Lietuvos filmavimo vietas. Nesvarbu, esate kino entuziastas ar keliautojas — pajuskite istorijas, kurios slepiasi kiekvienoje scenoje."
           linkTo="/map"
           navigate={navigate}
         />
