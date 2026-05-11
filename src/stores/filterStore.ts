@@ -2,13 +2,13 @@
 // ir užtikrina, kad bet kuris komponentas (žemėlapis, sąrašas, paieškos laukelis) 
 // galėtų paskaityti arba įrašyti. 
 
-import { create } from "zustand"; //  funkciją create sukurs globalią būseną
-import { persist } from "zustand/middleware"; // išlaikymo įrankis, išsaugo duomenis net uždarius naršyklę. 
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 
-export interface FilterState { //apibrėžama struktūra (kuria dalinamės viešai)
-  selectedGenres: string[]; // kokius duomenis turi atsiminti
-  selectedMediaTypes: string[]; // 'film' | 'series'
+export interface FilterState {
+  selectedGenres: string[];
+  selectedMediaTypes: string[];
   studio: string;
   minRating: number;
   maxRating: number;
@@ -17,8 +17,8 @@ export interface FilterState { //apibrėžama struktūra (kuria dalinamės vieš
   selectedCounties: string[];
   selectedLocationTypes: string[];
 
-  toggleGenre: (genre: string) => void;//ir kokius veiksmus apibrėžta struktūra moka atlikti
-  toggleMediaType: (type: string) => void;//funkcija priima tekstą ir negrąžina nieko
+  toggleGenre: (genre: string) => void;
+  toggleMediaType: (type: string) => void;
   setStudio: (studio: string) => void;
   setRatingRange: (min: number, max: number) => void;
   setYearFrom: (year: number | null) => void;
@@ -29,7 +29,7 @@ export interface FilterState { //apibrėžama struktūra (kuria dalinamės vieš
   hasActiveFilters: () => boolean;
 }
 
-const DEFAULTS = { //apsibrėžiame, kaip atrodo tuščia, neliesta filtrų būsena
+const DEFAULTS = {
   selectedGenres: [] as string[],
   selectedMediaTypes: [] as string[],
   studio: "",
@@ -41,18 +41,15 @@ const DEFAULTS = { //apsibrėžiame, kaip atrodo tuščia, neliesta filtrų būs
   selectedLocationTypes: [] as string[],
 };
 
-const toggle = (arr: string[], v: string) => //gaunamas sąrašas arr ir nauja reikšmė - v
-  arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v];//ar reikšmė jau sąraše?
-  //jei taip - vartotojas nori filtrą išjungti, naudojame .filter, kad išmestumę reikšmę iš sąrašo
-  //jei ne - vartotojas nori įjungti filtrą, paimame seną sąrašą ...arr ir į galą pridedame naują reikšmę v
+const toggle = (arr: string[], v: string) =>
+  arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v];
 
-export const useFilterStore = create<FilterState>()( //sukūriame Store (saugyklą)
+export const useFilterStore = create<FilterState>()(
   persist(
-    (set, get) => ({ //zustand įrankiai
-      ...DEFAULTS,//pirmą kartą užpildoma tuščiomis/pradinėmis reikšmėmis
+    (set, get) => ({
+      ...DEFAULTS,
       toggleGenre: (g) =>
         set((s) => ({ selectedGenres: toggle(s.selectedGenres, g) })),
-      //set komanda skirta pakeisti duomenis, paimame seną būseną (s) ir užsetiname naują masyvą, naudodami toggle jungiklį
       toggleMediaType: (t) =>
         set((s) => ({ selectedMediaTypes: toggle(s.selectedMediaTypes, t) })),
       setStudio: (studio) => set({ studio }),
@@ -68,8 +65,6 @@ export const useFilterStore = create<FilterState>()( //sukūriame Store (saugykl
       clearAllFilters: () => set({ ...DEFAULTS }),
       hasActiveFilters: () => {
         const s = get();
-        //get komanda skirta pažiūrėti kas dabar užrašyta. Tik nuskaitom dabartinius duomenis get() 
-        // ir ar nor vienas filtras aktyvus - grąžina true/false
         return (
           s.selectedGenres.length > 0 ||
           s.selectedMediaTypes.length > 0 ||
@@ -84,8 +79,7 @@ export const useFilterStore = create<FilterState>()( //sukūriame Store (saugykl
       },
     }),
     {
-      
-      name: "cinemap-filters",//importuotas persist įrankis, šiuo pavadinimu local storage bus saugomi šie duomenys
+      name: "cinemap-filters",
       partialize: (s) => ({
         selectedGenres: s.selectedGenres,
         selectedMediaTypes: s.selectedMediaTypes,
@@ -112,29 +106,16 @@ export const COUNTIES = [
   "Telšių",
   "Utenos",
   "Tauragės",
-] as const;//sąrašas yra nekintamas, per čia koreguojam reikšmes
-
-export const LOCATION_TYPES = [
-  "dvaras",
-  "rūmai",
-  "pilis",
-  "gatvė",
-  "aikštė",
-  "parkas",
-  "miškas",
-  "kalėjimas",
-  "bažnyčia",
-  "muziejus",
-  "interjeras",
-  "architektūra",
 ] as const;
 
-export const MEDIA_TYPES = [  //kokio tipo turinį galima filtruoti, pasirinkimai
-  { value: "film", label: "Filmas" },//react paims masyvą, pereis per jį ciklą .map() ir automatiškai nupieš tiek mygtukų, kiek elementų
+// LOCATION_TYPES pašalintas — naudojamas dinamiškai iš DB per useLocationTypes hook
+
+export const MEDIA_TYPES = [
+  { value: "film", label: "Filmas" },
   { value: "series", label: "Serialas" },
 ] as const;
 
-export const formatMediaType = (type: string) => { //paima vieną žodį, patikrina jį per if sąlygas ir grąžina lietuvišką žodį
+export const formatMediaType = (type: string) => {
   if (type === "series") return "Serialas";
   if (type === "film") return "Filmas";
   return type;

@@ -1,3 +1,4 @@
+//searchbar
 // ═══════════════════════════════════════════════
 // IMPORTAI
 // ═══════════════════════════════════════════════
@@ -8,13 +9,17 @@ import { useLocations } from "../../hooks/useLocations"; // visos lokacijos GeoJ
 import { useFilteredLocations } from "../../hooks/useFilteredLocations"; // filtruotos lokacijos, tik filtro santraukai rodyti (kiek rasta)
 import { useGenres } from "../../hooks/useGenres"; // žanrų sąrašas iš DB, filtro "Žanras" pill'ams generuoti
 
+
 import {
-  useFilterStore, //filtro būsena (Zustand)
-  COUNTIES, //statinis apskričių sąrašas
-  LOCATION_TYPES, //statinis lokacijų tipų sąrašas
-  MEDIA_TYPES, //statinis media tipų sąrašas
-  formatMediaType, //"tv", "Serialas" formatavimas
+  useFilterStore,
+  COUNTIES,
+  // LOCATION_TYPES,
+  MEDIA_TYPES,
+  formatMediaType,
 } from "../../stores/filterStore";
+
+
+import { useLocationTypes } from "../../hooks/useLocationTypes";
 
 interface PillProps {
   label: string;
@@ -87,6 +92,7 @@ export default function SearchBar() {
   const { data: filteredData } = useFilteredLocations();
   const filteredCount = filteredData?.features?.length ?? 0;//skaičius filtro santraukai: "Rastos lokacijos: 12"
   const { data: genres } = useGenres();//žanrų sąrašas: ["Drama", "Komedija", "Trileris", ...]
+  const locationTypes = useLocationTypes();
   const setSelectedLocation = useMapStore((s) => s.setSelectedLocation);
   const mapInstance = useMapStore((s) => s.mapInstance);
   const selectedLocationId = useMapStore((s) => s.selectedLocationId);
@@ -451,14 +457,14 @@ onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#222222"; e.currentT
           <div>
             <span style={labelStyle}>Lokacijos tipas</span>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {LOCATION_TYPES.map((t) => (
-                <Pill
-                  key={t}
-                  label={t}
-                  active={filter.selectedLocationTypes.includes(t)}
-                  onClick={() => filter.toggleLocationType(t)}
-                />
-              ))}
+              {locationTypes.map((t: string) => (
+  <Pill
+    key={t}
+    label={t}
+    active={filter.selectedLocationTypes.includes(t)}
+    onClick={() => filter.toggleLocationType(t)}
+  />
+))}
             </div>
           </div>
         </div>
