@@ -48,44 +48,48 @@ const scrollRowStyle: React.CSSProperties = {
   gap: 12,
   padding: "0 16px 16px",
   overflowX: "auto",
+  cursor: "grab",
+  userSelect: "none",
 };
 
+// Drag scroll — be strėlyčių
 function ScrollRow({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
-  const scroll = (dir: number) => {
-    ref.current?.scrollBy({ left: dir * 300, behavior: "smooth" });
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    isDragging.current = true;
+    startX.current = e.pageX - (ref.current?.offsetLeft ?? 0);
+    scrollLeft.current = ref.current?.scrollLeft ?? 0;
+    if (ref.current) ref.current.style.cursor = "grabbing";
   };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current) return;
+    e.preventDefault();
+    const x = e.pageX - (ref.current?.offsetLeft ?? 0);
+    const walk = (x - startX.current) * 1.2;
+    if (ref.current) ref.current.scrollLeft = scrollLeft.current - walk;
+  };
+
+  const onMouseUp = () => {
+    isDragging.current = false;
+    if (ref.current) ref.current.style.cursor = "grab";
+  };
+
   return (
-    <div style={{ position: "relative" }}>
-      <button
-        type="button"
-        onClick={() => scroll(-1)}
-        style={{
-          position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)",
-          zIndex: 10, background: "rgba(10,10,10,0.8)", border: "1px solid #333",
-          color: "#c9a84c", width: 32, height: 32, borderRadius: "50%",
-          cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 18, lineHeight: 1,
-        }}
-      >
-        ‹
-      </button>
-      <div ref={ref} className="cinemap-scroll-row" style={scrollRowStyle}>
-        {children}
-      </div>
-      <button
-        type="button"
-        onClick={() => scroll(1)}
-        style={{
-          position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)",
-          zIndex: 10, background: "rgba(10,10,10,0.8)", border: "1px solid #333",
-          color: "#c9a84c", width: 32, height: 32, borderRadius: "50%",
-          cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 18, lineHeight: 1,
-        }}
-      >
-        ›
-      </button>
+    <div
+      ref={ref}
+      className="cinemap-scroll-row"
+      style={scrollRowStyle}
+      onMouseDown={onMouseDown}
+      onMouseMove={onMouseMove}
+      onMouseUp={onMouseUp}
+      onMouseLeave={onMouseUp}
+    >
+      {children}
     </div>
   );
 }
@@ -103,7 +107,6 @@ function SectionHeader({
 }) {
   return (
     <div style={{ padding: "24px 16px 8px" }}>
-      {/* Antraštė — paspaudus nukreipia */}
       <button
         type="button"
         onClick={() => navigate({ to: linkTo as any })}
@@ -125,10 +128,8 @@ function SectionHeader({
         }}
       >
         {title}
-        <span style={{ fontSize: 13, opacity: 0.7 }}>›</span>
+        <span style={{ fontSize: 16, opacity: 0.7 }}>›</span>
       </button>
-
-      {/* Aprašymas — visas plotis */}
       <p style={{ color: "#6b7280", fontSize: 14, margin: 0, lineHeight: 1.6 }}>
         {description}
       </p>
@@ -170,7 +171,7 @@ export default function DiscoverPage() {
       const { data, error } = await supabase
         .from("collections_curated")
         .select("id, title, description, cover_url, is_route")
-        .limit(6);
+        .limit(10);
       if (error) throw error;
       return (data ?? []) as CuratedCollection[];
     },
@@ -201,12 +202,6 @@ export default function DiscoverPage() {
       <style>{`
         .cinemap-scroll-row::-webkit-scrollbar { display: none; }
         .cinemap-scroll-row { scrollbar-width: none; }
-        .cinemap-line-clamp-2 {
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
       `}</style>
 
       <Suspense fallback={<div style={{ width: "100%", height: 240, background: "#1a1a1a" }} />}>
@@ -305,7 +300,7 @@ export default function DiscoverPage() {
           linkTo="/films"
           navigate={navigate}
         />
-        <div className="cinemap-scroll-row" style={scrollRowStyle}>
+        <ScrollRow>
           {(films ?? []).map((film) => (
             <button
               key={film.id}
@@ -365,18 +360,18 @@ export default function DiscoverPage() {
               )}
             </button>
           ))}
-        </div>
+        </ScrollRow>
       </section>
 
       {/* Section 3: Kino maršrutai */}
       <section>
         <SectionHeader
           title="Kino maršrutai"
-          description="Iš anksto paruošti maršrutai po svarbiausias Lietuvos filmavimo vietas. Nesvarbu, esate kino entuziastas ar keliautojas - pajuskite istorijas, kurios slepiasi kiekvienoje scenoje."
+          description="Iš anksto paruošti maršrutai po svarbiausias Lietuvos filmavimo vietas. Nesvarbu, esate kino entuziastas ar keliautojas — pajuskite istorijas, kurios slepiasi kiekvienoje scenoje."
           linkTo="/map"
           navigate={navigate}
         />
-        <div className="cinemap-scroll-row" style={scrollRowStyle}>
+        <ScrollRow>
           {collections && collections.length > 0 ? (
             collections.map((col) => (
               <button
@@ -452,7 +447,7 @@ export default function DiscoverPage() {
               Maršrutai bus pridėti netrukus
             </div>
           )}
-        </div>
+        </ScrollRow>
       </section>
     </main>
   );
