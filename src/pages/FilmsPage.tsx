@@ -22,6 +22,16 @@ const MEDIA_TYPE_OPTIONS = [
   { value: "series", label: "Serialai" },
 ];
 
+function filmsCountLabel(count: number): string {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (count === 1) return "1 filmas ir serialas įamžintas Lietuvoje";
+  if (mod10 >= 2 && mod10 <= 9 && (mod100 < 10 || mod100 >= 20)) {
+    return `${count} filmai ir serialai įamžinti Lietuvoje`;
+  }
+  return `${count} filmų ir serialų įamžintų Lietuvoje`;
+}
+
 export default function FilmsPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
@@ -44,7 +54,6 @@ export default function FilmsPage() {
     },
   });
 
-  // Dinamiški žanrai iš esamų filmų
   const genres = useMemo(() => {
     const set = new Set<string>();
     films.forEach((f) => f.genre?.forEach((g) => set.add(g)));
@@ -129,7 +138,7 @@ export default function FilmsPage() {
           Visas turinys
         </h1>
         <p style={{ color: "#6b7280", fontSize: 13, margin: "0 0 20px" }}>
-          {films.length} filmų ir serialų įamžintų Lietuvoje
+          {filmsCountLabel(films.length)}
         </p>
 
         {/* Search */}
@@ -185,7 +194,6 @@ export default function FilmsPage() {
 
           <div style={{ width: 1, background: "#222", margin: "0 4px" }} />
 
-          {/* Genre filter */}
           <select
             value={filterGenre}
             onChange={(e) => setFilterGenre(e.target.value)}
@@ -208,7 +216,6 @@ export default function FilmsPage() {
 
           <div style={{ width: 1, background: "#222", margin: "0 4px" }} />
 
-          {/* Sort */}
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as "rating" | "year")}
@@ -265,7 +272,6 @@ export default function FilmsPage() {
 
           <div style={{ width: 1, background: "#222", margin: "0 4px" }} />
 
-          {/* Min rating buttons */}
           <span style={{ color: "#6b7280", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.06em" }}>
             IMDb ≥
           </span>
@@ -291,7 +297,6 @@ export default function FilmsPage() {
           ))}
         </div>
 
-        {/* Active filter info */}
         {hasFilters && (
           <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ color: "#9ca3af", fontSize: 12 }}>
@@ -354,76 +359,43 @@ export default function FilmsPage() {
                 overflow: "hidden",
               }}
             >
-              {/* Poster */}
               <div style={{ width: "100%", aspectRatio: "2/3", position: "relative" }}>
                 <ImageWithFallback
-                  src={
-                    film.poster_url
-                      ? `https://image.tmdb.org/t/p/w342${film.poster_url}`
-                      : null
-                  }
+                  src={film.poster_url ? `https://image.tmdb.org/t/p/w342${film.poster_url}` : null}
                   alt={film.title_lt ?? ""}
                   fallbackType="poster"
                   width={160}
                   height={240}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    objectPosition: "top center",
-                    display: "block",
-                  }}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }}
                 />
-
-                {/* Hover overlay */}
                 <div
                   className="film-overlay"
                   style={{
-                    position: "absolute",
-                    inset: 0,
+                    position: "absolute", inset: 0,
                     background: "rgba(201,168,76,0.08)",
                     border: "2px solid rgba(201,168,76,0.4)",
-                    borderRadius: 10,
-                    opacity: 0,
-                    transition: "opacity 0.18s",
+                    borderRadius: 10, opacity: 0, transition: "opacity 0.18s",
                   }}
                 />
-
-                {/* Media type badge */}
                 <div
                   style={{
-                    position: "absolute",
-                    top: 6,
-                    left: 6,
-                    background: film.media_type === "series"
-                      ? "rgba(99,102,241,0.85)"
-                      : "rgba(0,0,0,0.65)",
-                    color: "#fff",
-                    fontSize: 9,
-                    fontWeight: 700,
-                    borderRadius: 5,
-                    padding: "2px 6px",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.06em",
+                    position: "absolute", top: 6, left: 6,
+                    background: film.media_type === "series" ? "rgba(99,102,241,0.85)" : "rgba(0,0,0,0.65)",
+                    color: "#fff", fontSize: 9, fontWeight: 700,
+                    borderRadius: 5, padding: "2px 6px",
+                    textTransform: "uppercase", letterSpacing: "0.06em",
                   }}
                 >
                   {film.media_type === "series" ? "Serialas" : "Filmas"}
                 </div>
               </div>
-
-              {/* Info */}
               <div style={{ padding: "8px 8px 10px" }}>
                 <div
                   style={{
-                    color: "#f5f5f5",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    lineHeight: 1.3,
-                    marginBottom: 4,
-                    display: "-webkit-box",
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical",
-                    overflow: "hidden",
+                    color: "#f5f5f5", fontSize: 12, fontWeight: 600,
+                    lineHeight: 1.3, marginBottom: 4,
+                    display: "-webkit-box", WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical", overflow: "hidden",
                   } as React.CSSProperties}
                 >
                   {film.title_lt ?? film.title_orig ?? "—"}
@@ -435,9 +407,7 @@ export default function FilmsPage() {
                     </span>
                   )}
                   {film.year && (
-                    <span style={{ color: "#6b7280", fontSize: 11 }}>
-                      {film.year}
-                    </span>
+                    <span style={{ color: "#6b7280", fontSize: 11 }}>{film.year}</span>
                   )}
                 </div>
               </div>
