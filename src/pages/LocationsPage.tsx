@@ -23,6 +23,18 @@ function filmCountLabel(count: number): string {
   return `${count} filmų`;
 }
 
+function locationsCountLabel(count: number): string {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (count === 1 || (mod10 === 1 && mod100 !== 11)) {
+    return `${count} filmavimo vieta Lietuvoje`;
+  }
+  if (mod10 >= 2 && mod10 <= 9 && (mod100 < 10 || mod100 >= 20)) {
+    return `${count} filmavimo vietos Lietuvoje`;
+  }
+  return `${count} filmavimo vietų Lietuvoje`;
+}
+
 export default function LocationsPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
@@ -41,7 +53,6 @@ export default function LocationsPage() {
     },
   });
 
-  // Dinamiškai generuojami tipai iš esamų duomenų
   const types = useMemo(() => {
     const set = new Set(
       locations.map((l) => l.location_type).filter(Boolean) as string[]
@@ -49,7 +60,6 @@ export default function LocationsPage() {
     return Array.from(set).sort();
   }, [locations]);
 
-  // Unikalūs apskritys filtrams
   const counties = useMemo(() => {
     const set = new Set(locations.map((l) => l.county).filter(Boolean) as string[]);
     return Array.from(set).sort();
@@ -112,7 +122,7 @@ export default function LocationsPage() {
           Visos lokacijos
         </h1>
         <p style={{ color: "#6b7280", fontSize: 13, margin: "0 0 24px" }}>
-          {locations.length} filmavimo vietų Lietuvoje
+          {locationsCountLabel(locations.length)}
         </p>
 
         {/* Search */}
@@ -145,7 +155,6 @@ export default function LocationsPage() {
 
         {/* Filters */}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {/* "Visi tipai" mygtukas */}
           <button
             type="button"
             className="loc-filter-btn"
@@ -164,7 +173,6 @@ export default function LocationsPage() {
             Visi tipai
           </button>
 
-          {/* Dinamiškai generuojami tipai iš DB */}
           {types.map((t) => (
             <button
               key={t}
@@ -187,7 +195,6 @@ export default function LocationsPage() {
             </button>
           ))}
 
-          {/* County filter */}
           {counties.length > 0 && (
             <>
               <div style={{ width: 1, background: "#222", margin: "0 4px" }} />
@@ -214,7 +221,6 @@ export default function LocationsPage() {
           )}
         </div>
 
-        {/* Active filter info */}
         {(filterType || filterCounty || search) && (
           <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ color: "#9ca3af", fontSize: 12 }}>
