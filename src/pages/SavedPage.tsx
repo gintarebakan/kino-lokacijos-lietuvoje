@@ -105,8 +105,8 @@ const tabStyle = (tab: string) => ({
   return (
     <main style={{ width: "100%", height: "100%", background: "#0a0a0a", display: "flex", flexDirection: "column", overflow: "hidden", borderRight: "1px solid #222222" }}>
       <div style={{ display: "flex", borderBottom: "1px solid #222222", flexShrink: 0 }}>
-        <button type="button" style={tabStyle("saved")} onClick={() => setActiveTab("saved")}>Issaugota ({bookmarks.length})</button>
-        <button type="button" style={tabStyle("route")} onClick={() => setActiveTab("route")}>Marsrutas ({routeLocations.length})</button>
+        <button type="button" style={tabStyle("saved")} onClick={() => setActiveTab("saved")}>Išsaugota ({bookmarks.length})</button>
+        <button type="button" style={tabStyle("route")} onClick={() => setActiveTab("route")}>Maršrutas ({routeLocations.length})</button>
       </div>
 
       {activeTab === "saved" && (
