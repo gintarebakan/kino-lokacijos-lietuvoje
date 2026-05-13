@@ -115,7 +115,9 @@ function SectionHeader({
     border: "none",
     padding: 0,
     cursor: "pointer",
+    textTransform: "uppercase",
     letterSpacing: "0.12em",
+    color: "#c9a84c",
     fontSize: 15,
     fontWeight: 700,
     margin: "0 0 8px",
@@ -125,18 +127,8 @@ function SectionHeader({
     gap: 6,
   }}
 >
-  {(() => {
-    const words = title.split(" ");
-    return (
-      <>
-        <span style={{ color: "#c9a84c", textTransform: "uppercase" }}>{words[0]}</span>
-        {words.length > 1 && (
-          <span style={{ color: "#f5f5f5", textTransform: "uppercase" }}>{words.slice(1).join(" ")}</span>
-        )}
-      </>
-    );
-  })()}
-  <span style={{ fontSize: 16, opacity: 0.5, color: "#c9a84c" }}>›</span>
+  {title}
+  <span style={{ fontSize: 16, opacity: 0.7 }}>›</span>
 </button>
       <p style={{ color: "#6b7280", fontSize: 14, margin: 0, lineHeight: 1.6 }}>
         {description}
