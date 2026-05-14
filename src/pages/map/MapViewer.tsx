@@ -13,14 +13,9 @@ import type { LocationProperties } from "../../types/locations";
 import { useLocations } from "../../hooks/useLocations";
 import { useFilteredLocations } from "../../hooks/useFilteredLocations";
 import { useFilterStore } from "../../stores/filterStore";
-import {
-  createCircleMarker,
-  createSelectedMarker,
-  createClusterMarker,
-} from "./markers";
+import { createCircleMarker, createSelectedMarker, createClusterMarker } from "./markers";
 
-const MAPTILER_KEY =
-  import.meta.env.VITE_MAPTILER_KEY ?? import.meta.env.MAPTILER_KEY ?? "";
+const MAPTILER_KEY = import.meta.env.VITE_MAPTILER_KEY ?? import.meta.env.MAPTILER_KEY ?? "";
 const STYLE_URLS: Record<LayerStyle, string> = {
   streets: `https://api.maptiler.com/maps/dataviz-dark/style.json?key=${MAPTILER_KEY}`,
   satellite: `https://api.maptiler.com/maps/hybrid/style.json?key=${MAPTILER_KEY}`,
@@ -42,17 +37,14 @@ export default function MapViewer() {
   const renderMarkersRef = useRef<(() => void) | null>(null);
   const [isLocating, setIsLocating] = useState(false);
 
-  const { data: allLocationsData, isLoading: isLoadingAll, error: errorAll } =
-    useLocations();
+  const { data: allLocationsData, isLoading: isLoadingAll, error: errorAll } = useLocations();
   const hasActiveFilters = useFilterStore((s) => s.hasActiveFilters)();
   const {
     data: filteredLocationsData,
     isLoading: isLoadingFiltered,
     error: errorFiltered,
   } = useFilteredLocations();
-  const locationsData = hasActiveFilters
-    ? filteredLocationsData
-    : allLocationsData;
+  const locationsData = hasActiveFilters ? filteredLocationsData : allLocationsData;
   const isLoading = hasActiveFilters ? isLoadingFiltered : isLoadingAll;
   const error = hasActiveFilters ? errorFiltered : errorAll;
 
@@ -78,10 +70,7 @@ export default function MapViewer() {
       attributionControl: false,
     });
 
-    map.addControl(
-      new maplibregl.AttributionControl({ compact: true }),
-      "bottom-right",
-    );
+    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
 
     mapRef.current = map;
     store.setMap(map);
@@ -97,9 +86,7 @@ export default function MapViewer() {
       isBookmarked: boolean,
       isSelected: boolean,
     ): HTMLElement => {
-      const el = isSelected
-        ? createSelectedMarker()
-        : createCircleMarker(isBookmarked);
+      const el = isSelected ? createSelectedMarker() : createCircleMarker(isBookmarked);
       el.addEventListener("click", (e: MouseEvent) => {
         e.stopPropagation();
         const m = mapRef.current;
@@ -152,8 +139,7 @@ export default function MapViewer() {
         };
 
         if (props.cluster) {
-          const count = (feature as ClusterFeature<LocationProperties>).properties
-            .point_count;
+          const count = (feature as ClusterFeature<LocationProperties>).properties.point_count;
           const el = createClusterMarker(count);
           el.addEventListener("click", () => {
             // Cluster click → reset selection
@@ -164,9 +150,7 @@ export default function MapViewer() {
               duration: 500,
             });
           });
-          const marker = new maplibregl.Marker({ element: el })
-            .setLngLat([lng, lat])
-            .addTo(m);
+          const marker = new maplibregl.Marker({ element: el }).setLngLat([lng, lat]).addTo(m);
           clusterMarkersRef.current.push(marker);
         } else {
           const isBookmarked = savedIds.includes(props.id);
@@ -192,9 +176,7 @@ export default function MapViewer() {
     const handleMoveEnd = () => {
       if (!mapRef.current) return;
       const c = mapRef.current.getCenter();
-      useMapStore
-        .getState()
-        .setViewport(mapRef.current.getZoom(), [c.lng, c.lat]);
+      useMapStore.getState().setViewport(mapRef.current.getZoom(), [c.lng, c.lat]);
       // Note: we intentionally do NOT clear selectedLocationId here so the
       // detail panel stays open while the user pans/zooms around the marker.
       renderMarkers();
@@ -203,9 +185,7 @@ export default function MapViewer() {
     const handleZoomEnd = () => {
       if (!mapRef.current) return;
       const c = mapRef.current.getCenter();
-      useMapStore
-        .getState()
-        .setViewport(mapRef.current.getZoom(), [c.lng, c.lat]);
+      useMapStore.getState().setViewport(mapRef.current.getZoom(), [c.lng, c.lat]);
       renderMarkers();
     };
 
@@ -240,9 +220,7 @@ export default function MapViewer() {
   // Load fetched locations into supercluster and re-render
   useEffect(() => {
     if (!locationsData || !clusterRef.current) return;
-    clusterRef.current.load(
-      locationsData.features as PointFeature<LocationProperties>[],
-    );
+    clusterRef.current.load(locationsData.features as PointFeature<LocationProperties>[]);
     clusterLoadedRef.current = true;
     renderMarkersRef.current?.();
   }, [locationsData]);
@@ -257,9 +235,7 @@ export default function MapViewer() {
     if (!map || !locationsData) return;
 
     const apply = () => {
-      const feature = locationsData.features.find(
-        (f) => f.properties.id === pendingLocationSlug,
-      );
+      const feature = locationsData.features.find((f) => f.properties.id === pendingLocationSlug);
       if (!feature) {
         useMapStore.getState().setPendingLocation(null);
         return;
@@ -333,16 +309,11 @@ export default function MapViewer() {
     if (!map) return;
     const savedIds = useMapStore.getState().savedLocationIds;
 
-    const swap = (
-      id: string,
-      isSelected: boolean,
-    ) => {
+    const swap = (id: string, isSelected: boolean) => {
       const entry = locationMarkersRef.current.get(id);
       if (!entry) return;
       const isBookmarked = savedIds.includes(id);
-      const newEl = isSelected
-        ? createSelectedMarker()
-        : createCircleMarker(isBookmarked);
+      const newEl = isSelected ? createSelectedMarker() : createCircleMarker(isBookmarked);
       newEl.addEventListener("click", (e: MouseEvent) => {
         e.stopPropagation();
         map.easeTo({
@@ -494,8 +465,8 @@ export default function MapViewer() {
         onClick={handleZoomIn}
         aria-label="Priartinti"
         className="cinemap-zoom-btn"
-style={{ position: "absolute", bottom: 96, right: 120, zIndex: 10 }}
->
+        style={{ position: "absolute", bottom: 96, right: 120, zIndex: 10 }}
+      >
         +
       </button>
       <button
@@ -503,7 +474,8 @@ style={{ position: "absolute", bottom: 96, right: 120, zIndex: 10 }}
         onClick={handleZoomOut}
         aria-label="Atitolinti"
         className="cinemap-zoom-btn"
-style={{ position: "absolute", bottom: 96, right: 75, zIndex: 10 }}      >
+        style={{ position: "absolute", bottom: 96, right: 75, zIndex: 10 }}
+      >
         −
       </button>
 
@@ -513,7 +485,8 @@ style={{ position: "absolute", bottom: 96, right: 75, zIndex: 10 }}      >
         onClick={handleGeolocate}
         aria-label="Mano vieta"
         className={`cinemap-geo-btn${isLocating ? " cinemap-geo-active" : ""}`}
-style={{ position: "absolute", bottom: 94, right: 16, zIndex: 10 }}      >
+        style={{ position: "absolute", bottom: 94, right: 16, zIndex: 10 }}
+      >
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
           <circle cx="10" cy="10" r="3" fill="white" />
           <line x1="10" y1="2" x2="10" y2="6" stroke="white" strokeWidth="2" />
@@ -524,7 +497,9 @@ style={{ position: "absolute", bottom: 94, right: 16, zIndex: 10 }}      >
       </button>
 
       {/* Layer switcher */}
-<div style={{ position: "absolute", right: 16, bottom: 46, zIndex: 10 }}>            <div
+      <div style={{ position: "absolute", right: 16, bottom: 46, zIndex: 10 }}>
+        {" "}
+        <div
           style={{
             background: "#111111",
             border: "1px solid #222222",

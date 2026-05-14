@@ -30,9 +30,7 @@ const PosterFallback = () => (
       <path d="M2 15l4-4 3 3 4-5 5 6" stroke="#c9a84c" strokeWidth="1.5" strokeLinejoin="round" />
       <path d="M2 4v16M22 4v16M7 4v16M12 4v16M17 4v16" stroke="#333" strokeWidth="0.5" />
     </svg>
-    <span style={{ color: "#4b5563", fontSize: "10px", letterSpacing: "0.05em" }}>
-      PLAKATAS
-    </span>
+    <span style={{ color: "#4b5563", fontSize: "10px", letterSpacing: "0.05em" }}>PLAKATAS</span>
   </div>
 );
 
@@ -58,9 +56,7 @@ const LocationFallback = () => (
       />
       <circle cx="12" cy="9" r="2.5" stroke="#c9a84c" strokeWidth="1.5" fill="none" />
     </svg>
-    <span style={{ color: "#4b5563", fontSize: "10px", letterSpacing: "0.05em" }}>
-      LOKACIJA
-    </span>
+    <span style={{ color: "#4b5563", fontSize: "10px", letterSpacing: "0.05em" }}>LOKACIJA</span>
   </div>
 );
 

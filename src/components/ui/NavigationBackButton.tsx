@@ -35,17 +35,8 @@ export function NavigationBackButton({
         className,
       ].join(" ")}
     >
-      <ChevronLeft
-        size={20}
-        strokeWidth={2.5}
-        className="flex-shrink-0"
-        aria-hidden="true"
-      />
-      {label && (
-        <span className="text-sm font-semibold tracking-wide pr-0.5">
-          {label}
-        </span>
-      )}
+      <ChevronLeft size={20} strokeWidth={2.5} className="flex-shrink-0" aria-hidden="true" />
+      {label && <span className="text-sm font-semibold tracking-wide pr-0.5">{label}</span>}
     </button>
   );
 }

@@ -15,7 +15,9 @@ export function useLocationTypes(): string[] {
         .not("location_type", "is", null);
       if (error) throw error;
       const unique = Array.from(
-        new Set((data ?? []).map((r: { location_type: string }) => r.location_type).filter(Boolean))
+        new Set(
+          (data ?? []).map((r: { location_type: string }) => r.location_type).filter(Boolean),
+        ),
       ).sort() as string[];
       return unique;
     },

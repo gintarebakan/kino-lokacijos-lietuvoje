@@ -101,11 +101,7 @@ function ActionIconButton({
 }
 
 /** Resolves a Google Maps URL from PostGIS coordinates (GeoJSON) or falls back to name search */
-function buildMapsUrl(
-  coordinates: unknown,
-  name: string,
-  address?: string | null
-): string {
+function buildMapsUrl(coordinates: unknown, name: string, address?: string | null): string {
   if (coordinates) {
     try {
       const geo =
@@ -321,11 +317,7 @@ export default function LocationDetailPanel() {
 
       {/* Scrollable content */}
       <div style={{ flex: 1, overflowY: "auto" }}>
-        {isLoading && (
-          <div style={{ padding: 24, color: "#9ca3af", fontSize: 14 }}>
-            Kraunama…
-          </div>
-        )}
+        {isLoading && <div style={{ padding: 24, color: "#9ca3af", fontSize: 14 }}>Kraunama…</div>}
 
         {error && !isLoading && (
           <div style={{ padding: 24, color: "#f87171", fontSize: 14 }}>
@@ -334,9 +326,7 @@ export default function LocationDetailPanel() {
         )}
 
         {!isLoading && !error && !data && selectedLocationId && (
-          <div style={{ padding: 24, color: "#9ca3af", fontSize: 14 }}>
-            Lokacija nerasta.
-          </div>
+          <div style={{ padding: 24, color: "#9ca3af", fontSize: 14 }}>Lokacija nerasta.</div>
         )}
 
         {data && (
@@ -363,8 +353,7 @@ export default function LocationDetailPanel() {
                 style={{
                   position: "absolute",
                   inset: 0,
-                  background:
-                    "linear-gradient(180deg, transparent 40%, rgba(12,12,12,0.95) 100%)",
+                  background: "linear-gradient(180deg, transparent 40%, rgba(12,12,12,0.95) 100%)",
                 }}
               />
             </div>
@@ -429,9 +418,7 @@ export default function LocationDetailPanel() {
                   }}
                   style={{
                     flex: 1,
-                    background: isBookmarked(data.slug)
-                      ? "#c9a84c"
-                      : "transparent",
+                    background: isBookmarked(data.slug) ? "#c9a84c" : "transparent",
                     color: isBookmarked(data.slug) ? "#0a0a0a" : "#c9a84c",
                     border: "1px solid #c9a84c",
                     borderRadius: 8,
@@ -538,9 +525,7 @@ export default function LocationDetailPanel() {
               {/* Films at this location */}
               {data.film_locations && data.film_locations.length > 0 && (
                 <Section title="Filmuose">
-                  <div
-                    style={{ display: "flex", flexDirection: "column", gap: 14 }}
-                  >
+                  <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                     {data.film_locations.map((fl) => {
                       const film = fl.films_tmdb;
                       const filmId = film?.id ?? null;
@@ -553,10 +538,7 @@ export default function LocationDetailPanel() {
                             if (filmId) setSelectedFilm(filmId, fl.id);
                           }}
                           onKeyDown={(e) => {
-                            if (
-                              (e.key === "Enter" || e.key === " ") &&
-                              filmId
-                            ) {
+                            if ((e.key === "Enter" || e.key === " ") && filmId) {
                               e.preventDefault();
                               setSelectedFilm(filmId, fl.id);
                             }
@@ -570,8 +552,7 @@ export default function LocationDetailPanel() {
                             borderRadius: 10,
                             padding: 10,
                             cursor: filmId ? "pointer" : "default",
-                            transition:
-                              "background 160ms ease, border-color 160ms ease",
+                            transition: "background 160ms ease, border-color 160ms ease",
                             alignItems: "stretch",
                           }}
                         >
@@ -600,9 +581,7 @@ export default function LocationDetailPanel() {
                                 }}
                                 onError={(e) => {
                                   e.currentTarget.style.display = "none";
-                                  e.currentTarget.parentElement?.classList.add(
-                                    "poster-fallback"
-                                  );
+                                  e.currentTarget.parentElement?.classList.add("poster-fallback");
                                 }}
                               />
                             ) : null}
@@ -701,12 +680,7 @@ export default function LocationDetailPanel() {
                             }}
                             aria-hidden="true"
                           >
-                            <svg
-                              width="16"
-                              height="16"
-                              viewBox="0 0 16 16"
-                              fill="none"
-                            >
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                               <path
                                 d="M6 4L10 8L6 12"
                                 stroke="currentColor"
@@ -729,60 +703,28 @@ export default function LocationDetailPanel() {
 
       {/* Footer action bar */}
       {data && (
-<div
-  style={{
-    borderTop: "1px solid #222222",
-    background: "#111111",
-    padding: "12px 16px",
-    display: "flex",
-    gap: 8,
-    alignItems: "center",
-    justifyContent: "flex-end",
-    position: "relative",
-    flexShrink: 0,
-  }}
->
+        <div
+          style={{
+            borderTop: "1px solid #222222",
+            background: "#111111",
+            padding: "12px 16px",
+            display: "flex",
+            gap: 8,
+            alignItems: "center",
+            justifyContent: "flex-end",
+            position: "relative",
+            flexShrink: 0,
+          }}
+        >
           {/* Share / copy link */}
           <div style={{ position: "relative" }}>
             <ActionIconButton onClick={handleShare} ariaLabel="Dalintis">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <circle
-                  cx="13"
-                  cy="3"
-                  r="1.5"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-                <circle
-                  cx="13"
-                  cy="13"
-                  r="1.5"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-                <circle
-                  cx="3"
-                  cy="8"
-                  r="1.5"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-                <line
-                  x1="4.5"
-                  y1="7"
-                  x2="11.5"
-                  y2="4"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-                <line
-                  x1="4.5"
-                  y1="9"
-                  x2="11.5"
-                  y2="12"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
+                <circle cx="13" cy="3" r="1.5" stroke="currentColor" strokeWidth="1.5" />
+                <circle cx="13" cy="13" r="1.5" stroke="currentColor" strokeWidth="1.5" />
+                <circle cx="3" cy="8" r="1.5" stroke="currentColor" strokeWidth="1.5" />
+                <line x1="4.5" y1="7" x2="11.5" y2="4" stroke="currentColor" strokeWidth="1.5" />
+                <line x1="4.5" y1="9" x2="11.5" y2="12" stroke="currentColor" strokeWidth="1.5" />
               </svg>
             </ActionIconButton>
 
@@ -812,10 +754,7 @@ export default function LocationDetailPanel() {
           {/* Google Maps navigation — type-safe, works with PostGIS geometry or null */}
           <ActionIconButton
             onClick={() =>
-              window.open(
-                buildMapsUrl(data.coordinates, data.name, data.address),
-                "_blank"
-              )
+              window.open(buildMapsUrl(data.coordinates, data.name, data.address), "_blank")
             }
             ariaLabel="Nukreipti į Google Maps"
           >
@@ -827,13 +766,7 @@ export default function LocationDetailPanel() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
-              <circle
-                cx="12"
-                cy="9"
-                r="2.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              />
+              <circle cx="12" cy="9" r="2.5" stroke="currentColor" strokeWidth="1.5" />
             </svg>
           </ActionIconButton>
 
@@ -849,13 +782,7 @@ export default function LocationDetailPanel() {
                   stroke="currentColor"
                   strokeWidth="1.5"
                 />
-                <circle
-                  cx="8"
-                  cy="8"
-                  r="2"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
+                <circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="1.5" />
               </svg>
             </ActionIconButton>
           )}
@@ -863,37 +790,18 @@ export default function LocationDetailPanel() {
           {/* Official website */}
           {data.official_website_url && (
             <ActionIconButton
-              onClick={() =>
-                window.open(data.official_website_url!, "_blank")
-              }
+              onClick={() => window.open(data.official_website_url!, "_blank")}
               ariaLabel="Tinklapis"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <circle
-                  cx="8"
-                  cy="8"
-                  r="6"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-                <path
-                  d="M8 2C8 2 6 5 6 8C6 11 8 14 8 14"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
+                <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" />
+                <path d="M8 2C8 2 6 5 6 8C6 11 8 14 8 14" stroke="currentColor" strokeWidth="1.5" />
                 <path
                   d="M8 2C8 2 10 5 10 8C10 11 8 14 8 14"
                   stroke="currentColor"
                   strokeWidth="1.5"
                 />
-                <line
-                  x1="2"
-                  y1="8"
-                  x2="14"
-                  y2="8"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
+                <line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" strokeWidth="1.5" />
               </svg>
             </ActionIconButton>
           )}
@@ -905,13 +813,7 @@ export default function LocationDetailPanel() {
   );
 }
 
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ marginTop: 22 }}>
       <h3

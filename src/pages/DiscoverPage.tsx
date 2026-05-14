@@ -107,32 +107,30 @@ function SectionHeader({
 }) {
   return (
     <div style={{ padding: "24px 16px 8px" }}>
-<button
-  type="button"
-  onClick={() => navigate({ to: linkTo as any })}
-  style={{
-    background: "transparent",
-    border: "none",
-    padding: 0,
-    cursor: "pointer",
-    textTransform: "uppercase",
-    letterSpacing: "0.12em",
-    color: "#c9a84c",
-    fontSize: 15,
-    fontWeight: 700,
-    margin: "0 0 8px",
-    textAlign: "left",
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-  }}
->
-  {title}
-  <span style={{ fontSize: 16, opacity: 0.7 }}>›</span>
-</button>
-      <p style={{ color: "#6b7280", fontSize: 14, margin: 0, lineHeight: 1.6 }}>
-        {description}
-      </p>
+      <button
+        type="button"
+        onClick={() => navigate({ to: linkTo as any })}
+        style={{
+          background: "transparent",
+          border: "none",
+          padding: 0,
+          cursor: "pointer",
+          textTransform: "uppercase",
+          letterSpacing: "0.12em",
+          color: "#c9a84c",
+          fontSize: 15,
+          fontWeight: 700,
+          margin: "0 0 8px",
+          textAlign: "left",
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+        }}
+      >
+        {title}
+        <span style={{ fontSize: 16, opacity: 0.7 }}>›</span>
+      </button>
+      <p style={{ color: "#6b7280", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{description}</p>
     </div>
   );
 }
@@ -285,9 +283,7 @@ export default function DiscoverPage() {
             </button>
           ))}
           {locations && locations.length === 0 && (
-            <div style={{ color: "#6b7280", fontSize: 13, padding: "8px 0" }}>
-              Nėra lokacijų.
-            </div>
+            <div style={{ color: "#6b7280", fontSize: 13, padding: "8px 0" }}>Nėra lokacijų.</div>
           )}
         </ScrollRow>
       </section>
@@ -336,7 +332,13 @@ export default function DiscoverPage() {
                   fallbackType="poster"
                   width={120}
                   height={180}
-                  style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    objectPosition: "top center",
+                    display: "block",
+                  }}
                 />
               </div>
               <div

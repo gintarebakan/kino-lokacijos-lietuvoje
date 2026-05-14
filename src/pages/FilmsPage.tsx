@@ -91,7 +91,8 @@ export default function FilmsPage() {
     setFilterRating(0);
   };
 
-  const hasFilters = search || filterType || filterGenre || filterYearFrom || filterYearTo || filterRating > 0;
+  const hasFilters =
+    search || filterType || filterGenre || filterYearFrom || filterYearTo || filterRating > 0;
 
   const openFilm = (id: string) => {
     useMapStore.getState().setRouteGeoJSON(null);
@@ -144,11 +145,24 @@ export default function FilmsPage() {
         {/* Search */}
         <div style={{ position: "relative", maxWidth: 400, marginBottom: 16 }}>
           <svg
-            width="16" height="16" viewBox="0 0 24 24" fill="none"
-            stroke="#6b7280" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
-            style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#6b7280"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{
+              position: "absolute",
+              left: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              pointerEvents: "none",
+            }}
           >
-            <circle cx="11" cy="11" r="7" /><path d="m21 21-4.35-4.35" />
+            <circle cx="11" cy="11" r="7" />
+            <path d="m21 21-4.35-4.35" />
           </svg>
           <input
             type="text"
@@ -210,7 +224,9 @@ export default function FilmsPage() {
           >
             <option value="">Visi žanrai</option>
             {genres.map((g) => (
-              <option key={g} value={g}>{g}</option>
+              <option key={g} value={g}>
+                {g}
+              </option>
             ))}
           </select>
 
@@ -272,7 +288,14 @@ export default function FilmsPage() {
 
           <div style={{ width: 1, background: "#222", margin: "0 4px" }} />
 
-          <span style={{ color: "#6b7280", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+          <span
+            style={{
+              color: "#6b7280",
+              fontSize: 11,
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+            }}
+          >
             IMDb ≥
           </span>
           {[0, 6, 7, 7.5, 8].map((r) => (
@@ -366,24 +389,40 @@ export default function FilmsPage() {
                   fallbackType="poster"
                   width={160}
                   height={240}
-                  style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    objectPosition: "top center",
+                    display: "block",
+                  }}
                 />
                 <div
                   className="film-overlay"
                   style={{
-                    position: "absolute", inset: 0,
+                    position: "absolute",
+                    inset: 0,
                     background: "rgba(201,168,76,0.08)",
                     border: "2px solid rgba(201,168,76,0.4)",
-                    borderRadius: 10, opacity: 0, transition: "opacity 0.18s",
+                    borderRadius: 10,
+                    opacity: 0,
+                    transition: "opacity 0.18s",
                   }}
                 />
                 <div
                   style={{
-                    position: "absolute", top: 6, left: 6,
-                    background: film.media_type === "series" ? "rgba(99,102,241,0.85)" : "rgba(0,0,0,0.65)",
-                    color: "#fff", fontSize: 9, fontWeight: 700,
-                    borderRadius: 5, padding: "2px 6px",
-                    textTransform: "uppercase", letterSpacing: "0.06em",
+                    position: "absolute",
+                    top: 6,
+                    left: 6,
+                    background:
+                      film.media_type === "series" ? "rgba(99,102,241,0.85)" : "rgba(0,0,0,0.65)",
+                    color: "#fff",
+                    fontSize: 9,
+                    fontWeight: 700,
+                    borderRadius: 5,
+                    padding: "2px 6px",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
                   }}
                 >
                   {film.media_type === "series" ? "Serialas" : "Filmas"}
@@ -391,12 +430,19 @@ export default function FilmsPage() {
               </div>
               <div style={{ padding: "8px 8px 10px" }}>
                 <div
-                  style={{
-                    color: "#f5f5f5", fontSize: 12, fontWeight: 600,
-                    lineHeight: 1.3, marginBottom: 4,
-                    display: "-webkit-box", WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical", overflow: "hidden",
-                  } as React.CSSProperties}
+                  style={
+                    {
+                      color: "#f5f5f5",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      lineHeight: 1.3,
+                      marginBottom: 4,
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    } as React.CSSProperties
+                  }
                 >
                   {film.title_lt ?? film.title_orig ?? "—"}
                 </div>
@@ -406,9 +452,7 @@ export default function FilmsPage() {
                       ⭐ {Number(film.imdb_rating).toFixed(1)}
                     </span>
                   )}
-                  {film.year && (
-                    <span style={{ color: "#6b7280", fontSize: 11 }}>{film.year}</span>
-                  )}
+                  {film.year && <span style={{ color: "#6b7280", fontSize: 11 }}>{film.year}</span>}
                 </div>
               </div>
             </button>

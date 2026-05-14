@@ -4,10 +4,10 @@ export function CookieBanner() {
   const consent = useCookieStore((s) => s.consent);
   const setConsent = useCookieStore((s) => s.setConsent);
 
-  // Sutiko — banneris nerodomas
+  // banneris nerodomas, kai sutinka
   if (consent === "accepted") return null;
 
-  // Atmetė — užblokuotas ekranas
+  // užblokuotas ekranas, kai atmetama
   if (consent === "declined") {
     return (
       <div
@@ -60,7 +60,7 @@ export function CookieBanner() {
     );
   }
 
-  // consent === null — pirmą kartą, rodomas banneris
+  // consent === null / pirmą kartą, rodomas banneris
   return (
     <div
       style={{
@@ -80,8 +80,9 @@ export function CookieBanner() {
       }}
     >
       <p style={{ color: "#9ca3af", fontSize: 13, margin: 0, maxWidth: 680, lineHeight: 1.6 }}>
-        Mūsų svetainė naudoja slapukus (cookies) jūsų patirčiai pagerinti - išsaugoti pasirinktus filtrus, maršrutus ir mėgstamiausias lokacijas. 
-        Duomenys saugomi tik jūsų naršyklėje ir nėra perduodami trečiosioms šalims.
+        Mūsų svetainė naudoja slapukus (cookies) jūsų patirčiai pagerinti - išsaugoti pasirinktus
+        filtrus, maršrutus ir mėgstamiausias lokacijas. Duomenys saugomi tik jūsų naršyklėje ir nėra
+        perduodami trečiosioms šalims.
       </p>
       <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
         <button

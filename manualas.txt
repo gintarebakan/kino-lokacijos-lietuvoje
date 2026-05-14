@@ -1,0 +1,247 @@
+================================================================
+KINO LOKACIJOS LIETUVOJE | NAUDOTOJO VADOVAS
+================================================================
+Projektas: Interaktyvi Lietuvos kino lokacijų informacinė sistema
+Technologijos: React, TypeScript, Vite, MapLibre GL JS, Supabase, 
+Vercel
+
+Adresas: https://kino-lokacijos-lietuvoje.vercel.app
+
+TVS (Turinio Valdymo Sistema): 
+https://kino-lokacijos-lietuvoje.vercel.app/admin/
+
+----------------------------------------------------------------
+1. PROJEKTO APRAŠYMAS
+----------------------------------------------------------------
+"Kino Lokacijos Lietuvoje" - tai interaktyvi WebGIS informacinė
+sistema, leidžianti vartotojams atrasti realias Lietuvos vietas,
+kuriose buvo filmuojami kino filmai ir serialai. Sistema sujungia
+geografinius žemėlapio duomenis su kino metaduomenimis (TMDB API)
+ir leidžia naršyti lokacijas, filmus bei kuruotus maršrutus.
+
+----------------------------------------------------------------
+2. SISTEMOS REIKALAVIMAI (PALEIDIMUI LOKALIAI)
+----------------------------------------------------------------
+- Node.js
+- Interneto ryšys
+- Naršyklė: Chrome, Firefox, Edge ir t.t.
+
+----------------------------------------------------------------
+3. APLINKOS KINTAMIEJI (.env failas)
+----------------------------------------------------------------
+.env failas su visais raktais yra įtrauktas į projekto archyvą.
+
+  VITE_SUPABASE_URL=https://[projektas].supabase.co
+  VITE_SUPABASE_ANON_KEY=[projekto-anon-raktas]
+  VITE_MAPTILER_KEY=[maptiler-raktas]
+  VITE_ORS_KEY=[openrouteservice-raktas]
+
+----------------------------------------------------------------
+4. PROJEKTO PALEIDIMAS (LOKALIAI / LOCALHOST)
+----------------------------------------------------------------
+
+1. Išpakuokite projekto archyvą
+2. Atidarykite terminalą projekto aplanke
+3. Paleiskite kūrimo serverį:
+
+   npm run dev
+
+4. Atidarykite naršyklę adresu:
+
+   http://localhost:5173
+
+PASTABA: node_modules aplankas įtrauktas į archyvą, tad
+npm install vykdyti nereikia.
+
+----------------------------------------------------------------
+5. ADMINISTRATORIAUS SĄSAJA (CMS)
+----------------------------------------------------------------
+Administratoriaus sąsaja pasiekiama adresu:
+
+   http://localhost:5173/admin/login
+
+Prisijungus galima valdyti sistemos turinį:
+  - Pridėti, redaguoti ir šalinti filmavimo lokacijas
+  - Pridėti, redaguoti ir šalinti filmus bei serialus
+  - Tvarkyti filmo-lokacijos ryšius ir scenų informaciją
+  - Valdyti kuruotus maršrutus ir kolekcijas
+
+Recenzento prisijungimo duomenys:
+  El. paštas:  recenzentas@test.lt
+  Slaptažodis: Recenzentas2026
+
+Prieiga suteikiama visiems autentifikuotiems vartotojams per 
+Supabase Auth (RLS politika: authenticated).
+
+----------------------------------------------------------------
+6. ŠONINĖ NAVIGACIJA/PUSLAPIAI
+----------------------------------------------------------------
+
+PAGRINDINIS (/)
+  - Mini žemėlapio peržiūra su lokacijų taškais
+  - Populiarių lokacijų, filmų ir maršrutų sekcijos
+  - Paspaudus ant kortelės pereinama į žemėlapį
+
+LOKACIJOS (/locations)
+  - Visų filmavimo vietų tinklelis
+  - Filtravimas pagal lokacijos tipą
+  - Filtravimas pagal apskritį
+  - Paieška pagal pavadinimą
+
+TURINYS (/films)
+  - Visų filmų ir serialų sąrašas
+  - Filtravimas pagal tipą, žanrą, metus, IMDb reitingą
+  - Rikiavimas pagal reitingą arba metus
+
+ŽEMĖLAPIS (/map)
+  - Pagrindinis interaktyvus žemėlapis
+  - Lokacijų žymekliai su klasterizavimu
+  - Lokacijos detalių skydelis (kairėje)
+  - Filmo konteksto vaizdas
+  - Maršrutų peržiūra
+
+IŠSAUGOTA (/saved)
+  - Vartotojo išsaugotų lokacijų sąrašas
+  - Galimybė pridėti prie maršruto arba pašalinti
+
+APIE (/about)
+  - Sistemos aprašymas ir tikslai
+  - Techninė informacija
+
+----------------------------------------------------------------
+7. ŽEMĖLAPIO VALDYMAS
+----------------------------------------------------------------
+
+Naršymas:
+  - Slinkimas pelės ratu - priartinti/atitolinti
+  - Spustelėjimas ir tempimas - judėti po žemėlapį
+  - Dukart spustelėjimas - priartinti
+
+Valdymo mygtukai (apatinis dešinys kampas):
+  +/- - priartinti/atitolinti
+  taikinys - rodyti dabartinę vartotojo vietą (GPS)
+  gatvės/palydovas - perjungti žemėlapio stilių
+
+Žymekliai:
+  Auksinis apskritimas - filmavimo lokacija
+  Raudonas apskritimas - išsaugota lokacija
+  Auksinis skaičius - lokacijų klasteris (paspaudus priartinama)
+  Ašarėlės (teardrop) forma - šiuo metu atverta lokacija
+
+----------------------------------------------------------------
+8. LOKACIJOS INFORMACIJA
+----------------------------------------------------------------
+
+Paspaudus ant žymeklio žemėlapyje atidaromas detalių skydelis:
+  - Lokacijos nuotrauka, pavadinimas, adresas
+  - Tipas ir apskritis
+  - Aprašymas ir kuratoriaus pastabos
+  - Pasiekiamumas
+  - Filmai filmuoti šioje vietoje (su fiktyviu lokacijos pavadinimu)
+
+Skydelio apačioje:
+  Dalintis - nukopijuoja lokacijos URL
+  Žemėlapis - atidaro Google Maps navigaciją
+  Tinklapis - atidaro oficialų lokacijos puslapį
+
+Paspaudus ant filmo lokacijos sąraše:
+  - Atidaromas filmo konteksto skydelis
+  - Rodomas posteris, aprašymas, anonsas
+  - Scenos aprašymas ir nuotraukos
+
+----------------------------------------------------------------
+9. FILMŲ INFORMACIJA
+----------------------------------------------------------------
+
+Paspaudus ant filmo (FilmsPage/Turinys arba DiscoverPage/Pagrindinis):
+  - Atidaromas filmo detalių skydelis žemėlapyje
+  - Rodomas posteris, žanrai, reitingas, IMDb nuoroda
+  - Režisierius ir aktoriai
+  - Anonso mygtukas (YouTube)
+  - Filmavimo lokacijų sąrašas su reikšmingumo žymomis:
+      PAGRINDINĖ - svarbiausios scenos
+      SVARBI - reikšmingos scenos
+      EPIZODINĖ - trumpos scenos
+
+----------------------------------------------------------------
+10. MARŠRUTAI
+----------------------------------------------------------------
+
+Kuruoti maršrutai pasiekiami:
+  - DiscoverPage „Kino maršrutai" sekcijoje
+
+Maršruto skydelyje:
+  - Lokacijų sąrašas eilės tvarka
+  - Bendras atstumas ir važiavimo trukmė (automobilio)
+  - Išsaugoti visas lokacijas - išsaugo visą maršrutą
+  - Žvaigždutė prie lokacijos - išsaugo pasirinktą vieną lokaciją
+  - Nukreipti į Google Maps - atidaro navigaciją į išorę
+  - Dalintis - nukopijuoja maršruto URL
+
+Žemėlapyje maršrutas parodomas punktyrine violetine linija.
+
+----------------------------------------------------------------
+11. IŠSAUGOTŲ VIETŲ VALDYMAS
+----------------------------------------------------------------
+
+Lokaciją galima išsaugoti:
+  - Paspaudus išsaugoti lokacijos skydelyje
+  - Paspaudus žvaigždutę maršruto lokacijų sąraše
+
+Išsaugota puslapyje (/saved):
+  - Pridėti į maršrutą - prideda prie aktyvaus maršruto
+  - Ištrinti iš išsaugotų - pašalina iš sąrašo
+  - Bendras atstumas ir trukmė rodomi automobiliu arba pėsčiomis
+
+Žemėlapyje išsaugotos lokacijos žymimos raudonu žymekliu.
+
+----------------------------------------------------------------
+12. PAIEŠKA IR FILTRAI
+----------------------------------------------------------------
+
+Visuotinė paieška (žemėlapio puslapyje):
+  - Paieška pagal lokacijos ir flimo pavadinimą, adresą
+  - Filtravimas pagal žanrą, medijos tipą, įvertinimą, metus, apskritį, lokacijos tipą
+  - Rezultatai atnaujinami realiu laiku
+
+FilmsPage filtrai:
+  - Visi / Filmai / Serialai
+  - Žanras (dinamiškai iš DB)
+  - Metai (nuo / iki)
+  - IMDb reitingas
+  - Rikiavimas: pagal reitingą arba metus
+
+LocationsPage filtrai:
+  - Tipas (dinamiškai iš DB)
+  - Apskritis (dinamiškai iš DB)
+  - Paieška pagal pavadinimą
+
+----------------------------------------------------------------
+13. TURINYS
+----------------------------------------------------------------
+  manualas.txt - naudojimo vadovas
+  /src - programos  kodas
+  /public - statiniai failai
+  /node_modules - projekto priklausomybės (npm install nereikia)
+  /dist - sukurta produkcinė versija (build nereikia)
+  package.json - priklausomybių sąrašas
+  vite.config.ts - Vite konfigūracija
+  tsconfig.json - TypeScript konfigūracija
+  .env - API raktai
+
+----------------------------------------------------------------
+14. PASTABOS
+----------------------------------------------------------------
+
+- Programa veikia kaip SPA (Single Page Application)
+- Visi duomenys saugomi Supabase (PostgreSQL + PostGIS)
+- Žemėlapis naudoja MapLibre GL JS + MapTiler
+- Klasterizavimas atliekamas kliento pusėje (Supercluster)
+- Maršrutų skaičiavimui naudojamas OpenRouteService API
+- Filmo metaduomenys gaunami iš TMDB API
+
+================================================================
+IS autorius: Gintarė Bakanaitė
+Studijų programa: MKDf'22/1
+Akademiniai metai: 2025-2026
+================================================================

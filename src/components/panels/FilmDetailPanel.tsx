@@ -6,6 +6,9 @@ import { useMapStore } from "../../stores/mapStore";
 import { ImageWithFallback } from "../ui/ImageWithFallback";
 import { createPortal } from "react-dom";
 
+//-----Tipai
+
+// Filmo duomenų struktūra iš films_tmdb lentelės
 interface FilmRow {
   id: string;
   tmdb_id: number | null;
@@ -22,6 +25,7 @@ interface FilmRow {
   actors: string[] | null;
 }
 
+// Lokacijos nuorodos struktūra, naudojama filmavimo vietų sąraše
 interface LocationRef {
   id: string;
   name: string;
@@ -31,6 +35,7 @@ interface LocationRef {
   location_type: string | null;
 }
 
+// Filmo-lokacijos ryšio struktūra iš film_locations lentelės
 interface FilmLocationRow {
   id: string;
   scene_significance: string | null;
@@ -41,11 +46,15 @@ interface FilmLocationRow {
   locations_lt: LocationRef | null;
 }
 
+// Kombinuota užklausos rezultato struktūra
 interface FilmDetailData {
   film: FilmRow | null;
   locations: FilmLocationRow[];
 }
 
+//-----Scenos reikšmingumo konfigūracija
+
+// Vizualiniai parametrai kiekvienam reikšmingumo lygiui + rūšiavimo tvarka
 const SIGNIFICANCE_CONFIG: Record<
   string,
   { label: string; bg: string; border: string; color: string; order: number }
@@ -55,7 +64,7 @@ const SIGNIFICANCE_CONFIG: Record<
     bg: "rgba(201,168,76,0.2)",
     border: "#c9a84c",
     color: "#c9a84c",
-    order: 0,
+    order: 0, // Rodoma pirmiausia
   },
   svarbi: {
     label: "Svarbi",
@@ -69,20 +78,26 @@ const SIGNIFICANCE_CONFIG: Record<
     bg: "rgba(107,114,128,0.1)",
     border: "#374151",
     color: "#6b7280",
-    order: 2,
+    order: 2, // Rodoma paskutinė
   },
 };
 
+// Normalizavimo žemėlapis
 const SIGNIFICANCE_ALIASES: Record<string, string> = {
   pagrindine: "pagrindinė",
   epizodine: "epizodinė",
 };
 
+// Normalizuoja standartinę formą
 function normalizeSig(sig: string | null): string | null {
   if (!sig) return null;
   return SIGNIFICANCE_ALIASES[sig] ?? sig;
 }
 
+/**
+ * Scenos reikšmingumo žymos komponentas.
+ * Grąžina null jei reikšmingumas nenurodytas arba neatpažintas konfigūracijoje.
+ */
 function SignificanceBadge({ sig }: { sig: string | null }) {
   const key = normalizeSig(sig);
   if (!key) return null;
@@ -108,21 +123,40 @@ function SignificanceBadge({ sig }: { sig: string | null }) {
   );
 }
 
+// Formatuoja media tipo kodą į didžiosiomis raidėmis lietuvišką pavadinimą
 const formatMediaType = (type: string | null | undefined) => {
   if (type === "series") return "SERIALAS";
   if (type === "film") return "FILMAS";
   return (type ?? "").toUpperCase();
 };
 
-// Bendras šriftas visam panelui
+// Bendras šriftas visam skydeliui užtikrina vizualinį nuoseklumą
 const PANEL_FONT = "Inter, system-ui, -apple-system, sans-serif";
 
+//----- Pagrindinis komponentas
+
+/**
+Filmo detalių skydelis rodomas paspaudus ant filmo FilmsPage arba DiscoverPage puslapiuose. 
+Skiriasi nuo FilmContextView tuo, kad atidaromas tiesiogiai iš filmų sąrašo, ne per lokacijos skydelį.
+ *
+rodo:
+Filmo posterį
+Pavadinimą, metus, žanrus, reitingą, IMDb nuorodą
+Režisierių ir aktorius
+Filmo aprašymą
+Anonso mygtuką 
+Filmavimo lokacijų sąrašą su reikšmingumo žymomis
+ */
 export default function FilmDetailPanel() {
   const navigate = useNavigate();
   const routeLocation = useLocation();
   const selectedFilmDetailId = useMapStore((s) => s.selectedFilmDetailId);
   const setSelectedFilmDetail = useMapStore((s) => s.setSelectedFilmDetail);
+
+  // Ar šiuo metu rodomas anonsas
   const [showTrailer, setShowTrailer] = useState(false);
+
+  // Responsive stebėjimas, mobiliuose prietaisuose skydelis rodomas iš apačios
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -133,9 +167,14 @@ export default function FilmDetailPanel() {
     return () => mq.removeEventListener("change", update);
   }, []);
 
+  //----- Duomenų užklausa
+
+  // Dvi lygiagrečios Supabase užklausos:
+  //Filmo metaduomenys iš films_tmdb
+  //Filmavimo lokacijos iš film_locations su lokacijos detalėmis
   const { data, isLoading, error } = useQuery<FilmDetailData>({
     queryKey: ["film-detail", selectedFilmDetailId],
-    enabled: !!selectedFilmDetailId,
+    enabled: !!selectedFilmDetailId, // Vykdoma tik kai filmas pasirinktas
     queryFn: async () => {
       const { data: film, error: filmErr } = await supabase
         .from("films_tmdb")
@@ -146,6 +185,7 @@ export default function FilmDetailPanel() {
         .single();
       if (filmErr) throw filmErr;
 
+      // Nested join, lokacijos duomenys įtraukiami per FK ryšį
       const { data: filmLocs, error: locErr } = await supabase
         .from("film_locations")
         .select(
@@ -162,7 +202,10 @@ export default function FilmDetailPanel() {
     },
   });
 
+  // Jei filmas nepasirinkta, tai sskydelis ir nerodomas
   if (!selectedFilmDetailId) return null;
+
+  //-----Stiliai
 
   const desktopStyle: React.CSSProperties = {
     position: "absolute",
@@ -195,6 +238,8 @@ export default function FilmDetailPanel() {
   const film = data?.film ?? null;
   const trailerKey = film?.trailer_key ?? null;
 
+  // Rūšiuojame lokacijas pagal reikšmingumo lygį:
+  // pagrindinė (0), svarbi (1), epizodinė (2), nežinoma (99)
   const sortedLocations = [...(data?.locations ?? [])].sort((a, b) => {
     const aKey = normalizeSig(a.scene_significance);
     const bKey = normalizeSig(b.scene_significance);
@@ -203,6 +248,13 @@ export default function FilmDetailPanel() {
     return aOrder - bOrder;
   });
 
+  /**
+Paspaudus ant lokacijos eilutės:
+Išsaugome dabartinį filmo ID kad vėliau galima būtų grįžti
+Uždarome filmo skydelį
+ Naviguojame į /map jei dar nesame ten
+Su 100ms vėlavimu nustatome laukiantį slugą
+   */
   const handleLocationClick = (slug: string | null) => {
     if (!slug) return;
     useMapStore.getState().setPreviousFilmDetail(selectedFilmDetailId);
@@ -216,9 +268,11 @@ export default function FilmDetailPanel() {
     }, 100);
   };
 
+  //-----Render
+
   return (
     <aside style={isMobile ? mobileStyle : desktopStyle} aria-label="Filmo informacija">
-      {/* Poster hero */}
+      {/* filmo viršelio nuotrauka su gradientu */}
       <div
         style={{
           position: "relative",
@@ -232,47 +286,92 @@ export default function FilmDetailPanel() {
           src={film?.poster_url ? `https://image.tmdb.org/t/p/w500${film.poster_url}` : null}
           alt={film?.title_lt ?? ""}
           fallbackType="poster"
-          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "top center",
+            display: "block",
+          }}
         />
+        {/* gradientinis sklandus perėjimas prie turinio žemiau */}
         <div
           style={{
-            position: "absolute", inset: 0,
+            position: "absolute",
+            inset: 0,
             background: "linear-gradient(to top, #111111, transparent 50%)",
             pointerEvents: "none",
           }}
         />
+        {/* Uždarymo mygtukas */}
         <button
           type="button"
           onClick={() => setSelectedFilmDetail(null)}
           aria-label="Uždaryti"
           style={{
-            position: "absolute", top: 12, right: 12,
-            width: 32, height: 32,
+            position: "absolute",
+            top: 12,
+            right: 12,
+            width: 32,
+            height: 32,
             background: "rgba(0,0,0,0.5)",
             border: "1px solid rgba(255,255,255,0.1)",
             borderRadius: "50%",
-            color: "#f5f5f5", cursor: "pointer",
-            display: "inline-flex", alignItems: "center", justifyContent: "center", padding: 0,
+            color: "#f5f5f5",
+            cursor: "pointer",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 0,
           }}
         >
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M3 3L13 13M13 3L3 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <path
+              d="M3 3L13 13M13 3L3 13"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
           </svg>
         </button>
       </div>
 
+      {/* Krovimo indikatorius */}
       {isLoading && <div style={{ padding: 16, color: "#9ca3af", fontSize: 14 }}>Kraunama…</div>}
+
+      {/* Klaidos pranešimas */}
       {error && !isLoading && (
-        <div style={{ padding: 16, color: "#f87171", fontSize: 14 }}>Nepavyko įkelti informacijos.</div>
+        <div style={{ padding: 16, color: "#f87171", fontSize: 14 }}>
+          Nepavyko įkelti informacijos.
+        </div>
       )}
 
       {film && (
         <>
           <div style={{ padding: 16 }}>
-            <div style={{ fontSize: 11, color: "#c9a84c", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>
+            {/* Media tipo žyma */}
+            <div
+              style={{
+                fontSize: 11,
+                color: "#c9a84c",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                marginBottom: 6,
+              }}
+            >
               {formatMediaType(film.media_type) || "FILMAS"}
             </div>
-            <h2 style={{ margin: 0, color: "#f5f5f5", fontSize: 22, fontWeight: 700, lineHeight: 1.25 }}>
+
+            {/* Pavadinimas su metais */}
+            <h2
+              style={{
+                margin: 0,
+                color: "#f5f5f5",
+                fontSize: 22,
+                fontWeight: 700,
+                lineHeight: 1.25,
+              }}
+            >
               {film.title_lt ?? "—"}
               {film.year ? (
                 <span style={{ color: "#6b7280", fontSize: 15, fontWeight: 400, marginLeft: 8 }}>
@@ -281,18 +380,38 @@ export default function FilmDetailPanel() {
               ) : null}
             </h2>
 
+            {/* Žanrų žymos, tik pirmieji 3 */}
             {film.genre && film.genre.length > 0 && (
               <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 4 }}>
                 {film.genre.slice(0, 3).map((g) => (
-                  <span key={g} style={{ background: "#1a1a1a", border: "1px solid #222222", borderRadius: 10, fontSize: 11, color: "#9ca3af", padding: "2px 8px" }}>
+                  <span
+                    key={g}
+                    style={{
+                      background: "#1a1a1a",
+                      border: "1px solid #222222",
+                      borderRadius: 10,
+                      fontSize: 11,
+                      color: "#9ca3af",
+                      padding: "2px 8px",
+                    }}
+                  >
                     {g}
                   </span>
                 ))}
               </div>
             )}
 
+            {/* IMDb reitingas ir nuoroda */}
             {(film.imdb_rating != null || film.imdb_url) && (
-              <div style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 12, flexWrap: "wrap" }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 12,
+                  alignItems: "center",
+                  marginTop: 12,
+                  flexWrap: "wrap",
+                }}
+              >
                 {film.imdb_rating != null && (
                   <span style={{ fontSize: 13, color: "#c9a84c", fontWeight: 600 }}>
                     ⭐ {film.imdb_rating.toFixed(1)}
@@ -303,7 +422,16 @@ export default function FilmDetailPanel() {
                     href={film.imdb_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", background: "#f5c518", color: "#0a0a0a", borderRadius: 4, padding: "2px 6px", textDecoration: "none" }}
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: "0.06em",
+                      background: "#f5c518",
+                      color: "#0a0a0a",
+                      borderRadius: 4,
+                      padding: "2px 6px",
+                      textDecoration: "none",
+                    }}
                   >
                     IMDb
                   </a>
@@ -311,6 +439,7 @@ export default function FilmDetailPanel() {
               </div>
             )}
 
+            {/* Režisierius */}
             {film.director && (
               <div style={{ marginTop: 10, fontSize: 12 }}>
                 <span style={{ color: "#4b5563", marginRight: 6 }}>Režisierius</span>
@@ -318,6 +447,7 @@ export default function FilmDetailPanel() {
               </div>
             )}
 
+            {/* Aktoriai, tik pirmieji 3 */}
             {film.actors && film.actors.length > 0 && (
               <div style={{ marginTop: 4, fontSize: 12 }}>
                 <span style={{ color: "#4b5563", marginRight: 6 }}>Aktoriai</span>
@@ -325,47 +455,103 @@ export default function FilmDetailPanel() {
               </div>
             )}
 
+            {/* Filmo aprašymas */}
             {film.description && (
-              <p style={{ marginTop: 14, marginBottom: 0, color: "#9ca3af", fontSize: 13, lineHeight: 1.6 }}>
+              <p
+                style={{
+                  marginTop: 14,
+                  marginBottom: 0,
+                  color: "#9ca3af",
+                  fontSize: 13,
+                  lineHeight: 1.6,
+                }}
+              >
                 {film.description}
               </p>
             )}
 
+            {/* Anonso mygtukas atidaro YouTube modal per React portal */}
             {trailerKey ? (
               <>
                 <button
                   type="button"
                   onClick={() => setShowTrailer(true)}
                   style={{
-                    marginTop: 16, width: "100%", padding: "12px",
+                    marginTop: 16,
+                    width: "100%",
+                    padding: "12px",
                     background: "linear-gradient(135deg, #c9a84c, #a8863a)",
-                    border: "none", borderRadius: 8, color: "#0a0a0a",
-                    fontWeight: 700, fontSize: 14, letterSpacing: "0.05em",
-                    cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                    border: "none",
+                    borderRadius: 8,
+                    color: "#0a0a0a",
+                    fontWeight: 700,
+                    fontSize: 14,
+                    letterSpacing: "0.05em",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
                     fontFamily: PANEL_FONT,
                   }}
                 >
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 16 16"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
                     <path d="M4 2L14 8L4 14V2Z" />
                   </svg>
                   Anonsas
                 </button>
 
-                {showTrailer && typeof document !== "undefined" &&
+                {/* Anonso renderinamas į document.body per React portal
+                    kad nepaveiktų skydelio overflow ir z-index */}
+                {showTrailer &&
+                  typeof document !== "undefined" &&
                   createPortal(
                     <div
                       onClick={() => setShowTrailer(false)}
-                      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.92)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}
+                      style={{
+                        position: "fixed",
+                        inset: 0,
+                        background: "rgba(0,0,0,0.92)",
+                        zIndex: 1000,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
                     >
                       <button
                         type="button"
                         onClick={() => setShowTrailer(false)}
                         aria-label="Uždaryti"
-                        style={{ position: "absolute", top: 20, right: 20, width: 40, height: 40, borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                        style={{
+                          position: "absolute",
+                          top: 20,
+                          right: 20,
+                          width: 40,
+                          height: 40,
+                          borderRadius: "50%",
+                          background: "rgba(255,255,255,0.1)",
+                          border: "1px solid rgba(255,255,255,0.2)",
+                          color: "#fff",
+                          fontSize: 18,
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
                       >
                         ×
                       </button>
-                      <div onClick={(e) => e.stopPropagation()} style={{ width: "min(860px, 90vw)", aspectRatio: "16/9" }}>
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ width: "min(860px, 90vw)", aspectRatio: "16/9" }}
+                      >
+                        {/* autoplay=1, vaizdo įrašas prasideda automatiškai */}
                         <iframe
                           src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`}
                           allow="autoplay; encrypted-media"
@@ -375,23 +561,39 @@ export default function FilmDetailPanel() {
                       </div>
                     </div>,
                     document.body,
-                  )
-                }
+                  )}
               </>
             ) : (
+              // Anonso mygtukas išjungtas kai trailer_key nėra DB
               <button
                 type="button"
                 disabled
                 style={{
-                  marginTop: 16, width: "100%", padding: "12px",
-                  background: "#1a1a1a", border: "none", borderRadius: 8,
-                  color: "#6b7280", fontWeight: 700, fontSize: 14,
-                  letterSpacing: "0.05em", cursor: "not-allowed",
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                  marginTop: 16,
+                  width: "100%",
+                  padding: "12px",
+                  background: "#1a1a1a",
+                  border: "none",
+                  borderRadius: 8,
+                  color: "#6b7280",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  letterSpacing: "0.05em",
+                  cursor: "not-allowed",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
                   fontFamily: PANEL_FONT,
                 }}
               >
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
                   <path d="M4 2L14 8L4 14V2Z" />
                 </svg>
                 Anonsas neprieinamas
@@ -399,12 +601,32 @@ export default function FilmDetailPanel() {
             )}
           </div>
 
+          {/* Filmavimo lokacijų sąrašas surūšiuotas pagal reikšmingumą */}
           {sortedLocations.length > 0 && (
             <section>
-              <h3 style={{ margin: 0, padding: "16px 16px 8px", fontSize: 11, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>
+              <h3
+                style={{
+                  margin: 0,
+                  padding: "16px 16px 8px",
+                  fontSize: 11,
+                  color: "#6b7280",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  fontWeight: 600,
+                }}
+              >
                 Filmavimo lokacijos
               </h3>
-              <ul style={{ listStyle: "none", margin: 0, padding: "0 8px 24px", display: "flex", flexDirection: "column", gap: 4 }}>
+              <ul
+                style={{
+                  listStyle: "none",
+                  margin: 0,
+                  padding: "0 8px 24px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
+                }}
+              >
                 {sortedLocations.map((fl) => {
                   const loc = fl.locations_lt;
                   const slug = loc?.slug ?? null;
@@ -413,45 +635,127 @@ export default function FilmDetailPanel() {
                       <button
                         type="button"
                         onClick={() => handleLocationClick(slug)}
-                        disabled={!slug}
+                        disabled={!slug} // Išjungiamas jei lokacija neturi slugo
                         style={{
-                          width: "100%", display: "flex", alignItems: "center", gap: 12,
-                          background: "transparent", border: "none", padding: "8px",
-                          borderRadius: 8, cursor: slug ? "pointer" : "default",
-                          textAlign: "left", color: "#f5f5f5", transition: "background 160ms ease",
+                          width: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 12,
+                          background: "transparent",
+                          border: "none",
+                          padding: "8px",
+                          borderRadius: 8,
+                          cursor: slug ? "pointer" : "default",
+                          textAlign: "left",
+                          color: "#f5f5f5",
+                          transition: "background 160ms ease",
                           fontFamily: PANEL_FONT,
                         }}
-                        onMouseEnter={(e) => { if (slug) e.currentTarget.style.background = "#1a1a1a"; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                        onMouseEnter={(e) => {
+                          if (slug) e.currentTarget.style.background = "#1a1a1a";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "transparent";
+                        }}
                       >
-                        <div style={{ width: 56, height: 56, borderRadius: 8, overflow: "hidden", flexShrink: 0, background: "#1a1a1a" }}>
+                        {/* Lokacijos miniatiūra */}
+                        <div
+                          style={{
+                            width: 56,
+                            height: 56,
+                            borderRadius: 8,
+                            overflow: "hidden",
+                            flexShrink: 0,
+                            background: "#1a1a1a",
+                          }}
+                        >
                           <ImageWithFallback
                             src={loc?.image_url}
                             alt={loc?.name ?? ""}
                             fallbackType="location"
-                            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              display: "block",
+                            }}
                           />
                         </div>
+
+                        {/* Lokacijos informacija */}
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 14, fontWeight: 700, color: "#f5f5f5", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          <div
+                            style={{
+                              fontSize: 14,
+                              fontWeight: 700,
+                              color: "#f5f5f5",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
                             {loc?.name ?? "—"}
                           </div>
+                          {/* Fiktyvus pavadinimas, kai lokacija filme vaizduojama kaip kita vieta */}
                           {fl.fictional_name && (
-                            <div style={{ fontSize: 12, color: "#6b7280", fontStyle: "italic", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            <div
+                              style={{
+                                fontSize: 12,
+                                color: "#6b7280",
+                                fontStyle: "italic",
+                                marginTop: 2,
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
                               kaip „{fl.fictional_name}"
                             </div>
                           )}
-                          <div style={{ marginTop: 6, display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+                          {/* Reikšmingumo žyma ir lokacijos tipas */}
+                          <div
+                            style={{
+                              marginTop: 6,
+                              display: "flex",
+                              gap: 6,
+                              flexWrap: "wrap",
+                              alignItems: "center",
+                            }}
+                          >
                             <SignificanceBadge sig={fl.scene_significance} />
                             {loc?.location_type && (
-                              <span style={{ fontSize: 10, color: "#9ca3af", background: "#1a1a1a", border: "1px solid #2a2a2a", padding: "2px 6px", borderRadius: 6 }}>
+                              <span
+                                style={{
+                                  fontSize: 10,
+                                  color: "#9ca3af",
+                                  background: "#1a1a1a",
+                                  border: "1px solid #2a2a2a",
+                                  padding: "2px 6px",
+                                  borderRadius: 6,
+                                }}
+                              >
                                 {loc.location_type}
                               </span>
                             )}
                           </div>
                         </div>
-                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ color: "#6b7280", flexShrink: 0 }}>
-                          <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+
+                        {/* Rodyklė dešinėn vizualiai rodo, kad eilutė yra paspaudžiama */}
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          aria-hidden="true"
+                          style={{ color: "#6b7280", flexShrink: 0 }}
+                        >
+                          <path
+                            d="M6 4L10 8L6 12"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
                         </svg>
                       </button>
                     </li>

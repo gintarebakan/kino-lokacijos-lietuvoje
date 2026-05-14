@@ -18,7 +18,8 @@ interface LocationRow {
   lat: number;
 }
 //paima duomenis iš Supabase ir juos perpakuoja žemėlapiui.
-async function fetchLocationsGeoJson(): Promise<LocationsCollection> {//sukurs standartinį žemėlapio taškų rinkinį
+async function fetchLocationsGeoJson(): Promise<LocationsCollection> {
+  //sukurs standartinį žemėlapio taškų rinkinį
   //kreipiamės į duomenų bazę
   const { data, error } = await supabase
     .from("locations_geojson") //imame iš View lentelės
@@ -28,19 +29,14 @@ async function fetchLocationsGeoJson(): Promise<LocationsCollection> {//sukurs s
 
   const rows = (data ?? []) as LocationRow[];
 
-  //^ paprašėme duomenų bazės atsiųsti visus Lietuvos taškus. 
+  //^ paprašėme duomenų bazės atsiųsti visus Lietuvos taškus.
   // Grįžta paprastas sąrašas (lentelė).
 
   return {
     type: "FeatureCollection", //taškų nurodyta kolekcija
     features: rows
-    //saugiklis - filtravimas, išmeta lokacijas jei neturi koordinačių
-      .filter(
-        (loc) =>
-          typeof loc.lng === "number" &&
-          typeof loc.lat === "number" &&
-          !!loc.slug,
-      )
+      //saugiklis - filtravimas, išmeta lokacijas jei neturi koordinačių
+      .filter((loc) => typeof loc.lng === "number" && typeof loc.lat === "number" && !!loc.slug)
       //map - iš db eilutės suformuoja GeoJSON objektą
       .map((loc) => ({
         type: "Feature",
@@ -49,8 +45,9 @@ async function fetchLocationsGeoJson(): Promise<LocationsCollection> {//sukurs s
           coordinates: [loc.lng, loc.lat],
           //įdedame koordinates ten, kur žemėlapis jų ieško
         },
-        properties: {//likusi informacija
-         
+        properties: {
+          //likusi informacija
+
           id: loc.slug as string,
           name: loc.name,
           slug: loc.slug ?? undefined,
@@ -64,7 +61,7 @@ async function fetchLocationsGeoJson(): Promise<LocationsCollection> {//sukurs s
 
 export function useLocations() {
   return useQuery({
-    queryKey: ["locations", "geojson"],//užvadinam
+    queryKey: ["locations", "geojson"], //užvadinam
     queryFn: fetchLocationsGeoJson, //kviečiam ankstesnę f-ją
     staleTime: 5 * 60 * 1000,
   });

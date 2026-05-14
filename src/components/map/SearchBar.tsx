@@ -9,7 +9,6 @@ import { useLocations } from "../../hooks/useLocations"; // visos lokacijos GeoJ
 import { useFilteredLocations } from "../../hooks/useFilteredLocations"; // filtruotos lokacijos, tik filtro santraukai rodyti (kiek rasta)
 import { useGenres } from "../../hooks/useGenres"; // žanrų sąrašas iš DB, filtro "Žanras" pill'ams generuoti
 
-
 import {
   useFilterStore,
   COUNTIES,
@@ -17,7 +16,6 @@ import {
   MEDIA_TYPES,
   formatMediaType,
 } from "../../stores/filterStore";
-
 
 import { useLocationTypes } from "../../hooks/useLocationTypes";
 
@@ -76,22 +74,22 @@ const labelStyle: React.CSSProperties = {
 // SEARCHBAR KOMPONENTAS
 // ═══════════════════════════════════════════════
 export default function SearchBar() {
-  const [query, setQuery] = useState("");//vartotojo įvestas tekstas paieškos lauke
-  const [open, setOpen] = useState(false);//ar rodomas rezultatų dropdown
-  const [filtersOpen, setFiltersOpen] = useState(false);//ar atidarytas filtrų skydelis
-  const [mounted, setMounted] = useState(false);//React SSR apsauga, filtro būsena tikrinama tik po mount
-  const [isMobile, setIsMobile] = useState(false);//responsive (mobiliuose prietaisuose slėpiame SearchBar kai atidarytas panel)
-  const containerRef = useRef<HTMLDivElement>(null);//nuoroda į visą komponentą - reikia "klik lauke" aptikimui
-// ═══════════════════════════════════════════════
-// HOOK'AI
-// ═══════════════════════════════════════════════
-  const { data: results, isLoading } = useSearch(query);//kviečia search_all per supabase.rpc()
-// results = [{ type: "location", title: "Trakų pilis", ... }, ...]
-  const { data: locationsData } = useLocations();//GeoJSON FeatureCollection - reikia koordinatėms
-// locationsData.features[i].geometry.coordinates = [lng, lat]
+  const [query, setQuery] = useState(""); //vartotojo įvestas tekstas paieškos lauke
+  const [open, setOpen] = useState(false); //ar rodomas rezultatų dropdown
+  const [filtersOpen, setFiltersOpen] = useState(false); //ar atidarytas filtrų skydelis
+  const [mounted, setMounted] = useState(false); //React SSR apsauga, filtro būsena tikrinama tik po mount
+  const [isMobile, setIsMobile] = useState(false); //responsive (mobiliuose prietaisuose slėpiame SearchBar kai atidarytas panel)
+  const containerRef = useRef<HTMLDivElement>(null); //nuoroda į visą komponentą - reikia "klik lauke" aptikimui
+  // ═══════════════════════════════════════════════
+  // HOOK'AI
+  // ═══════════════════════════════════════════════
+  const { data: results, isLoading } = useSearch(query); //kviečia search_all per supabase.rpc()
+  // results = [{ type: "location", title: "Trakų pilis", ... }, ...]
+  const { data: locationsData } = useLocations(); //GeoJSON FeatureCollection - reikia koordinatėms
+  // locationsData.features[i].geometry.coordinates = [lng, lat]
   const { data: filteredData } = useFilteredLocations();
-  const filteredCount = filteredData?.features?.length ?? 0;//skaičius filtro santraukai: "Rastos lokacijos: 12"
-  const { data: genres } = useGenres();//žanrų sąrašas: ["Drama", "Komedija", "Trileris", ...]
+  const filteredCount = filteredData?.features?.length ?? 0; //skaičius filtro santraukai: "Rastos lokacijos: 12"
+  const { data: genres } = useGenres(); //žanrų sąrašas: ["Drama", "Komedija", "Trileris", ...]
   const locationTypes = useLocationTypes();
   const setSelectedLocation = useMapStore((s) => s.setSelectedLocation);
   const mapInstance = useMapStore((s) => s.mapInstance);
@@ -119,72 +117,65 @@ export default function SearchBar() {
     document.addEventListener("mousedown", onDown);
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
-// ═══════════════════════════════════════════════
-// MOBILAUS SLĖPIMAS
-// ═══════════════════════════════════════════════
+  // ═══════════════════════════════════════════════
+  // MOBILAUS SLĖPIMAS
+  // ═══════════════════════════════════════════════
   const isPanelOpen =
-    selectedLocationId !== null ||
-    selectedFilmId !== null ||
-    selectedFilmDetailId !== null;
-  if (mounted && isMobile && isPanelOpen) return null;//mobiliame įrenginyje kai atidarytas informacinis skydelis
-//SearchBar visiškai išnyksta — ekrano nėra kur abu sutalpinti
-// ═══════════════════════════════════════════════
-// REZULTATO PASIRINKIMAS
-// ═══════════════════════════════════════════════
+    selectedLocationId !== null || selectedFilmId !== null || selectedFilmDetailId !== null;
+  if (mounted && isMobile && isPanelOpen) return null; //mobiliame įrenginyje kai atidarytas informacinis skydelis
+  //SearchBar visiškai išnyksta — ekrano nėra kur abu sutalpinti
+  // ═══════════════════════════════════════════════
+  // REZULTATO PASIRINKIMAS
+  // ═══════════════════════════════════════════════
   const handlePick = (r: SearchResult) => {
-    setOpen(false);//uždaro dropdown
+    setOpen(false); //uždaro dropdown
     if (r.type === "location") {
       const slug = r.slug ?? r.id;
-      setQuery(r.title);//užpildo paieškos laukelį pavadinimu
+      setQuery(r.title); //užpildo paieškos laukelį pavadinimu
       // Randa lokacijos koordinates iš GeoJSON cache
-      const feature = locationsData?.features.find(
-        (f) => f.properties.id === slug,
-      );
+      const feature = locationsData?.features.find((f) => f.properties.id === slug);
       if (feature && mapInstance) {
         const [lng, lat] = feature.geometry.coordinates as [number, number];
         mapInstance.easeTo({
-          center: [lng, lat],//centralizuoja žemėlapį
-          zoom: Math.max(mapInstance.getZoom(), 13),//priartina (ne mažiau 13)
-          offset: [-160, 0],//pastumia į dešinę dėl skydelio
-          duration: 700,//700ms animacija
+          center: [lng, lat], //centralizuoja žemėlapį
+          zoom: Math.max(mapInstance.getZoom(), 13), //priartina (ne mažiau 13)
+          offset: [-160, 0], //pastumia į dešinę dėl skydelio
+          duration: 700, //700ms animacija
         });
       }
-      setSelectedLocation(slug);//Zustand atidarys LocationPanel
+      setSelectedLocation(slug); //Zustand atidarys LocationPanel
       return;
     }
     if (r.type === "film") {
       setQuery(r.title);
-      useMapStore.getState().setSelectedFilmDetail(r.id);//atidaro filmo detalių rodinį tiesiogiai (ne per lokaciją)
+      useMapStore.getState().setSelectedFilmDetail(r.id); //atidaro filmo detalių rodinį tiesiogiai (ne per lokaciją)
       return;
     }
   };
 
   const showResults = open && query.trim().length >= 2;
-// ═══════════════════════════════════════════════
-// FILTRO SANTRAUKA
-// ═══════════════════════════════════════════════
+  // ═══════════════════════════════════════════════
+  // FILTRO SANTRAUKA
+  // ═══════════════════════════════════════════════
   const summaryParts: string[] = [];
-  if (filter.selectedGenres.length)
-    summaryParts.push(filter.selectedGenres.join(", "));//["Drama", "Trileris"] į "Drama, Trileris"
+  if (filter.selectedGenres.length) summaryParts.push(filter.selectedGenres.join(", ")); //["Drama", "Trileris"] į "Drama, Trileris"
   if (filter.selectedMediaTypes.length)
-    summaryParts.push(
-      filter.selectedMediaTypes.map(formatMediaType).join(", "),
-    );
+    summaryParts.push(filter.selectedMediaTypes.map(formatMediaType).join(", "));
   if (filter.studio.trim()) summaryParts.push(filter.studio.trim());
   if (filter.minRating > 0 || filter.maxRating < 10)
-    summaryParts.push(
-      `${filter.minRating.toFixed(1)}–${filter.maxRating.toFixed(1)} ⭐`,
-    );//"7.0–10.0 ⭐"
-    // Galutinis rezultatas: "Rastos lokacijos: 5 · Drama · 7.0–10.0 ⭐ · Vilniaus"
+    summaryParts.push(`${filter.minRating.toFixed(1)}–${filter.maxRating.toFixed(1)} ⭐`); //"7.0–10.0 ⭐"
+  // Galutinis rezultatas: "Rastos lokacijos: 5 · Drama · 7.0–10.0 ⭐ · Vilniaus"
   if (filter.yearFrom !== null || filter.yearTo !== null)
     summaryParts.push(`${filter.yearFrom ?? ""}–${filter.yearTo ?? ""}`);
-  if (filter.selectedCounties.length)
-    summaryParts.push(filter.selectedCounties.join(", "));
+  if (filter.selectedCounties.length) summaryParts.push(filter.selectedCounties.join(", "));
   if (filter.selectedLocationTypes.length)
     summaryParts.push(filter.selectedLocationTypes.join(", "));
 
-return (
-    <div ref={containerRef} style={{ position: "absolute", top: 16, right: 16, width: 320, zIndex: 40 }}>
+  return (
+    <div
+      ref={containerRef}
+      style={{ position: "absolute", top: 16, right: 16, width: 320, zIndex: 40 }}
+    >
       <div
         style={{
           background: "#111111",
@@ -258,30 +249,31 @@ return (
         onClick={() => setFiltersOpen((v) => !v)}
         aria-expanded={filtersOpen}
         aria-controls="cinemap-filters-drawer"
-style={{
-  marginTop: 8,
-  display: "flex",
-  alignItems: "center",
-  gap: 8,
-  padding: "8px 12px",
-  background: "#111111",
-  border: "1px solid #222222",
-  borderRadius: 8,
-  color: "#9ca3af",
-  fontSize: 14,
-  cursor: "pointer",
-  width: "100%",
-  transition: "border-color 0.15s",
-}}
-onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#c9a84c"; e.currentTarget.style.color = "#f5f5f5"; }}
-onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#222222"; e.currentTarget.style.color = "#9ca3af"; }}      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          aria-hidden="true"
-        >
+        style={{
+          marginTop: 8,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "8px 12px",
+          background: "#111111",
+          border: "1px solid #222222",
+          borderRadius: 8,
+          color: "#9ca3af",
+          fontSize: 14,
+          cursor: "pointer",
+          width: "100%",
+          transition: "border-color 0.15s",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = "#c9a84c";
+          e.currentTarget.style.color = "#f5f5f5";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = "#222222";
+          e.currentTarget.style.color = "#9ca3af";
+        }}
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <line x1="2" y1="4" x2="14" y2="4" stroke="currentColor" strokeWidth="1.5" />
           <circle cx="5" cy="4" r="1.5" fill="currentColor" />
           <line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" strokeWidth="1.5" />
@@ -332,9 +324,7 @@ onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#222222"; e.currentT
                 />
               ))}
               {(!genres || genres.length === 0) && (
-                <span style={{ fontSize: 12, color: "#6b7280" }}>
-                  Kraunama…
-                </span>
+                <span style={{ fontSize: 12, color: "#6b7280" }}>Kraunama…</span>
               )}
             </div>
           </div>
@@ -354,12 +344,10 @@ onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#222222"; e.currentT
             </div>
           </div>
 
-
           {/* ĮVERTINIMAS */}
           <div>
             <span style={labelStyle}>
-              IMDb įvertinimas: {filter.minRating.toFixed(1)} –{" "}
-              {filter.maxRating.toFixed(1)}
+              IMDb įvertinimas: {filter.minRating.toFixed(1)} – {filter.maxRating.toFixed(1)}
             </span>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <input
@@ -370,10 +358,7 @@ onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#222222"; e.currentT
                 value={filter.minRating}
                 onChange={(e) => {
                   const v = Number(e.target.value);
-                  filter.setRatingRange(
-                    Math.min(v, filter.maxRating),
-                    filter.maxRating,
-                  );
+                  filter.setRatingRange(Math.min(v, filter.maxRating), filter.maxRating);
                 }}
                 style={{ flex: 1, accentColor: "#c9a84c" }}
               />
@@ -385,10 +370,7 @@ onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#222222"; e.currentT
                 value={filter.maxRating}
                 onChange={(e) => {
                   const v = Number(e.target.value);
-                  filter.setRatingRange(
-                    filter.minRating,
-                    Math.max(v, filter.minRating),
-                  );
+                  filter.setRatingRange(filter.minRating, Math.max(v, filter.minRating));
                 }}
                 style={{ flex: 1, accentColor: "#c9a84c" }}
               />
@@ -458,13 +440,13 @@ onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#222222"; e.currentT
             <span style={labelStyle}>Lokacijos tipas</span>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {locationTypes.map((t: string) => (
-  <Pill
-    key={t}
-    label={t}
-    active={filter.selectedLocationTypes.includes(t)}
-    onClick={() => filter.toggleLocationType(t)}
-  />
-))}
+                <Pill
+                  key={t}
+                  label={t}
+                  active={filter.selectedLocationTypes.includes(t)}
+                  onClick={() => filter.toggleLocationType(t)}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -524,15 +506,9 @@ onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#222222"; e.currentT
             boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
           }}
         >
-          {isLoading && (
-            <div style={{ padding: 12, color: "#9ca3af", fontSize: 13 }}>
-              Ieškoma…
-            </div>
-          )}
+          {isLoading && <div style={{ padding: 12, color: "#9ca3af", fontSize: 13 }}>Ieškoma…</div>}
           {!isLoading && (results?.length ?? 0) === 0 && (
-            <div style={{ padding: 12, color: "#9ca3af", fontSize: 13 }}>
-              Nieko nerasta
-            </div>
+            <div style={{ padding: 12, color: "#9ca3af", fontSize: 13 }}>Nieko nerasta</div>
           )}
           {!isLoading &&
             results?.map((r) => (
@@ -624,9 +600,11 @@ onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#222222"; e.currentT
                     flexShrink: 0,
                   }}
                 >
-                  {r.type === "location" ? "Lokacija"
-                    : r.media_type === "tv" || r.media_type === "series" ? "Serialas"
-                    : "Filmas"}
+                  {r.type === "location"
+                    ? "Lokacija"
+                    : r.media_type === "tv" || r.media_type === "series"
+                      ? "Serialas"
+                      : "Filmas"}
                 </span>
               </button>
             ))}

@@ -9,7 +9,9 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <Suspense fallback={<div className="w-full h-full" style={{ background: "var(--color-bg-primary)" }} />}>
+    <Suspense
+      fallback={<div className="w-full h-full" style={{ background: "var(--color-bg-primary)" }} />}
+    >
       <DiscoverPage />
     </Suspense>
   );

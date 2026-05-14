@@ -9,7 +9,9 @@ export const Route = createFileRoute("/saved")({
 
 function SavedRoute() {
   return (
-    <Suspense fallback={<div className="w-full h-full" style={{ background: "var(--color-bg-primary)" }} />}>
+    <Suspense
+      fallback={<div className="w-full h-full" style={{ background: "var(--color-bg-primary)" }} />}
+    >
       <SavedPage />
     </Suspense>
   );

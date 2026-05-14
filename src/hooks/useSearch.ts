@@ -17,7 +17,7 @@ export interface SearchResult {
 async function searchAll(query: string): Promise<SearchResult[]> {
   const trimmed = query.trim();
   if (trimmed.length < 2) return [];
-  const { data, error } = await supabase.rpc("search_all", { query: trimmed });//tekstinės paieškos variklis
+  const { data, error } = await supabase.rpc("search_all", { query: trimmed }); //tekstinės paieškos variklis
   if (error) throw error;
   return (data ?? []) as SearchResult[];
 }
@@ -39,7 +39,7 @@ export function useSearch(query: string) {
   return useQuery({
     queryKey: ["search", debounced],
     queryFn: () => searchAll(debounced),
-    enabled: debounced.length >= 2,//bent 2 raidės
+    enabled: debounced.length >= 2, //bent 2 raidės
     staleTime: 30 * 1000, //kaip greitai rezultatas bus primintas
   });
 }

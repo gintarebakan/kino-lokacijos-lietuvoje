@@ -1,13 +1,20 @@
 /**
- * Pure DOM marker factories for MapLibre custom markers.
- * No icon libraries - all SVG inline
+MapLibre custom markers naudojimui.
+Ikonos SVG formatu inline.
  */
 
 export type MarkerTier = "gold" | "gray";
 
+// Teardropo (selected žymekliui) formos SVG
 const TEARDROP_PATH =
   "M16 0C7.163 0 0 7.163 0 16c0 9.5 13 22.5 15.2 24.4a1.2 1.2 0 0 0 1.6 0C19 38.5 32 25.5 32 16 32 7.163 24.837 0 16 0z";
 
+/**
+ * vizualinis akcentas selected žymeklio viduje.
+ *
+ * @param size  - Ikono dydis pikseliais
+ * @param color - Ikono spalva
+ */
 function makeFilmReel(size: number, color: string): SVGSVGElement {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("width", String(size));
@@ -15,6 +22,7 @@ function makeFilmReel(size: number, color: string): SVGSVGElement {
   svg.setAttribute("viewBox", "0 0 24 24");
   svg.setAttribute("fill", "none");
 
+  // Išorinis žiedas
   const outer = document.createElementNS("http://www.w3.org/2000/svg", "circle");
   outer.setAttribute("cx", "12");
   outer.setAttribute("cy", "12");
@@ -23,6 +31,7 @@ function makeFilmReel(size: number, color: string): SVGSVGElement {
   outer.setAttribute("stroke-width", "1.5");
   svg.appendChild(outer);
 
+  // Vidinis žiedas
   const inner = document.createElementNS("http://www.w3.org/2000/svg", "circle");
   inner.setAttribute("cx", "12");
   inner.setAttribute("cy", "12");
@@ -30,6 +39,7 @@ function makeFilmReel(size: number, color: string): SVGSVGElement {
   inner.setAttribute("fill", color);
   svg.appendChild(inner);
 
+  // 6 angos viduje tolygiai išdėstytos 60° intervalais aplink centrą
   const slotPositions = [0, 60, 120, 180, 240, 300];
   for (const angle of slotPositions) {
     const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -47,8 +57,14 @@ function makeFilmReel(size: number, color: string): SVGSVGElement {
 }
 
 /**
- * Default circle marker (24x24). Used for unselected locations.
- * Bookmarked → red. Otherwise always gold.
+ * Apskrito žymeklio HTML elementas (24×24 px).
+ * Naudojamas nepasirinktoms lokacijoms žemėlapyje.
+ *
+ * Spalvos:
+ * Išsaugota lokacija -> raudona (#e53e3e)
+ * Įprasta lokacija  -> auksinė (#c9a84c)
+ *
+ * @param isBookmarked - Ar lokacija yra vartotojo išsaugotų sąraše
  */
 export function createCircleMarker(isBookmarked: boolean): HTMLElement {
   const el = document.createElement("div");
@@ -65,8 +81,10 @@ export function createCircleMarker(isBookmarked: boolean): HTMLElement {
 }
 
 /**
- * Selected teardrop marker (32x40) with film-reel icon.
- * Always gold regardless of tier.
+ * Pasirinktos lokacijos tapimas į teardropo formos žymeklį (32×40 px).
+ * Visada auksinės spalvos nepriklausomai nuo išsaugojimo būsenos.
+ *
+ * MapViewer.tsx naudoja šio žymeklio plotį (32px) kaip identifikatorių nustatant ar žymeklis yra selected būsenoje
  */
 export function createSelectedMarker(): HTMLElement {
   const wrapper = document.createElement("div");
@@ -74,9 +92,10 @@ export function createSelectedMarker(): HTMLElement {
   wrapper.style.position = "relative";
   wrapper.style.display = "block";
   wrapper.style.lineHeight = "0";
-  wrapper.style.width = "32px";
+  wrapper.style.width = "32px"; // <-------------------------------------------
   wrapper.style.height = "40px";
 
+  // Teardropo SVG forma
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("width", "32");
   svg.setAttribute("height", "40");
@@ -90,6 +109,7 @@ export function createSelectedMarker(): HTMLElement {
   svg.appendChild(path);
   wrapper.appendChild(svg);
 
+  // Centruota ikona skirta teardropo vduje
   const reel = makeFilmReel(12, "#000000");
   reel.style.position = "absolute";
   reel.style.top = "8px";
@@ -99,8 +119,19 @@ export function createSelectedMarker(): HTMLElement {
   return wrapper;
 }
 
+/**
+ * Klasterio žymeklis, kuris rodo kelių artimų lokacijų skaičių.
+ * Dydis dinamiškai didėja priklausomai nuo taškų skaičiaus:
+ * mažiau 10 taškų  -> 40×40 px, šriftas 13px
+ * nuo 10–49 taškų -> 52×52 px, šriftas 15px
+ * nuo ir daugiau 50 taškų  -> 64×64 px, šriftas 17px
+ *
+ * @param pointCount - Klasteryje esančių lokacijų skaičius
+ */
 export function createClusterMarker(pointCount: number): HTMLElement {
   const el = document.createElement("div");
+
+  // Dydis priklauso nuo taškų kiekio,kuo didesni klasteriai,tuo ryškesni
   let size = 40;
   let fontSize = 13;
   if (pointCount >= 50) {
@@ -125,6 +156,9 @@ export function createClusterMarker(pointCount: number): HTMLElement {
   el.style.cursor = "pointer";
   el.style.fontFamily = "Inter, sans-serif";
   el.style.boxShadow = "0 2px 8px rgba(0,0,0,0.4)";
+
+  // Rodomas taškų skaičius klasterio centre
   el.textContent = String(pointCount);
+
   return el;
 }

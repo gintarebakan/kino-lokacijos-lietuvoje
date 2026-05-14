@@ -18,17 +18,49 @@ interface RouterContext {
 
 function NotFoundComponent() {
   return (
-    <div style={{ display: "flex", minHeight: "100dvh", alignItems: "center", justifyContent: "center", padding: "0 16px", background: "var(--color-bg-primary)" }}>
+    <div
+      style={{
+        display: "flex",
+        minHeight: "100dvh",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "0 16px",
+        background: "var(--color-bg-primary)",
+      }}
+    >
       <div style={{ maxWidth: 448, textAlign: "center" }}>
-        <h1 style={{ color: "var(--color-gold)", fontFamily: "Georgia, serif", fontSize: "5rem" }}>404</h1>
-        <h2 style={{ marginTop: 16, fontSize: "1.25rem", fontWeight: 600, color: "var(--color-text-primary)" }}>
+        <h1 style={{ color: "var(--color-gold)", fontFamily: "Georgia, serif", fontSize: "5rem" }}>
+          404
+        </h1>
+        <h2
+          style={{
+            marginTop: 16,
+            fontSize: "1.25rem",
+            fontWeight: 600,
+            color: "var(--color-text-primary)",
+          }}
+        >
           Puslapis nerastas
         </h2>
         <p style={{ marginTop: 8, fontSize: "0.875rem", color: "var(--color-text-secondary)" }}>
           Puslapis neegzistuoja arba buvo perkeltas.
         </p>
         <div style={{ marginTop: 24 }}>
-          <Link to="/" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: 6, padding: "8px 16px", fontSize: "0.875rem", fontWeight: 500, background: "var(--color-gold)", color: "var(--color-bg-primary)", textDecoration: "none" }}>
+          <Link
+            to="/"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 6,
+              padding: "8px 16px",
+              fontSize: "0.875rem",
+              fontWeight: 500,
+              background: "var(--color-gold)",
+              color: "var(--color-bg-primary)",
+              textDecoration: "none",
+            }}
+          >
             I pradzia
           </Link>
         </div>
@@ -74,15 +106,19 @@ function RootComponent() {
     <div style={{ width: "100%", height: "100dvh", background: "var(--color-bg-primary)" }}>
       <AppSidebar />
       <div style={contentStyle}>
-
         {/* Persistent map layer */}
-        <div style={{
-          position: "absolute",
-          top: 0, left: 0, right: 0, bottom: 0,
-          visibility: (isMapRoute || isSavedRoute) ? "visible" : "hidden",
-          pointerEvents: (isMapRoute || isSavedRoute) ? "auto" : "none",
-          zIndex: (isMapRoute || isSavedRoute) ? 1 : 0,
-        }}>
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            visibility: isMapRoute || isSavedRoute ? "visible" : "hidden",
+            pointerEvents: isMapRoute || isSavedRoute ? "auto" : "none",
+            zIndex: isMapRoute || isSavedRoute ? 1 : 0,
+          }}
+        >
           <Suspense fallback={null}>
             <MapViewer />
             {isMapRoute && <SearchBar />}
@@ -95,24 +131,39 @@ function RootComponent() {
         {/* SavedPage sidebar overlay */}
         {isSavedRoute && (
           <Suspense fallback={null}>
-            <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, width: 360, zIndex: 30, background: "#0a0a0a", borderRight: "1px solid #222222" }}>
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                bottom: 0,
+                width: 360,
+                zIndex: 30,
+                background: "#0a0a0a",
+                borderRight: "1px solid #222222",
+              }}
+            >
               <SavedPageDirect />
             </div>
           </Suspense>
         )}
 
         {/* Other routes */}
-        <div style={{
-          position: "absolute",
-          top: 0, left: 0, right: 0, bottom: 0,
-          visibility: (isMapRoute || isSavedRoute) ? "hidden" : "visible",
-          zIndex: (isMapRoute || isSavedRoute) ? 0 : 2,
-          overflowY: "auto",
-          overflowX: "hidden",
-        }}>
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            visibility: isMapRoute || isSavedRoute ? "hidden" : "visible",
+            zIndex: isMapRoute || isSavedRoute ? 0 : 2,
+            overflowY: "auto",
+            overflowX: "hidden",
+          }}
+        >
           <Outlet />
         </div>
-
       </div>
 
       {/* Cookie banner — virš visko, išskyrus admin */}

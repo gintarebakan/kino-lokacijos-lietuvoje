@@ -1,3 +1,7 @@
+// Admin CMS Kolekcijų lokacijų valdymas
+// Šis puslapis leidžia administruoti ryšius tarp kolekcijų ir lokacijų:
+// pridėti lokacijas į kolekciją, nustatyti jų eiliškumą ir šalinti
+
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -7,15 +11,16 @@ export const Route = createFileRoute("/admin/collection-locations")({
   component: AdminCollectionLocations,
 });
 
-// ── Types ──────────────────────────────────────────────────────────────────────
+//-----Tipai
 
+// Kolekcijos-lokacijos ryšio struktūra su joined duomenimis
 interface CollectionLocation {
   id: string;
   collection_id: string | null;
   location_id: string | null;
   order_index: number | null;
-  collections_curated: { title: string } | null;
-  locations_lt: { name: string } | null;
+  collections_curated: { title: string } | null; // Kolekcijos pavadinimas (joined)
+  locations_lt: { name: string } | null;          // Lokacijos pavadinimas (joined)
 }
 
 interface Collection {
@@ -28,12 +33,13 @@ interface Location {
   name: string;
 }
 
+// Naujos lokacijos pridėjimo formos eilutė
 interface AddRow {
   location_id: string;
   order_index: string;
 }
 
-// ── Shared styles ──────────────────────────────────────────────────────────────
+//------Bendri stiliai
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
@@ -56,37 +62,41 @@ const labelStyle: React.CSSProperties = {
   letterSpacing: "0.08em",
 };
 
-// ── Component ──────────────────────────────────────────────────────────────────
+//------Pagrindinis komponentas
 
 export default function AdminCollectionLocations() {
   const qc = useQueryClient();
+
+  // Filtravimo būsena
   const [filterCollection, setFilterCollection] = useState("");
+
+  // Pridėjimo formos būsena
   const [addingToCollection, setAddingToCollection] = useState("");
   const [addRows, setAddRows] = useState<AddRow[]>([{ location_id: "", order_index: "0" }]);
+
+  // Eiliškumo redagavimo būsena
   const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
   const [editingOrderValue, setEditingOrderValue] = useState("");
 
-  // ── Queries ──────────────────────────────────────────────────────────────────
+  //-------Duomenų užklausos
 
+  // Visi kolekcijų-lokacijų ryšiai su joined pavadinimais
   const { data: collectionLocations = [], isLoading } = useQuery({
     queryKey: ["admin-collection-locations"],
     queryFn: async (): Promise<CollectionLocation[]> => {
       const { data, error } = await supabase
         .from("collection_locations")
-        .select(`
-          id,
-          collection_id,
-          location_id,
-          order_index,
-          collections_curated!fk_collection ( title ),
-          locations_lt!fk_location ( name )
-        `)
+        .select(
+          `id, collection_id, location_id, order_index,
+           collections_curated!fk_collection ( title ),
+           locations_lt!fk_location ( name )`,
+        )
         .order("collection_id", { ascending: true })
         .order("order_index", { ascending: true });
 
       if (error) throw error;
 
-      // Normalise: PostgREST may return array OR object depending on version
+      // PostgREST gali grąžinti masyvą arba objektą / paimame pirmą elementą jei masyvas
       return (data ?? []).map((row: any) => ({
         ...row,
         collections_curated: Array.isArray(row.collections_curated)
@@ -99,6 +109,7 @@ export default function AdminCollectionLocations() {
     },
   });
 
+  // Kolekcijų sąrašas pasirinkimo laukui
   const { data: collections = [] } = useQuery<Collection[]>({
     queryKey: ["admin-collections-select"],
     queryFn: async () => {
@@ -111,6 +122,7 @@ export default function AdminCollectionLocations() {
     },
   });
 
+  // Lokacijų sąrašas pasirinkimo laukui
   const { data: locations = [] } = useQuery<Location[]>({
     queryKey: ["admin-locations-select"],
     queryFn: async () => {
@@ -123,8 +135,9 @@ export default function AdminCollectionLocations() {
     },
   });
 
-  // ── Mutations ────────────────────────────────────────────────────────────────
+  // ------EDIT
 
+  // Kelių lokacijų pridėjimas į kolekciją vienu kartu (bulk insert)
   const bulkAdd = useMutation({
     mutationFn: async () => {
       const validRows = addRows.filter((r) => r.location_id);
@@ -137,22 +150,22 @@ export default function AdminCollectionLocations() {
         order_index: Number(r.order_index) || 0,
       }));
 
-      // upsert — tyliai praleidžia jau egzistuojančias (collection_id, location_id) poras
-      const { error } = await supabase
-        .from("collection_locations")
-        .upsert(payload, {
-          onConflict: "collection_id,location_id",
-          ignoreDuplicates: true,
-        });
+      // (upsert) jei pora (collection_id, location_id) jau egzistuoja, praleidžiama
+      const { error } = await supabase.from("collection_locations").upsert(payload, {
+        onConflict: "collection_id,location_id",
+        ignoreDuplicates: true,
+      });
       if (error) throw error;
     },
     onSuccess: () => {
+      // Atnaujiname sąrašą ir išvalome formą
       qc.invalidateQueries({ queryKey: ["admin-collection-locations"] });
       setAddRows([{ location_id: "", order_index: "0" }]);
       setAddingToCollection("");
     },
   });
 
+  // Lokacijos eiliškumo atnaujinimas kolekcijoje
   const updateOrder = useMutation({
     mutationFn: async ({ id, order_index }: { id: string; order_index: number }) => {
       const { error } = await supabase
@@ -167,33 +180,34 @@ export default function AdminCollectionLocations() {
     },
   });
 
+  // Lokacijos pašalinimas iš kolekcijos
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("collection_locations")
-        .delete()
-        .eq("id", id);
+      const { error } = await supabase.from("collection_locations").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-collection-locations"] }),
   });
 
-  // ── Helpers ──────────────────────────────────────────────────────────────────
+  //------Pagalbinės funkcijos
 
+  // Filtruojame ir rūšiuojame pagal eiliškumą
   const filtered = collectionLocations
     .filter((cl) => !filterCollection || cl.collection_id === filterCollection)
     .sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0));
 
+  // Atnaujina konkretaus formos lauko reikšmę pagal indeksą
   const updateRow = (idx: number, field: keyof AddRow, value: string) =>
     setAddRows((prev) => prev.map((r, i) => (i === idx ? { ...r, [field]: value } : r)));
 
+  // Prideda naują tuščią eilutę į pridėjimo formą
   const addNewRow = () =>
     setAddRows((prev) => [...prev, { location_id: "", order_index: String(prev.length) }]);
 
-  const removeRow = (idx: number) =>
-    setAddRows((prev) => prev.filter((_, i) => i !== idx));
+  // Pašalina eilutę iš pridėjimo formos
+  const removeRow = (idx: number) => setAddRows((prev) => prev.filter((_, i) => i !== idx));
 
-  // ── Render ───────────────────────────────────────────────────────────────────
+  //-------Render
 
   return (
     <div>
@@ -207,7 +221,7 @@ export default function AdminCollectionLocations() {
         </span>
       </div>
 
-      {/* Filter */}
+      {/* Filtravimas pagal kolekciją */}
       <div style={{ marginBottom: 20 }}>
         <label style={labelStyle}>Filtruoti pagal kolekciją</label>
         <select
@@ -222,12 +236,13 @@ export default function AdminCollectionLocations() {
         </select>
       </div>
 
-      {/* Add form */}
+      {/* Pridėjimo forma */}
       <div style={{ background: "#111111", border: "1px solid #222", borderRadius: 12, padding: 24, marginBottom: 24 }}>
         <h2 style={{ margin: "0 0 16px", color: "#c9a84c", fontSize: 15 }}>
           Pridėti lokacijas į kolekciją
         </h2>
 
+        {/* Kolekcijos pasirinkimas */}
         <div style={{ marginBottom: 16 }}>
           <label style={labelStyle}>
             Kolekcija <span style={{ color: "#f87171" }}>*</span>
@@ -244,18 +259,17 @@ export default function AdminCollectionLocations() {
           </select>
         </div>
 
+        {/* Stulpelių antraštės */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 120px 40px", gap: 8, marginBottom: 4 }}>
           <span style={labelStyle}>Lokacija</span>
           <span style={labelStyle}>Eiliškumas</span>
           <span />
         </div>
 
+        {/* Lokacijų eilutės - galima pridėti kelias iš karto */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
           {addRows.map((row, idx) => (
-            <div
-              key={idx}
-              style={{ display: "grid", gridTemplateColumns: "1fr 120px 40px", gap: 8, alignItems: "center" }}
-            >
+            <div key={idx} style={{ display: "grid", gridTemplateColumns: "1fr 120px 40px", gap: 8, alignItems: "center" }}>
               <select
                 value={row.location_id}
                 onChange={(e) => updateRow(idx, "location_id", e.target.value)}
@@ -275,22 +289,16 @@ export default function AdminCollectionLocations() {
                 style={inputStyle}
               />
 
+              {/* Eilutės pašalinimo mygtukas - išjungtas jei tik viena eilutė */}
               <button
                 type="button"
                 onClick={() => removeRow(idx)}
                 disabled={addRows.length === 1}
                 style={{
-                  background: "transparent",
-                  border: "1px solid #333",
-                  borderRadius: 6,
-                  color: "#f87171",
-                  fontSize: 16,
+                  background: "transparent", border: "1px solid #333", borderRadius: 6,
+                  color: "#f87171", fontSize: 16,
                   cursor: addRows.length === 1 ? "not-allowed" : "pointer",
-                  height: 36,
-                  width: 36,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  height: 36, width: 36, display: "flex", alignItems: "center", justifyContent: "center",
                 }}
               >
                 ×
@@ -299,44 +307,35 @@ export default function AdminCollectionLocations() {
           ))}
         </div>
 
+        {/* Naujos eilutės pridėjimas */}
         <button
           type="button"
           onClick={addNewRow}
           style={{
-            background: "transparent",
-            border: "1px dashed #444",
-            borderRadius: 8,
-            padding: "8px 16px",
-            color: "#9ca3af",
-            fontSize: 13,
-            cursor: "pointer",
-            marginBottom: 16,
+            background: "transparent", border: "1px dashed #444", borderRadius: 8,
+            padding: "8px 16px", color: "#9ca3af", fontSize: 13, cursor: "pointer", marginBottom: 16,
           }}
         >
           + Pridėti dar vieną lokaciją
         </button>
 
+        {/* Klaidos pranešimas */}
         {bulkAdd.isError && (
           <div style={{ color: "#f87171", fontSize: 13, marginBottom: 8 }}>
             {(bulkAdd.error as Error)?.message ?? "Klaida išsaugant."}
           </div>
         )}
 
+        {/* Formos valdymo mygtukai */}
         <div style={{ display: "flex", gap: 8 }}>
           <button
             type="button"
             onClick={() => bulkAdd.mutate()}
             disabled={bulkAdd.isPending}
             style={{
-              background: "#c9a84c",
-              border: "none",
-              borderRadius: 8,
-              padding: "10px 20px",
-              color: "#0a0a0a",
-              fontWeight: 700,
-              fontSize: 13,
-              cursor: "pointer",
-              opacity: bulkAdd.isPending ? 0.7 : 1,
+              background: "#c9a84c", border: "none", borderRadius: 8,
+              padding: "10px 20px", color: "#0a0a0a", fontWeight: 700,
+              fontSize: 13, cursor: "pointer", opacity: bulkAdd.isPending ? 0.7 : 1,
             }}
           >
             {bulkAdd.isPending ? "Saugoma…" : "Išsaugoti"}
@@ -348,13 +347,8 @@ export default function AdminCollectionLocations() {
               setAddingToCollection("");
             }}
             style={{
-              background: "transparent",
-              border: "1px solid #333",
-              borderRadius: 8,
-              padding: "10px 20px",
-              color: "#9ca3af",
-              fontSize: 13,
-              cursor: "pointer",
+              background: "transparent", border: "1px solid #333", borderRadius: 8,
+              padding: "10px 20px", color: "#9ca3af", fontSize: 13, cursor: "pointer",
             }}
           >
             Išvalyti
@@ -362,26 +356,19 @@ export default function AdminCollectionLocations() {
         </div>
       </div>
 
-      {/* List */}
+      {/* Krovimo indikatorius */}
       {isLoading && <div style={{ color: "#9ca3af", marginBottom: 16 }}>Kraunama…</div>}
 
+      {/* Įrašų lentelė */}
       <div style={{ background: "#111111", border: "1px solid #222", borderRadius: 12, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid #222" }}>
               {["#", "Lokacija", "Kolekcija", "Eiliškumas", ""].map((h) => (
-                <th
-                  key={h}
-                  style={{
-                    padding: "12px 16px",
-                    textAlign: "left",
-                    color: "#6b7280",
-                    fontSize: 11,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.08em",
-                    fontWeight: 600,
-                  }}
-                >
+                <th key={h} style={{
+                  padding: "12px 16px", textAlign: "left", color: "#6b7280",
+                  fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600,
+                }}>
                   {h}
                 </th>
               ))}
@@ -399,11 +386,11 @@ export default function AdminCollectionLocations() {
                 </td>
 
                 <td style={{ padding: "12px 16px", color: "#9ca3af", fontSize: 13 }}>
-                  {cl.collections_curated?.title
-                    ?? collections.find((c) => c.id === cl.collection_id)?.title
-                    ?? "—"}
+                  {cl.collections_curated?.title ??
+                    collections.find((c) => c.id === cl.collection_id)?.title ?? "—"}
                 </td>
 
+                {/* Eiliškumo redagavimas/ paspaudus skaičių atsidaro inline input */}
                 <td style={{ padding: "12px 16px", width: 140 }}>
                   {editingOrderId === cl.id ? (
                     <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
@@ -413,86 +400,38 @@ export default function AdminCollectionLocations() {
                         value={editingOrderValue}
                         onChange={(e) => setEditingOrderValue(e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter")
-                            updateOrder.mutate({ id: cl.id, order_index: Number(editingOrderValue) });
+                          // Enter - išsaugo, Escape - atšaukia
+                          if (e.key === "Enter") updateOrder.mutate({ id: cl.id, order_index: Number(editingOrderValue) });
                           if (e.key === "Escape") setEditingOrderId(null);
                         }}
                         autoFocus
                         style={{ ...inputStyle, width: 60, padding: "4px 8px" }}
                       />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          updateOrder.mutate({ id: cl.id, order_index: Number(editingOrderValue) })
-                        }
-                        style={{
-                          background: "#c9a84c",
-                          border: "none",
-                          borderRadius: 4,
-                          padding: "4px 8px",
-                          color: "#0a0a0a",
-                          fontSize: 11,
-                          fontWeight: 700,
-                          cursor: "pointer",
-                        }}
-                      >
+                      <button type="button"
+                        onClick={() => updateOrder.mutate({ id: cl.id, order_index: Number(editingOrderValue) })}
+                        style={{ background: "#c9a84c", border: "none", borderRadius: 4, padding: "4px 8px", color: "#0a0a0a", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                         ✓
                       </button>
-                      <button
-                        type="button"
+                      <button type="button"
                         onClick={() => setEditingOrderId(null)}
-                        style={{
-                          background: "transparent",
-                          border: "1px solid #333",
-                          borderRadius: 4,
-                          padding: "4px 8px",
-                          color: "#9ca3af",
-                          fontSize: 11,
-                          cursor: "pointer",
-                        }}
-                      >
+                        style={{ background: "transparent", border: "1px solid #333", borderRadius: 4, padding: "4px 8px", color: "#9ca3af", fontSize: 11, cursor: "pointer" }}>
                         ✕
                       </button>
                     </div>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditingOrderId(cl.id);
-                        setEditingOrderValue(cl.order_index?.toString() ?? "0");
-                      }}
-                      style={{
-                        background: "transparent",
-                        border: "1px solid #2a2a2a",
-                        borderRadius: 6,
-                        padding: "4px 10px",
-                        color: "#c9a84c",
-                        fontSize: 13,
-                        cursor: "pointer",
-                        minWidth: 40,
-                      }}
-                    >
+                    <button type="button"
+                      onClick={() => { setEditingOrderId(cl.id); setEditingOrderValue(cl.order_index?.toString() ?? "0"); }}
+                      style={{ background: "transparent", border: "1px solid #2a2a2a", borderRadius: 6, padding: "4px 10px", color: "#c9a84c", fontSize: 13, cursor: "pointer", minWidth: 40 }}>
                       {cl.order_index ?? 0}
                     </button>
                   )}
                 </td>
 
+                {/* Įrašo pašalinimas su patvirtinimu */}
                 <td style={{ padding: "12px 16px" }}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (confirm("Ištrinti šį įrašą?")) remove.mutate(cl.id);
-                    }}
-                    style={{
-                      background: "transparent",
-                      border: "1px solid #333",
-                      borderRadius: 6,
-                      padding: "4px 10px",
-                      color: "#f87171",
-                      fontSize: 12,
-                      cursor: "pointer",
-                    }}
-                  >
+                  <button type="button"
+                    onClick={() => { if (confirm("Ištrinti šį įrašą?")) remove.mutate(cl.id); }}
+                    style={{ background: "transparent", border: "1px solid #333", borderRadius: 6, padding: "4px 10px", color: "#f87171", fontSize: 12, cursor: "pointer" }}>
                     Ištrinti
                   </button>
                 </td>
@@ -501,11 +440,10 @@ export default function AdminCollectionLocations() {
           </tbody>
         </table>
 
+        {/* Tuščio sąrašo pranešimas */}
         {!isLoading && filtered.length === 0 && (
           <div style={{ padding: 24, color: "#6b7280", fontSize: 13, textAlign: "center" }}>
-            {filterCollection
-              ? "Pasirinktoje kolekcijoje įrašų nerasta."
-              : "Įrašų nerasta."}
+            {filterCollection ? "Pasirinktoje kolekcijoje įrašų nerasta." : "Įrašų nerasta."}
           </div>
         )}
       </div>

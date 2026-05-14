@@ -1,5 +1,5 @@
 //useLocationDetail.ts - enciklopedija
-//Žemėlapyje atsirado taškas, vartotojas jį paspaudė 
+//Žemėlapyje atsirado taškas, vartotojas jį paspaudė
 //reikia visų įmanomų detalių apie tą vietą
 
 import { useQuery } from "@tanstack/react-query";
@@ -54,7 +54,7 @@ async function fetchLocationDetail(slug: string): Promise<LocationDetail | null>
   const { data, error } = await supabase
     .from("locations_lt")
     .select(
-`id, name, slug, address, county, location_type, description, curator_notes, accessibility, image_url, official_website_url, street_view_url, coordinates,
+      `id, name, slug, address, county, location_type, description, curator_notes, accessibility, image_url, official_website_url, street_view_url, coordinates,
       film_locations (
          id, fictional_name, scene_desc, scene_facts, scene_images, scene_significance,
          films_tmdb (
@@ -63,8 +63,8 @@ async function fetchLocationDetail(slug: string): Promise<LocationDetail | null>
        )`,
     )
     //kai ieškojome lokacijų sąrašo, naudojome filtrus (.in(), .or()). čia mes ieškome tiksliai
-    .eq("slug", slug)//stabdom paiešką kai randam tą ID(slug) įrašą, kuris atitinka vartotojo paspaustą
-    .maybeSingle();//jei nėra-null, ir ''vieta nerasta''
+    .eq("slug", slug) //stabdom paiešką kai randam tą ID(slug) įrašą, kuris atitinka vartotojo paspaustą
+    .maybeSingle(); //jei nėra-null, ir ''vieta nerasta''
 
   if (error) throw error;
   return (data as unknown as LocationDetail) ?? null;
@@ -74,7 +74,7 @@ export function useLocationDetail(slug: string | null) {
   return useQuery({
     queryKey: ["location-detail", slug],
     queryFn: () => fetchLocationDetail(slug as string),
-    enabled: !!slug,//hook'as miega kol vartotojas nepaspaudžia ant konkretaus žymeklio
+    enabled: !!slug, //hook'as miega kol vartotojas nepaspaudžia ant konkretaus žymeklio
     //5min
     staleTime: 5 * 60 * 1000,
   });

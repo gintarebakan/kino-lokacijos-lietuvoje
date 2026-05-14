@@ -6,13 +6,14 @@ import type maplibregl from "maplibre-gl";
 
 export type LayerStyle = "streets" | "satellite"; //žemėlapio stilius gali būti tik šie žodžiai
 
-interface MapState { //griežtas brėžinys ką Navigatorius turi sekti
-  mapInstance: maplibregl.Map | null;//Kai žemėlapis pirmą kartą užsikrauna, jis įdeda save į šį Zustand store (per funkciją setMap).
+interface MapState {
+  //griežtas brėžinys ką Navigatorius turi sekti
+  mapInstance: maplibregl.Map | null; //Kai žemėlapis pirmą kartą užsikrauna, jis įdeda save į šį Zustand store (per funkciją setMap).
   //bet kuris mygtukas gali pasakyti: useMapStore.getState().mapInstance.flyTo({ center: [Vilnius] })
   //saugome variklį, kad galėtume jį valdyti iš bet kurio programėlės kampo.
-  zoom: number;//ka dabar mato vartotojo akys
+  zoom: number; //ka dabar mato vartotojo akys
   center: [number, number];
-  selectedLocationId: string | null;//Koks informacinis langas dabar atidarytas kairėje pusėje
+  selectedLocationId: string | null; //Koks informacinis langas dabar atidarytas kairėje pusėje
   selectedFilmId: string | null;
   selectedFilmLocationId: string | null;
   savedLocationIds: string[];
@@ -22,10 +23,9 @@ interface MapState { //griežtas brėžinys ką Navigatorius turi sekti
   selectedFilmDetailId: string | null;
   routeGeoJSON: number[][] | null;
   selectedCollectionId: string | null;
-  previousCollectionId: string | null;//Iš kur vartotojas čia atėjo ir ar turime palikti nupieštą maršruto liniją?
+  previousCollectionId: string | null; //Iš kur vartotojas čia atėjo ir ar turime palikti nupieštą maršruto liniją?
   previousFilmDetailId: string | null;
   openLocationFromCollection: (locationSlug: string, collectionId: string) => void;
-
 
   setMap: (map: maplibregl.Map | null) => void;
   setViewport: (zoom: number, center: [number, number]) => void;
@@ -79,8 +79,6 @@ export const useMapStore = create<MapState>((set) => ({
       ...(id ? { selectedCollectionId: null } : {}),
     }),
 
-
-
   // Atėjimas iš Atradimų puslapio (viską panaikina):
   setSelectedLocationFromDiscover: (id) =>
     set({
@@ -92,7 +90,7 @@ export const useMapStore = create<MapState>((set) => ({
       previousCollectionId: null,
       routeGeoJSON: null,
     }),
-    
+
   // Paspaudimas tiesiogiai žemėlapyje:
   setSelectedLocationFromMap: (id) =>
     set((state) => ({
@@ -113,37 +111,41 @@ export const useMapStore = create<MapState>((set) => ({
   setSelectedFilmDetail: (id) =>
     set({
       selectedFilmDetailId: id,
-      ...(id ? {
-        selectedLocationId: null,
-      selectedFilmId: null,
-      selectedFilmLocationId: null,
-      selectedCollectionId: null,
-      previousCollectionId: null,
-      routeGeoJSON: null,
-      } : {}),
+      ...(id
+        ? {
+            selectedLocationId: null,
+            selectedFilmId: null,
+            selectedFilmLocationId: null,
+            selectedCollectionId: null,
+            previousCollectionId: null,
+            routeGeoJSON: null,
+          }
+        : {}),
     }),
 
   // Collection — opening sets state, closing clears route
   setSelectedCollection: (id) =>
     set({
       selectedCollectionId: id,
-      ...(!id ? {
-        routeGeoJSON: null,
-        previousCollectionId: null,
-      } : {}),
+      ...(!id
+        ? {
+            routeGeoJSON: null,
+            previousCollectionId: null,
+          }
+        : {}),
     }),
-//Atidarymas iš Maršruto (Kolekcijos) sąrašo:
-openLocationFromCollection: (locationSlug, collectionId) =>
-  set({
-    selectedLocationId: locationSlug,
-    selectedCollectionId: null,
-    previousCollectionId: collectionId,
-    selectedFilmId: null,
-    selectedFilmLocationId: null,
-    selectedFilmDetailId: null,
-    // routeGeoJSON intentionally NOT cleared
-  }),
-    
+  //Atidarymas iš Maršruto (Kolekcijos) sąrašo:
+  openLocationFromCollection: (locationSlug, collectionId) =>
+    set({
+      selectedLocationId: locationSlug,
+      selectedCollectionId: null,
+      previousCollectionId: collectionId,
+      selectedFilmId: null,
+      selectedFilmLocationId: null,
+      selectedFilmDetailId: null,
+      // routeGeoJSON intentionally NOT cleared
+    }),
+
   setPreviousCollection: (id) => set({ previousCollectionId: id }),
   setPreviousFilmDetail: (id) => set({ previousFilmDetailId: id }),
 
@@ -157,8 +159,8 @@ openLocationFromCollection: (locationSlug, collectionId) =>
         ? state.savedLocationIds.filter((s) => s !== id)
         : [...state.savedLocationIds, id],
     })),
-    //Jei lokacijos ID jau yra išsaugotų sąraše (includes(id)), mes naudojame .filter(), kad sukurtume naują sąrašą be šio ID (nuimame PATIKIMĄ)
-    //Jei jo ten nėra, mes paimame visus senus ID (...state.savedLocationIds) ir į sąrašo galą pridedame naują (uždedame PATIKIMĄ)
+  //Jei lokacijos ID jau yra išsaugotų sąraše (includes(id)), mes naudojame .filter(), kad sukurtume naują sąrašą be šio ID (nuimame PATIKIMĄ)
+  //Jei jo ten nėra, mes paimame visus senus ID (...state.savedLocationIds) ir į sąrašo galą pridedame naują (uždedame PATIKIMĄ)
   setSavedLocationIds: (ids) => set({ savedLocationIds: ids }),
 
   // Layer

@@ -1,16 +1,33 @@
-<!DOCTYPE html>
+<!doctype html>
+<!-- Pagrindinis HTML failas/ SPA įėjimo taškas -->
+<!-- Vite naudoja šį failą kaip šabloną ir automatiškai įterpia sugeneruotus JS/CSS failus -->
 <html lang="lt">
   <head>
     <meta charset="UTF-8" />
+    <!-- pritaiko puslapį prie ekrano dydžio -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CineMap - Filmų lokacijos</title>
-    <meta name="description" content="Atraskite ir sekite filmų lokacijas visame pasaulyje." />
+
+    <!-- Naršyklės skirtuko pavadinimas -->
+    <title>KinoLokacijosLietuvoje</title>
+
+    <!-- rodomas paieškos sistemose -->
+    <meta name="description" content="Atraskite Lietuvoje filmuotų kino projektų lokacijas" />
+
+    <!-- pagreitina šriftų įkėlimą -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Inter šriftas naudojamas visoje IS -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
+    <!-- čia React įterpia visą UI -->
     <div id="root"></div>
+
+    <!-- Vite kompiliuoja ir optimizuoja šį failą -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

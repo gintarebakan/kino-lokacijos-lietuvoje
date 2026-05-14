@@ -3,19 +3,22 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 
-export interface CollectionDetail { //apsibrėžiame kolekcijos taisykles COLLECTIONS_CURATED
+export interface CollectionDetail {
+  //apsibrėžiame kolekcijos taisykles COLLECTIONS_CURATED
   id: string;
   title: string;
-  slug: string | null; 
+  slug: string | null;
   description: string | null;
   cover_url: string | null;
   is_route: boolean | null;
-  collection_locations: CollectionLocation[];//sarasas su paciomis lokacijomis
+  collection_locations: CollectionLocation[]; //sarasas su paciomis lokacijomis
 }
 
-export interface CollectionLocation { //COLLECTION_LOCATIONS
+export interface CollectionLocation {
+  //COLLECTION_LOCATIONS
   order_index: number | null;
-  locations_lt: { //LOCATIONS_LT
+  locations_lt: {
+    //LOCATIONS_LT
     id: string;
     name: string;
     slug: string;
@@ -26,12 +29,13 @@ export interface CollectionLocation { //COLLECTION_LOCATIONS
   } | null;
 }
 
-export function useCollectionDetail(id: string | null) {//funkciją, kuriai paduodame kolekcijos ID
-  return useQuery<CollectionDetail | null>({//TanStack Query vykdo šią užduotį
-    queryKey: ["collection-detail", id],//TanStack Query iš čia ims nepasenusius duomenis
-    enabled: !!id,//jei nėra užklausos - nieko ir nedarom
+export function useCollectionDetail(id: string | null) {
+  //funkciją, kuriai paduodame kolekcijos ID
+  return useQuery<CollectionDetail | null>({
+    //TanStack Query vykdo šią užduotį
+    queryKey: ["collection-detail", id], //TanStack Query iš čia ims nepasenusius duomenis
+    enabled: !!id, //jei nėra užklausos - nieko ir nedarom
     queryFn: async () => {
-
       //pradzia
       //1 paimame kolekcijų aprašymą
 
@@ -42,9 +46,9 @@ export function useCollectionDetail(id: string | null) {//funkciją, kuriai padu
         .single();
       if (collErr) throw collErr;
 
-//2 paimamae lokacijų eiliškumą
+      //2 paimamae lokacijų eiliškumą
       const { data: clRows, error: clErr } = await supabase
-        .from("collection_locations")//Kuri lokacija, kuriai kolekcijai priklauso, ir KELINTA ji yra sąraše (kiek čia lokacijų)
+        .from("collection_locations") //Kuri lokacija, kuriai kolekcijai priklauso, ir KELINTA ji yra sąraše (kiek čia lokacijų)
         .select("location_id, order_index")
         .eq("collection_id", id as string)
         .order("order_index", { ascending: true });
@@ -53,20 +57,21 @@ export function useCollectionDetail(id: string | null) {//funkciją, kuriai padu
       if (!clRows || clRows.length === 0) {
         return { ...collection, collection_locations: [] } as CollectionDetail;
       }
-//paimamae pačias lokacijas
+      //paimamae pačias lokacijas
       const locationIds = clRows.map((r: any) => r.location_id);
 
-      const { data: locs, error: locErr } = await supabase
-        .rpc("get_locations_with_coords", { location_ids: locationIds });//supabase RPC - ištraukti lokaciją su koordinatėmis
+      const { data: locs, error: locErr } = await supabase.rpc("get_locations_with_coords", {
+        location_ids: locationIds,
+      }); //supabase RPC - ištraukti lokaciją su koordinatėmis
       if (locErr) throw locErr;
 
-//surenkame ir atiduodame
+      //surenkame ir atiduodame
       const collection_locations: CollectionLocation[] = clRows.map((cl: any) => ({
-        order_index: cl.order_index,//atneštoms lokacijoms (locs) priskiriam jos eilės numerį
+        order_index: cl.order_index, //atneštoms lokacijoms (locs) priskiriam jos eilės numerį
         locations_lt: locs?.find((l: any) => l.id === cl.location_id) ?? null,
       }));
 
-      return { ...collection, collection_locations } as CollectionDetail;//įdedam tą sarašą į pačią pirmą kolekciją
+      return { ...collection, collection_locations } as CollectionDetail; //įdedam tą sarašą į pačią pirmą kolekciją
     },
   });
 }

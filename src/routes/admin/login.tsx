@@ -26,32 +26,38 @@ export default function AdminLogin() {
       return;
     }
 
-navigate({ to: "/admin/locations" });
+    navigate({ to: "/admin/locations" });
   };
 
   return (
-    <div style={{
-      minHeight: "100dvh",
-      background: "#111111",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: 24,
-    }}>
-      <div style={{
-        width: "100%",
-        maxWidth: 400,
+    <div
+      style={{
+        minHeight: "100dvh",
         background: "#111111",
-        border: "1px solid #222222",
-        borderRadius: 16,
-        padding: 32,
-      }}>
-        <h1 style={{
-          margin: "0 0 8px",
-          color: "#c9a84c",
-          fontFamily: "Georgia, serif",
-          fontSize: 24,
-        }}>
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 24,
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 400,
+          background: "#111111",
+          border: "1px solid #222222",
+          borderRadius: 16,
+          padding: 32,
+        }}
+      >
+        <h1
+          style={{
+            margin: "0 0 8px",
+            color: "#c9a84c",
+            fontFamily: "Georgia, serif",
+            fontSize: 24,
+          }}
+        >
           CineMap TVS
         </h1>
         <p style={{ margin: "0 0 28px", color: "#6b7280", fontSize: 14 }}>
@@ -60,7 +66,16 @@ navigate({ to: "/admin/locations" });
 
         <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div>
-            <label style={{ display: "block", color: "#9ca3af", fontSize: 12, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            <label
+              style={{
+                display: "block",
+                color: "#9ca3af",
+                fontSize: 12,
+                marginBottom: 6,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+              }}
+            >
               El. paštas
             </label>
             <input
@@ -79,13 +94,22 @@ navigate({ to: "/admin/locations" });
                 outline: "none",
                 boxSizing: "border-box",
               }}
-              onFocus={(e) => e.currentTarget.style.borderColor = "#c9a84c"}
-              onBlur={(e) => e.currentTarget.style.borderColor = "#222222"}
+              onFocus={(e) => (e.currentTarget.style.borderColor = "#c9a84c")}
+              onBlur={(e) => (e.currentTarget.style.borderColor = "#222222")}
             />
           </div>
 
           <div>
-            <label style={{ display: "block", color: "#9ca3af", fontSize: 12, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            <label
+              style={{
+                display: "block",
+                color: "#9ca3af",
+                fontSize: 12,
+                marginBottom: 6,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+              }}
+            >
               Slaptažodis
             </label>
             <input
@@ -104,13 +128,22 @@ navigate({ to: "/admin/locations" });
                 outline: "none",
                 boxSizing: "border-box",
               }}
-              onFocus={(e) => e.currentTarget.style.borderColor = "#c9a84c"}
-              onBlur={(e) => e.currentTarget.style.borderColor = "#222222"}
+              onFocus={(e) => (e.currentTarget.style.borderColor = "#c9a84c")}
+              onBlur={(e) => (e.currentTarget.style.borderColor = "#222222")}
             />
           </div>
 
           {error && (
-            <div style={{ color: "#f87171", fontSize: 13, background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)", borderRadius: 8, padding: "10px 12px" }}>
+            <div
+              style={{
+                color: "#f87171",
+                fontSize: 13,
+                background: "rgba(248,113,113,0.1)",
+                border: "1px solid rgba(248,113,113,0.3)",
+                borderRadius: 8,
+                padding: "10px 12px",
+              }}
+            >
               {error}
             </div>
           )}

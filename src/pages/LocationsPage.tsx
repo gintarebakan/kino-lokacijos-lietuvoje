@@ -54,9 +54,7 @@ export default function LocationsPage() {
   });
 
   const types = useMemo(() => {
-    const set = new Set(
-      locations.map((l) => l.location_type).filter(Boolean) as string[]
-    );
+    const set = new Set(locations.map((l) => l.location_type).filter(Boolean) as string[]);
     return Array.from(set).sort();
   }, [locations]);
 
@@ -128,11 +126,24 @@ export default function LocationsPage() {
         {/* Search */}
         <div style={{ position: "relative", maxWidth: 400, marginBottom: 16 }}>
           <svg
-            width="16" height="16" viewBox="0 0 24 24" fill="none"
-            stroke="#6b7280" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
-            style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#6b7280"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{
+              position: "absolute",
+              left: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              pointerEvents: "none",
+            }}
           >
-            <circle cx="11" cy="11" r="7" /><path d="m21 21-4.35-4.35" />
+            <circle cx="11" cy="11" r="7" />
+            <path d="m21 21-4.35-4.35" />
           </svg>
           <input
             type="text"
@@ -214,7 +225,9 @@ export default function LocationsPage() {
               >
                 <option value="">Visi rajonai</option>
                 {counties.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
                 ))}
               </select>
             </>
@@ -228,7 +241,11 @@ export default function LocationsPage() {
             </span>
             <button
               type="button"
-              onClick={() => { setSearch(""); setFilterType(""); setFilterCounty(""); }}
+              onClick={() => {
+                setSearch("");
+                setFilterType("");
+                setFilterCounty("");
+              }}
               style={{
                 background: "transparent",
                 border: "none",
@@ -297,7 +314,8 @@ export default function LocationsPage() {
                 style={{
                   position: "absolute",
                   inset: 0,
-                  background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)",
+                  background:
+                    "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)",
                 }}
               />
 
@@ -370,11 +388,7 @@ export default function LocationsPage() {
                 >
                   {loc.name}
                 </div>
-                {loc.county && (
-                  <div style={{ color: "#9ca3af", fontSize: 11 }}>
-                    {loc.county}
-                  </div>
-                )}
+                {loc.county && <div style={{ color: "#9ca3af", fontSize: 11 }}>{loc.county}</div>}
               </div>
             </button>
           ))}

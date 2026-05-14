@@ -6,10 +6,7 @@ interface NavigationCloseButtonProps {
   className?: string;
 }
 
-export function NavigationCloseButton({
-  onClick,
-  className = "",
-}: NavigationCloseButtonProps) {
+export function NavigationCloseButton({ onClick, className = "" }: NavigationCloseButtonProps) {
   return (
     <button
       onClick={onClick}

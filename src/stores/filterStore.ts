@@ -1,10 +1,9 @@
-// filterStore.ts - prisimena vartotojo pasirinktus filtrus (žanrus, metus, apskritis) 
-// ir užtikrina, kad bet kuris komponentas (žemėlapis, sąrašas, paieškos laukelis) 
-// galėtų paskaityti arba įrašyti. 
+// filterStore.ts - prisimena vartotojo pasirinktus filtrus (žanrus, metus, apskritis)
+// ir užtikrina, kad bet kuris komponentas (žemėlapis, sąrašas, paieškos laukelis)
+// galėtų paskaityti arba įrašyti.
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
 
 export interface FilterState {
   selectedGenres: string[];
@@ -48,16 +47,13 @@ export const useFilterStore = create<FilterState>()(
   persist(
     (set, get) => ({
       ...DEFAULTS,
-      toggleGenre: (g) =>
-        set((s) => ({ selectedGenres: toggle(s.selectedGenres, g) })),
-      toggleMediaType: (t) =>
-        set((s) => ({ selectedMediaTypes: toggle(s.selectedMediaTypes, t) })),
+      toggleGenre: (g) => set((s) => ({ selectedGenres: toggle(s.selectedGenres, g) })),
+      toggleMediaType: (t) => set((s) => ({ selectedMediaTypes: toggle(s.selectedMediaTypes, t) })),
       setStudio: (studio) => set({ studio }),
       setRatingRange: (minRating, maxRating) => set({ minRating, maxRating }),
       setYearFrom: (yearFrom) => set({ yearFrom }),
       setYearTo: (yearTo) => set({ yearTo }),
-      toggleCounty: (c) =>
-        set((s) => ({ selectedCounties: toggle(s.selectedCounties, c) })),
+      toggleCounty: (c) => set((s) => ({ selectedCounties: toggle(s.selectedCounties, c) })),
       toggleLocationType: (t) =>
         set((s) => ({
           selectedLocationTypes: toggle(s.selectedLocationTypes, t),

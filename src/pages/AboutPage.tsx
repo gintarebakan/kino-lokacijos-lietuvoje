@@ -52,8 +52,7 @@ export default function AboutPage() {
             letterSpacing: "0.02em",
           }}
         >
-          Apie{" "}
-          <span style={{ color: "#c9a84c" }}>KinoLokacijosLietuvoje</span>
+          Apie <span style={{ color: "#c9a84c" }}>KinoLokacijosLietuvoje</span>
         </h1>
         <p
           style={{
@@ -64,8 +63,8 @@ export default function AboutPage() {
             margin: "0 auto",
           }}
         >
-          Interaktyvi internetinė informacinė sistema Lietuvoje filmuotų
-          kino projektų lokacijų vizualizavimui ir paieškai.
+          Interaktyvi internetinė informacinė sistema Lietuvoje filmuotų kino projektų lokacijų
+          vizualizavimui ir paieškai.
         </p>
       </section>
 
@@ -81,8 +80,8 @@ export default function AboutPage() {
       >
         {[
           { value: stats?.locations, label: "Filmavimo lokacijų" },
-          { value: stats?.films,     label: "Filmų ir serialų" },
-          { value: stats?.routes,    label: "Kino maršrutai" },
+          { value: stats?.films, label: "Filmų ir serialų" },
+          { value: stats?.routes, label: "Kino maršrutai" },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -107,7 +106,14 @@ export default function AboutPage() {
                 <span style={{ fontSize: 20, opacity: 0.4 }}>…</span>
               )}
             </div>
-            <div style={{ color: "#6b7280", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            <div
+              style={{
+                color: "#6b7280",
+                fontSize: 11,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+              }}
+            >
               {stat.label}
             </div>
           </div>
@@ -118,11 +124,10 @@ export default function AboutPage() {
       <section style={{ padding: "48px 48px", maxWidth: 900, margin: "0 auto" }}>
         <p style={labelStyle}>Kontekstas</p>
         <p style={{ ...bodyText, textAlign: "center" }}>
-          Kino industrija ir audiovizualinių projektų gamyba yra neatsiejama šiuolaikinės
-          kultūros dalis, turinti tiesioginę įtaką regionų ekonominiam aktyvumui bei turizmo
-          plėtrai. Šis reiškinys -{" "}
-          <span style={{ color: "#c9a84c" }}>kino turizmas</span>, transformuoja filmavimo
-          lokacijas į savarankiškus traukos objektus.
+          Kino industrija ir audiovizualinių projektų gamyba yra neatsiejama šiuolaikinės kultūros
+          dalis, turinti tiesioginę įtaką regionų ekonominiam aktyvumui bei turizmo plėtrai. Šis
+          reiškinys - <span style={{ color: "#c9a84c" }}>kino turizmas</span>, transformuoja
+          filmavimo lokacijas į savarankiškus traukos objektus.
         </p>
       </section>
 
@@ -132,11 +137,11 @@ export default function AboutPage() {
       <section style={{ padding: "48px 48px", maxWidth: 900, margin: "0 auto" }}>
         <p style={labelStyle}>Tikslas</p>
         <p style={{ ...bodyText, textAlign: "center" }}>
-          Realizuoti interaktyvią internetinę informacinę sistemą Lietuvoje filmuotų kino
-          projektų lokacijų vizualizavimui ir paieškai, skirtą susieti kino gerbėjus su
-          realaus pasaulio vietomis, kuriose buvo filmuojami jų mėgstami kūriniai. Padėti
-          žmonėms atrasti Lietuvos kino paveldą, planuoti keliones į filmavimo vietas ir
-          geriau pažinti šalies kultūrinę geografiją per kino prizmę.
+          Realizuoti interaktyvią internetinę informacinę sistemą Lietuvoje filmuotų kino projektų
+          lokacijų vizualizavimui ir paieškai, skirtą susieti kino gerbėjus su realaus pasaulio
+          vietomis, kuriose buvo filmuojami jų mėgstami kūriniai. Padėti žmonėms atrasti Lietuvos
+          kino paveldą, planuoti keliones į filmavimo vietas ir geriau pažinti šalies kultūrinę
+          geografiją per kino prizmę.
         </p>
       </section>
 
@@ -157,7 +162,16 @@ export default function AboutPage() {
           {[
             {
               icon: (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#c9a84c"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M12 22s7-7.5 7-13a7 7 0 1 0-14 0c0 5.5 7 13 7 13Z" />
                   <circle cx="12" cy="9" r="2.5" />
                 </svg>
@@ -167,7 +181,16 @@ export default function AboutPage() {
             },
             {
               icon: (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#c9a84c"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <circle cx="11" cy="11" r="7" />
                   <path d="m21 21-4.35-4.35" />
                 </svg>
@@ -177,7 +200,16 @@ export default function AboutPage() {
             },
             {
               icon: (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#c9a84c"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M3 12h18M3 6l9-3 9 3M3 18l9 3 9-3" />
                 </svg>
               ),
@@ -186,7 +218,16 @@ export default function AboutPage() {
             },
             {
               icon: (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#c9a84c"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                 </svg>
               ),
@@ -221,9 +262,7 @@ export default function AboutPage() {
               <div style={{ color: "#f5f5f5", fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
                 {feat.title}
               </div>
-              <div style={{ color: "#6b7280", fontSize: 12, lineHeight: 1.6 }}>
-                {feat.desc}
-              </div>
+              <div style={{ color: "#6b7280", fontSize: 12, lineHeight: 1.6 }}>{feat.desc}</div>
             </div>
           ))}
         </div>
@@ -283,9 +322,7 @@ export default function AboutPage() {
               <div style={{ color: "#f5f5f5", fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
                 {step.title}
               </div>
-              <div style={{ color: "#6b7280", fontSize: 12, lineHeight: 1.6 }}>
-                {step.desc}
-              </div>
+              <div style={{ color: "#6b7280", fontSize: 12, lineHeight: 1.6 }}>{step.desc}</div>
             </div>
           ))}
         </div>
@@ -297,15 +334,14 @@ export default function AboutPage() {
       <section style={{ padding: "48px 48px", maxWidth: 900, margin: "0 auto" }}>
         <p style={labelStyle}>Naujumas ir vertė</p>
         <p style={{ ...bodyText, textAlign: "center" }}>
-          Sistema grindžiama Lietuvos kino lokacijų duomenų apjungimu ir šių
-          lokacijų intelektualiu kuravimu. Pirmą kartą nacionaliniu lygmeniu susisteminama
-          Lietuvos kino paveldo geografinė informacija, dinamiškai siejant lokalius istorinius
-          duomenis su globalia kino metaduomenų baze{" "}
-          <span style={{ color: "#c9a84c" }}>TMDB API</span>.
+          Sistema grindžiama Lietuvos kino lokacijų duomenų apjungimu ir šių lokacijų intelektualiu
+          kuravimu. Pirmą kartą nacionaliniu lygmeniu susisteminama Lietuvos kino paveldo geografinė
+          informacija, dinamiškai siejant lokalius istorinius duomenis su globalia kino metaduomenų
+          baze <span style={{ color: "#c9a84c" }}>TMDB API</span>.
         </p>
         <p style={{ ...bodyText, textAlign: "center", marginTop: 16 }}>
-          Sukurta sistema leidžia vizualizuoti sudėtingus ryšius tarp kino lokacijų, filmų ir
-          jų istorinio konteksto.
+          Sukurta sistema leidžia vizualizuoti sudėtingus ryšius tarp kino lokacijų, filmų ir jų
+          istorinio konteksto.
         </p>
       </section>
 
@@ -316,7 +352,8 @@ export default function AboutPage() {
         style={{
           margin: "0 16px",
           borderRadius: 16,
-          background: "linear-gradient(135deg, rgba(201,168,76,0.15) 0%, rgba(201,168,76,0.05) 100%)",
+          background:
+            "linear-gradient(135deg, rgba(201,168,76,0.15) 0%, rgba(201,168,76,0.05) 100%)",
           border: "1px solid rgba(201,168,76,0.2)",
           padding: "40px 24px",
           textAlign: "center",
@@ -333,8 +370,19 @@ export default function AboutPage() {
         >
           Pradėkite tyrinėti
         </h2>
-        <p style={{ color: "#9ca3af", fontSize: 13, lineHeight: 1.7, margin: "0 0 24px", maxWidth: 360, marginLeft: "auto", marginRight: "auto" }}>
-          Atraskite kino lokacijas Lietuvoje: realias vietas, kurios įamžintos didžiuosiuose ekranuose.
+        <p
+          style={{
+            color: "#9ca3af",
+            fontSize: 13,
+            lineHeight: 1.7,
+            margin: "0 0 24px",
+            maxWidth: 360,
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
+        >
+          Atraskite kino lokacijas Lietuvoje: realias vietas, kurios įamžintos didžiuosiuose
+          ekranuose.
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
           <button
@@ -376,11 +424,32 @@ export default function AboutPage() {
       {/* ── Tech stack ── */}
       <section style={{ padding: "48px 48px 0", textAlign: "center" }}>
         <p style={labelStyle}>Techninė informacija</p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", maxWidth: 900, margin: "0 auto" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 8,
+            justifyContent: "center",
+            maxWidth: 900,
+            margin: "0 auto",
+          }}
+        >
           {[
-            "React", "TypeScript", "Vite", "MapLibre GL JS", "Supercluster",
-            "MapTiler", "Zustand", "TanStack Query", "TanStack Router",
-            "Supabase", "PostGIS", "pg_trgm", "TMDB API", "OpenRouteService", "Vercel",
+            "React",
+            "TypeScript",
+            "Vite",
+            "MapLibre GL JS",
+            "Supercluster",
+            "MapTiler",
+            "Zustand",
+            "TanStack Query",
+            "TanStack Router",
+            "Supabase",
+            "PostGIS",
+            "pg_trgm",
+            "TMDB API",
+            "OpenRouteService",
+            "Vercel",
           ].map((tech) => (
             <span
               key={tech}

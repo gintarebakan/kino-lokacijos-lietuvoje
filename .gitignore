@@ -14,7 +14,7 @@ node_modules
 dist
 dist-ssr
 
-# Environment variables — NEVER commit
+# Environment variables - NEVER commit
 .env
 .env.local
 .env.development.local
