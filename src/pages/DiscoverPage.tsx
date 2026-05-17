@@ -222,7 +222,6 @@ export default function DiscoverPage() {
               onClick={() => openLocation(loc.slug)}
               style={{
                 width: 160,
-                height: 200,
                 borderRadius: 12,
                 overflow: "hidden",
                 flexShrink: 0,
@@ -233,52 +232,54 @@ export default function DiscoverPage() {
                 background: "#1a1a1a",
               }}
             >
-              <ImageWithFallback
-                src={loc.image_url}
-                alt={loc.name}
-                fallbackType="location"
-                width={160}
-                height={200}
-                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent 50%)",
-                }}
-              />
-              {loc.film_count !== null && loc.film_count !== undefined && (
+              <div style={{ width: "100%", aspectRatio: "2/3", position: "relative" }}>
+                <ImageWithFallback
+                  src={loc.image_url}
+                  alt={loc.name}
+                  fallbackType="location"
+                  width={160}
+                  height={240}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                />
                 <div
                   style={{
                     position: "absolute",
-                    top: 8,
-                    right: 8,
-                    background: "rgba(201,168,76,0.9)",
-                    color: "#0a0a0a",
-                    fontSize: 11,
+                    inset: 0,
+                    background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent 50%)",
+                  }}
+                />
+                {loc.film_count !== null && loc.film_count !== undefined && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      background: "rgba(201,168,76,0.9)",
+                      color: "#0a0a0a",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      borderRadius: 8,
+                      padding: "2px 8px",
+                    }}
+                  >
+                    {filmCountLabel(Number(loc.film_count))}
+                  </div>
+                )}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    padding: 8,
+                    color: "#fff",
                     fontWeight: 700,
-                    borderRadius: 8,
-                    padding: "2px 8px",
+                    fontSize: 13,
+                    textAlign: "left",
                   }}
                 >
-                  {filmCountLabel(Number(loc.film_count))}
+                  {loc.name}
                 </div>
-              )}
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  padding: 8,
-                  color: "#fff",
-                  fontWeight: 700,
-                  fontSize: 13,
-                  textAlign: "left",
-                }}
-              >
-                {loc.name}
               </div>
             </button>
           ))}
@@ -309,66 +310,77 @@ export default function DiscoverPage() {
               }}
               style={{
                 width: 160,
+                height: 240,
                 flexShrink: 0,
-                background: "#1a1a1a",
+                background: "transparent",
                 border: "none",
                 padding: 0,
                 cursor: "pointer",
                 textAlign: "left",
                 borderRadius: 10,
                 overflow: "hidden",
+                position: "relative",
               }}
             >
-              <div style={{ width: "100%", aspectRatio: "2/3", position: "relative" }}>
-                <ImageWithFallback
-                  src={film.poster_url ? `https://image.tmdb.org/t/p/w342${film.poster_url}` : null}
-                  alt={film.title_lt ?? ""}
-                  fallbackType="poster"
-                  width={160}
-                  height={240}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    objectPosition: "top center",
-                    display: "block",
-                  }}
-                />
-                {/* Media type badge */}
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 6,
-                    left: 6,
-                    background:
-                      film.media_type === "series" ? "rgba(99,102,241,0.85)" : "rgba(0,0,0,0.65)",
-                    color: "#fff",
-                    fontSize: 9,
-                    fontWeight: 700,
-                    borderRadius: 5,
-                    padding: "2px 6px",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.06em",
-                  }}
-                >
-                  {film.media_type === "series" ? "Serialas" : "Filmas"}
-                </div>
+              <ImageWithFallback
+                src={film.poster_url ? `https://image.tmdb.org/t/p/w342${film.poster_url}` : null}
+                alt={film.title_lt ?? ""}
+                fallbackType="poster"
+                width={160}
+                height={240}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "top center",
+                  display: "block",
+                }}
+              />
+              {/* Gradient overlay */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent 50%)",
+                }}
+              />
+              {/* Media type badge */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 6,
+                  left: 6,
+                  background:
+                    film.media_type === "series" ? "rgba(99,102,241,0.85)" : "rgba(0,0,0,0.65)",
+                  color: "#fff",
+                  fontSize: 9,
+                  fontWeight: 700,
+                  borderRadius: 5,
+                  padding: "2px 6px",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.06em",
+                }}
+              >
+                {film.media_type === "series" ? "Serialas" : "Filmas"}
               </div>
-              <div style={{ padding: "8px 8px 10px" }}>
+              {/* Title, rating, year overlay at bottom */}
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  padding: 8,
+                }}
+              >
                 <div
-                  style={
-                    {
-                      color: "#f5f5f5",
-                      fontSize: 12,
-                      fontWeight: 600,
-                      lineHeight: 1.3,
-                      marginBottom: 4,
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                    } as React.CSSProperties
-                  }
+                  style={{
+                    color: "#fff",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    lineHeight: 1.3,
+                    marginBottom: 4,
+                  }}
                 >
                   {film.title_lt ?? ""}
                 </div>
@@ -378,7 +390,7 @@ export default function DiscoverPage() {
                       ⭐ {Number(film.imdb_rating).toFixed(1)}
                     </span>
                   )}
-                  {film.year && <span style={{ color: "#6b7280", fontSize: 11 }}>{film.year}</span>}
+                  {film.year && <span style={{ color: "#9ca3af", fontSize: 11 }}>{film.year}</span>}
                 </div>
               </div>
             </button>
@@ -405,8 +417,7 @@ export default function DiscoverPage() {
                   navigate({ to: "/map" });
                 }}
                 style={{
-                  width: 200,
-                  height: 140,
+                  width: 332,
                   cursor: "pointer",
                   background: "transparent",
                   padding: 0,
@@ -417,44 +428,45 @@ export default function DiscoverPage() {
                   position: "relative",
                 }}
               >
-                {col.cover_url && (
-                  <ImageWithFallback
-                    src={col.cover_url}
-                    alt={col.title}
-                    fallbackType="location"
-                    width={200}
-                    height={140}
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                <div style={{ width: "100%", aspectRatio: "2/3", position: "relative" }}>
+                  {col.cover_url && (
+                    <ImageWithFallback
+                      src={col.cover_url}
+                      alt={col.title}
+                      fallbackType="location"
+                      width={332}
+                      height={498}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    />
+                  )}
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent 60%)",
+                    }}
                   />
-                )}
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent 60%)",
-                  }}
-                />
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    padding: 8,
-                    color: "#fff",
-                    fontWeight: 700,
-                    fontSize: 13,
-                  }}
-                >
-                  {col.title}
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      padding: 12,
+                      color: "#fff",
+                      fontWeight: 700,
+                      fontSize: 14,
+                    }}
+                  >
+                    {col.title}
+                  </div>
                 </div>
               </button>
             ))
           ) : (
             <div
               style={{
-                width: 200,
-                height: 140,
+                width: 332,
                 borderRadius: 12,
                 flexShrink: 0,
                 display: "flex",
@@ -465,6 +477,7 @@ export default function DiscoverPage() {
                 fontSize: 13,
                 textAlign: "center",
                 padding: 12,
+                aspectRatio: "2/3",
               }}
             >
               Maršrutai bus pridėti netrukus
