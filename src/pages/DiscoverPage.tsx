@@ -308,30 +308,24 @@ export default function DiscoverPage() {
                 navigate({ to: "/map" });
               }}
               style={{
-                width: 120,
+                width: 160,
                 flexShrink: 0,
-                background: "transparent",
+                background: "#1a1a1a",
                 border: "none",
                 padding: 0,
                 cursor: "pointer",
                 textAlign: "left",
+                borderRadius: 10,
+                overflow: "hidden",
               }}
             >
-              <div
-                style={{
-                  width: 120,
-                  height: 180,
-                  borderRadius: 10,
-                  overflow: "hidden",
-                  background: "#1a1a1a",
-                }}
-              >
+              <div style={{ width: "100%", aspectRatio: "2/3", position: "relative" }}>
                 <ImageWithFallback
                   src={film.poster_url ? `https://image.tmdb.org/t/p/w342${film.poster_url}` : null}
                   alt={film.title_lt ?? ""}
                   fallbackType="poster"
-                  width={120}
-                  height={180}
+                  width={160}
+                  height={240}
                   style={{
                     width: "100%",
                     height: "100%",
@@ -340,27 +334,53 @@ export default function DiscoverPage() {
                     display: "block",
                   }}
                 />
-              </div>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#f5f5f5",
-                  
-                  marginTop: 6,
-                  lineHeight: 1.3,
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  maxWidth: 120,
-                }}
-              >
-                {film.title_lt ?? ""}
-              </div>
-              {film.imdb_rating !== null && film.imdb_rating !== undefined && (
-                <div style={{ fontSize: 11, color: "#c9a84c", marginTop: 2 }}>
-                  ⭐ {Number(film.imdb_rating).toFixed(1)}
+                {/* Media type badge */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 6,
+                    left: 6,
+                    background:
+                      film.media_type === "series" ? "rgba(99,102,241,0.85)" : "rgba(0,0,0,0.65)",
+                    color: "#fff",
+                    fontSize: 9,
+                    fontWeight: 700,
+                    borderRadius: 5,
+                    padding: "2px 6px",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                  }}
+                >
+                  {film.media_type === "series" ? "Serialas" : "Filmas"}
                 </div>
-              )}
+              </div>
+              <div style={{ padding: "8px 8px 10px" }}>
+                <div
+                  style={
+                    {
+                      color: "#f5f5f5",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      lineHeight: 1.3,
+                      marginBottom: 4,
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    } as React.CSSProperties
+                  }
+                >
+                  {film.title_lt ?? ""}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  {film.imdb_rating !== null && film.imdb_rating !== undefined && (
+                    <span style={{ color: "#c9a84c", fontSize: 11, fontWeight: 700 }}>
+                      ⭐ {Number(film.imdb_rating).toFixed(1)}
+                    </span>
+                  )}
+                  {film.year && <span style={{ color: "#6b7280", fontSize: 11 }}>{film.year}</span>}
+                </div>
+              </div>
             </button>
           ))}
         </ScrollRow>
