@@ -236,7 +236,7 @@ export default function LocationDetailPanel() {
       >✕</button>
 
       {/* Scrollable content */}
-      <div style={{ flex: 1, overflowY: "auto", background: "transparent" }}>
+      <div style={{ flex: 1, overflowY: "auto", background: "#0c0c0c" }}>
         {isLoading && <div style={{ padding: 24, color: "#9ca3af", fontSize: 14 }}>Kraunama…</div>}
         {error && !isLoading && <div style={{ padding: 24, color: "#f87171", fontSize: 14 }}>Nepavyko įkelti informacijos.</div>}
         {!isLoading && !error && !data && selectedLocationId && <div style={{ padding: 24, color: "#9ca3af", fontSize: 14 }}>Lokacija nerasta.</div>}
