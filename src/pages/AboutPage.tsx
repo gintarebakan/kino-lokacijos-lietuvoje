@@ -406,8 +406,7 @@ export default function DiscoverPage() {
                   navigate({ to: "/map" });
                 }}
                 style={{
-                  width: 200,
-                  height: 140,
+                  width: 332,
                   cursor: "pointer",
                   background: "transparent",
                   padding: 0,
@@ -418,44 +417,45 @@ export default function DiscoverPage() {
                   position: "relative",
                 }}
               >
-                {col.cover_url && (
-                  <ImageWithFallback
-                    src={col.cover_url}
-                    alt={col.title}
-                    fallbackType="location"
-                    width={200}
-                    height={140}
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                <div style={{ width: "100%", aspectRatio: "2/3", position: "relative" }}>
+                  {col.cover_url && (
+                    <ImageWithFallback
+                      src={col.cover_url}
+                      alt={col.title}
+                      fallbackType="location"
+                      width={332}
+                      height={498}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    />
+                  )}
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent 60%)",
+                    }}
                   />
-                )}
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent 60%)",
-                  }}
-                />
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    padding: 8,
-                    color: "#fff",
-                    fontWeight: 700,
-                    fontSize: 13,
-                  }}
-                >
-                  {col.title}
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      padding: 12,
+                      color: "#fff",
+                      fontWeight: 700,
+                      fontSize: 14,
+                    }}
+                  >
+                    {col.title}
+                  </div>
                 </div>
               </button>
             ))
           ) : (
             <div
               style={{
-                width: 200,
-                height: 140,
+                width: 332,
                 borderRadius: 12,
                 flexShrink: 0,
                 display: "flex",
@@ -466,6 +466,7 @@ export default function DiscoverPage() {
                 fontSize: 13,
                 textAlign: "center",
                 padding: 12,
+                aspectRatio: "2/3",
               }}
             >
               Maršrutai bus pridėti netrukus
