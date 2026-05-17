@@ -130,7 +130,7 @@ function SectionHeader({
         {title}
         <span style={{ fontSize: 16, opacity: 0.7 }}>›</span>
       </button>
-      <p style={{ color: "#6b7280", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{description}</p>
+      <p style={{ color: "#f5f5f5", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{description}</p>
     </div>
   );
 }
@@ -283,7 +283,7 @@ export default function DiscoverPage() {
             </button>
           ))}
           {locations && locations.length === 0 && (
-            <div style={{ color: "#6b7280", fontSize: 13, padding: "8px 0" }}>Nėra lokacijų.</div>
+            <div style={{ color: "#f5f5f5", fontSize: 13, padding: "8px 0" }}>Nėra lokacijų.</div>
           )}
         </ScrollRow>
       </section>
@@ -345,6 +345,7 @@ export default function DiscoverPage() {
                 style={{
                   fontSize: 12,
                   color: "#f5f5f5",
+                  
                   marginTop: 6,
                   lineHeight: 1.3,
                   whiteSpace: "nowrap",
@@ -369,7 +370,7 @@ export default function DiscoverPage() {
       <section>
         <SectionHeader
           title="Kino maršrutai"
-          description="Iš anksto paruošti maršrutai po svarbiausias Lietuvos filmavimo vietas. Nesvarbu, esate kino entuziastas ar keliautojas — pajuskite istorijas, kurios slepiasi kiekvienoje scenoje."
+          description="Iš anksto paruošti maršrutai po svarbiausias Lietuvos filmavimo vietas. Nesvarbu, esate kino entuziastas ar keliautojas - pajuskite istorijas, kurios slepiasi kiekvienoje scenoje."
           linkTo="/map"
           navigate={navigate}
         />
@@ -440,7 +441,7 @@ export default function DiscoverPage() {
                 alignItems: "center",
                 justifyContent: "center",
                 background: "linear-gradient(135deg, #1a1a1a, #111111)",
-                color: "#6b7280",
+                color: "#f5f5f5",
                 fontSize: 13,
                 textAlign: "center",
                 padding: 12,
