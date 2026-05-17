@@ -213,7 +213,7 @@ export default function SavedPage() {
                       cursor: "pointer",
                     }}
                   >
-                    Marsrutas
+                    Maršrutas
                   </button>
                   <button
                     type="button"
@@ -228,7 +228,7 @@ export default function SavedPage() {
                       cursor: "pointer",
                     }}
                   >
-                    Istrinti
+                    Ištrinti
                   </button>
                 </div>
               </div>
@@ -349,7 +349,7 @@ export default function SavedPage() {
                       cursor: "pointer",
                     }}
                   >
-                    {mode === "driving" ? "Automobiliu" : "Pesciomis"}
+                    {mode === "driving" ? "Automobiliu" : "Pėsčiomis"}
                   </button>
                 ))}
               </div>
