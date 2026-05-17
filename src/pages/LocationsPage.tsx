@@ -226,7 +226,7 @@ export default function LocationsPage() {
                   outline: "none",
                 }}
               >
-                <option value="">Visi rajonai</option>
+                <option value="">Visos apskritys</option>
                 {counties.map((c) => (
                   <option key={c} value={c}>
                     {c}
@@ -240,7 +240,7 @@ export default function LocationsPage() {
         {(filterType || filterCounty || search) && (
           <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ color: "#9ca3af", fontSize: 12 }}>
-              Rodoma: <strong style={{ color: "#c9a84c" }}>{filtered.length}</strong> lokacijų
+              Rodoma lokacijų: <strong style={{ color: "#c9a84c" }}>{filtered.length}</strong> 
             </span>
             <button
               type="button"

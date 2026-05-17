@@ -324,7 +324,7 @@ export default function FilmsPage() {
         {hasFilters && (
           <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ color: "#9ca3af", fontSize: 12 }}>
-              Rodoma: <strong style={{ color: "#c9a84c" }}>{filtered.length}</strong> kūrinių
+              Rodoma kūrinių: <strong style={{ color: "#c9a84c" }}>{filtered.length}</strong> 
             </span>
             <button
               type="button"
