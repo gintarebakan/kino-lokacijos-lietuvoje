@@ -35,6 +35,10 @@ function locationsCountLabel(count: number): string {
   return `${count} filmavimo vietų Lietuvoje`;
 }
 
+function capitalizeCounty(county: string): string {
+  return county.charAt(0).toUpperCase() + county.slice(1);
+}
+
 export default function LocationsPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
@@ -78,7 +82,7 @@ export default function LocationsPage() {
     if (slug) {
       useMapStore.getState().setPendingLocation(slug);
       useMapStore.getState().setSelectedLocationFromDiscover(slug);
-      // Force zoom to 15 to ensure individual markers are visible (not clustered)
+      // Force zoom to 14 to ensure individual markers are visible (not clustered)
       useMapStore.getState().setForceZoom(14);
     }
     navigate({ to: "/map" });
@@ -229,7 +233,7 @@ export default function LocationsPage() {
                 <option value="">Visos apskritys</option>
                 {counties.map((c) => (
                   <option key={c} value={c}>
-                    {c}
+                    {capitalizeCounty(c)}
                   </option>
                 ))}
               </select>
@@ -391,7 +395,11 @@ export default function LocationsPage() {
                 >
                   {loc.name}
                 </div>
-                {loc.county && <div style={{ color: "#9ca3af", fontSize: 11 }}>{loc.county}</div>}
+                {loc.county && (
+                  <div style={{ color: "#9ca3af", fontSize: 11 }}>
+                    {capitalizeCounty(loc.county)}
+                  </div>
+                )}
               </div>
             </button>
           ))}
