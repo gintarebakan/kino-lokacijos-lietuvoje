@@ -129,7 +129,7 @@ export default function SavedPage() {
       style={{
         width: "100%",
         height: "100%",
-        background: "#0a0a0a",
+        background: "#0c0c0c",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
@@ -146,7 +146,7 @@ export default function SavedPage() {
       </div>
 
       {activeTab === "saved" && (
-        <div style={{ flex: 1, overflowY: "auto", padding: "8px 0" }}>
+        <div className="cinemap-scroll-area" style={{ flex: 1, overflowY: "auto", padding: "8px 0" }}>
           {bookmarks.length === 0 ? (
             <div
               style={{
@@ -239,7 +239,7 @@ export default function SavedPage() {
 
       {activeTab === "route" && (
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-          <div style={{ flex: 1, overflowY: "auto", padding: "8px 0" }}>
+          <div className="cinemap-scroll-area" style={{ flex: 1, overflowY: "auto", padding: "8px 0" }}>
             {routeLocations.length === 0 ? (
               <div
                 style={{
@@ -323,7 +323,7 @@ export default function SavedPage() {
             <div
               style={{
                 borderTop: "1px solid #222222",
-                background: "#0a0a0a",
+                background: "#0c0c0c",
                 padding: "12px 16px",
                 flexShrink: 0,
                 display: "flex",
