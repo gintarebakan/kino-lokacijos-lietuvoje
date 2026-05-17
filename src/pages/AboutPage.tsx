@@ -1,191 +1,26 @@
-import { lazy, Suspense, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
-import { useMapStore } from "../stores/mapStore";
-import { ImageWithFallback } from "../components/ui/ImageWithFallback";
 
-const MiniMapPreview = lazy(() => import("../components/map/MiniMapPreview"));
-
-interface PopularLocation {
-  id: string;
-  name: string;
-  slug: string | null;
-  image_url: string | null;
-  location_type: string | null;
-  film_count: number | null;
-}
-
-function filmCountLabel(count: number): string {
-  if (count === 1) return "1 filmas";
-  const mod10 = count % 10;
-  const mod100 = count % 100;
-  if (mod10 >= 2 && mod10 <= 9 && (mod100 < 10 || mod100 >= 20)) {
-    return `${count} filmai`;
-  }
-  return `${count} filmų`;
-}
-
-interface PopularFilm {
-  id: string;
-  title_lt: string | null;
-  poster_url: string | null;
-  imdb_rating: number | null;
-  media_type: string | null;
-  year: number | null;
-}
-
-interface CuratedCollection {
-  id: string;
-  title: string;
-  description: string | null;
-  cover_url: string | null;
-  is_route: boolean | null;
-}
-
-const scrollRowStyle: React.CSSProperties = {
-  display: "flex",
-  gap: 12,
-  padding: "0 16px 16px",
-  overflowX: "auto",
-  cursor: "grab",
-  userSelect: "none",
-};
-
-// Drag scroll — be strėlyčių
-function ScrollRow({ children }: { children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isDragging = useRef(false);
-  const startX = useRef(0);
-  const scrollLeft = useRef(0);
-
-  const onMouseDown = (e: React.MouseEvent) => {
-    isDragging.current = true;
-    startX.current = e.pageX - (ref.current?.offsetLeft ?? 0);
-    scrollLeft.current = ref.current?.scrollLeft ?? 0;
-    if (ref.current) ref.current.style.cursor = "grabbing";
-  };
-
-  const onMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging.current) return;
-    e.preventDefault();
-    const x = e.pageX - (ref.current?.offsetLeft ?? 0);
-    const walk = (x - startX.current) * 1.2;
-    if (ref.current) ref.current.scrollLeft = scrollLeft.current - walk;
-  };
-
-  const onMouseUp = () => {
-    isDragging.current = false;
-    if (ref.current) ref.current.style.cursor = "grab";
-  };
-
-  return (
-    <div
-      ref={ref}
-      className="cinemap-scroll-row"
-      style={scrollRowStyle}
-      onMouseDown={onMouseDown}
-      onMouseMove={onMouseMove}
-      onMouseUp={onMouseUp}
-      onMouseLeave={onMouseUp}
-    >
-      {children}
-    </div>
-  );
-}
-
-function SectionHeader({
-  title,
-  description,
-  linkTo,
-  navigate,
-}: {
-  title: string;
-  description: string;
-  linkTo: string;
-  navigate: ReturnType<typeof useNavigate>;
-}) {
-  return (
-    <div style={{ padding: "24px 16px 8px" }}>
-      <button
-        type="button"
-        onClick={() => navigate({ to: linkTo as any })}
-        style={{
-          background: "transparent",
-          border: "none",
-          padding: 0,
-          cursor: "pointer",
-          textTransform: "uppercase",
-          letterSpacing: "0.12em",
-          color: "#c9a84c",
-          fontSize: 15,
-          fontWeight: 700,
-          margin: "0 0 8px",
-          textAlign: "left",
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-        }}
-      >
-        {title}
-        <span style={{ fontSize: 16, opacity: 0.7 }}>›</span>
-      </button>
-      <p style={{ color: "#6b7280", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{description}</p>
-    </div>
-  );
-}
-
-export default function DiscoverPage() {
+export default function AboutPage() {
   const navigate = useNavigate();
 
-  const { data: locations } = useQuery<PopularLocation[]>({
-    queryKey: ["popular-locations"],
+  const { data: stats } = useQuery({
+    queryKey: ["about-stats"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("locations_by_film_count")
-        .select("id, name, slug, image_url, location_type, film_count")
-        .limit(10);
-      if (error) throw error;
-      return (data ?? []) as PopularLocation[];
+      const [loc, films, routes] = await Promise.all([
+        supabase.from("locations_lt").select("id", { count: "exact", head: true }),
+        supabase.from("films_tmdb").select("id", { count: "exact", head: true }),
+        supabase.from("collections_curated").select("id", { count: "exact", head: true }),
+      ]);
+      return {
+        locations: loc.count ?? 0,
+        films: films.count ?? 0,
+        routes: routes.count ?? 0,
+      };
     },
+    staleTime: 5 * 60 * 1000,
   });
-
-  const { data: films } = useQuery<PopularFilm[]>({
-    queryKey: ["popular-films"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("films_tmdb")
-        .select("id, title_lt, poster_url, imdb_rating, media_type, year")
-        .order("imdb_rating", { ascending: false, nullsFirst: false })
-        .limit(10);
-      if (error) throw error;
-      return (data ?? []) as PopularFilm[];
-    },
-  });
-
-  const { data: collections } = useQuery<CuratedCollection[]>({
-    queryKey: ["collections"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("collections_curated")
-        .select("id, title, description, cover_url, is_route")
-        .limit(10);
-      if (error) throw error;
-      return (data ?? []) as CuratedCollection[];
-    },
-  });
-
-  const openLocation = (slug: string | null) => {
-    navigate({ to: "/map" });
-    useMapStore.getState().setSelectedLocationFromDiscover(null);
-    useMapStore.getState().setRouteGeoJSON(null);
-    if (slug) {
-      setTimeout(() => {
-        useMapStore.getState().setPendingLocation(slug);
-        useMapStore.getState().setSelectedLocationFromDiscover(slug);
-      }, 150);
-    }
-  };
 
   return (
     <main
@@ -197,283 +32,465 @@ export default function DiscoverPage() {
         paddingBottom: 80,
       }}
     >
-      <style>{`
-        .cinemap-scroll-row::-webkit-scrollbar { display: none; }
-        .cinemap-scroll-row { scrollbar-width: none; }
-      `}</style>
-
-      <Suspense fallback={<div style={{ width: "100%", height: 240, background: "#1a1a1a" }} />}>
-        <MiniMapPreview />
-      </Suspense>
-
-      {/* Section 1: Popular Locations */}
-      <section>
-        <SectionHeader
-          title="Populiarios lokacijos"
-          description="Filmavimo vietos Lietuvoje, kurios dažniausiai įamžintos ekrane. Atraskite lokacijas, kuriose buvo kuriami filmai ir serialai."
-          linkTo="/locations"
-          navigate={navigate}
-        />
-        <ScrollRow>
-          {(locations ?? []).map((loc) => (
-            <button
-              key={loc.id}
-              type="button"
-              onClick={() => openLocation(loc.slug)}
-              style={{
-                width: 160,
-                borderRadius: 12,
-                overflow: "hidden",
-                flexShrink: 0,
-                position: "relative",
-                border: "none",
-                padding: 0,
-                cursor: "pointer",
-                background: "#1a1a1a",
-              }}
-            >
-              <div style={{ width: "100%", aspectRatio: "2/3", position: "relative" }}>
-                <ImageWithFallback
-                  src={loc.image_url}
-                  alt={loc.name}
-                  fallbackType="location"
-                  width={160}
-                  height={240}
-                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                />
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent 50%)",
-                  }}
-                />
-                {loc.film_count !== null && loc.film_count !== undefined && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 8,
-                      right: 8,
-                      background: "rgba(201,168,76,0.9)",
-                      color: "#0a0a0a",
-                      fontSize: 11,
-                      fontWeight: 700,
-                      borderRadius: 8,
-                      padding: "2px 8px",
-                    }}
-                  >
-                    {filmCountLabel(Number(loc.film_count))}
-                  </div>
-                )}
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    padding: 8,
-                    color: "#fff",
-                    fontWeight: 700,
-                    fontSize: 13,
-                    textAlign: "left",
-                  }}
-                >
-                  {loc.name}
-                </div>
-              </div>
-            </button>
-          ))}
-          {locations && locations.length === 0 && (
-            <div style={{ color: "#6b7280", fontSize: 13, padding: "8px 0" }}>Nėra lokacijų.</div>
-          )}
-        </ScrollRow>
+      {/* ── Hero ── */}
+      <section
+        style={{
+          width: "100%",
+          padding: "64px 24px 48px",
+          textAlign: "center",
+          background: "linear-gradient(180deg, #111111 0%, #0a0a0a 100%)",
+          borderBottom: "1px solid #1a1a1a",
+        }}
+      >
+        <h1
+          style={{
+            fontFamily: "Georgia, serif",
+            color: "#f5f5f5",
+            fontSize: 30,
+            fontWeight: 700,
+            margin: "0 0 16px",
+            letterSpacing: "0.02em",
+          }}
+        >
+          Apie <span style={{ color: "#c9a84c" }}>KinoLokacijosLietuvoje</span>
+        </h1>
+        <p
+          style={{
+            color: "#9ca3af",
+            fontSize: 14,
+            maxWidth: 900,
+            lineHeight: 1.8,
+            margin: "0 auto",
+          }}
+        >
+          Interaktyvi internetinė informacinė sistema Lietuvoje filmuotų kino projektų lokacijų
+          vizualizavimui ir paieškai.
+        </p>
       </section>
 
-      {/* Section 2: Popular Films */}
-      <section>
-        <SectionHeader
-          title="Populiarus turinys"
-          description="Geriausiai įvertinti kino projektai, kurių scenoms filmuoti buvo pasirinktos Lietuvos lokacijos. Atraskite, kur buvo kuriami jūsų mėgstami filmai ir serialai."
-          linkTo="/films"
-          navigate={navigate}
-        />
-        <ScrollRow>
-          {(films ?? []).map((film) => (
-            <button
-              key={film.id}
-              type="button"
-              onClick={() => {
-                useMapStore.getState().setRouteGeoJSON(null);
-                useMapStore.getState().setPreviousCollection(null);
-                useMapStore.getState().setSelectedFilmDetail(film.id);
-                navigate({ to: "/map" });
-              }}
-              style={{
-                width: 160,
-                flexShrink: 0,
-                background: "#1a1a1a",
-                border: "none",
-                padding: 0,
-                cursor: "pointer",
-                textAlign: "left",
-                borderRadius: 10,
-                overflow: "hidden",
-              }}
-            >
-              <div style={{ width: "100%", aspectRatio: "2/3", position: "relative" }}>
-                <ImageWithFallback
-                  src={film.poster_url ? `https://image.tmdb.org/t/p/w342${film.poster_url}` : null}
-                  alt={film.title_lt ?? ""}
-                  fallbackType="poster"
-                  width={160}
-                  height={240}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    objectPosition: "top center",
-                    display: "block",
-                  }}
-                />
-                {/* Media type badge */}
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 6,
-                    left: 6,
-                    background:
-                      film.media_type === "series" ? "rgba(99,102,241,0.85)" : "rgba(0,0,0,0.65)",
-                    color: "#fff",
-                    fontSize: 9,
-                    fontWeight: 700,
-                    borderRadius: 5,
-                    padding: "2px 6px",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.06em",
-                  }}
-                >
-                  {film.media_type === "series" ? "Serialas" : "Filmas"}
-                </div>
-              </div>
-              <div style={{ padding: "8px 8px 10px" }}>
-                <div
-                  style={
-                    {
-                      color: "#f5f5f5",
-                      fontSize: 12,
-                      fontWeight: 600,
-                      lineHeight: 1.3,
-                      marginBottom: 4,
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                    } as React.CSSProperties
-                  }
-                >
-                  {film.title_lt ?? ""}
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  {film.imdb_rating !== null && film.imdb_rating !== undefined && (
-                    <span style={{ color: "#c9a84c", fontSize: 11, fontWeight: 700 }}>
-                      ⭐ {Number(film.imdb_rating).toFixed(1)}
-                    </span>
-                  )}
-                  {film.year && <span style={{ color: "#6b7280", fontSize: 11 }}>{film.year}</span>}
-                </div>
-              </div>
-            </button>
-          ))}
-        </ScrollRow>
-      </section>
-
-      {/* Section 3: Kino maršrutai */}
-      <section>
-        <SectionHeader
-          title="Kino maršrutai"
-          description="Iš anksto paruošti maršrutai po svarbiausias Lietuvos filmavimo vietas. Nesvarbu, esate kino entuziastas ar keliautojas - pajuskite istorijas, kurios slepiasi kiekvienoje scenoje."
-          linkTo="/map"
-          navigate={navigate}
-        />
-        <ScrollRow>
-          {collections && collections.length > 0 ? (
-            collections.map((col) => (
-              <button
-                key={col.id}
-                type="button"
-                onClick={() => {
-                  useMapStore.getState().setSelectedCollection(col.id);
-                  navigate({ to: "/map" });
-                }}
-                style={{
-                  width: 332,
-                  cursor: "pointer",
-                  background: "transparent",
-                  padding: 0,
-                  border: "none",
-                  borderRadius: 12,
-                  overflow: "hidden",
-                  flexShrink: 0,
-                  position: "relative",
-                }}
-              >
-                <div style={{ width: "100%", aspectRatio: "2/3", position: "relative" }}>
-                  {col.cover_url && (
-                    <ImageWithFallback
-                      src={col.cover_url}
-                      alt={col.title}
-                      fallbackType="location"
-                      width={332}
-                      height={498}
-                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                    />
-                  )}
-                  <div
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent 60%)",
-                    }}
-                  />
-                  <div
-                    style={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      padding: 12,
-                      color: "#fff",
-                      fontWeight: 700,
-                      fontSize: 14,
-                    }}
-                  >
-                    {col.title}
-                  </div>
-                </div>
-              </button>
-            ))
-          ) : (
+      {/* ── Stats ── */}
+      <section
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: 1,
+          background: "#1a1a1a",
+          borderBottom: "1px solid #1a1a1a",
+        }}
+      >
+        {[
+          { value: stats?.locations, label: "Filmavimo lokacijų" },
+          { value: stats?.films, label: "Filmų ir serialų" },
+          { value: stats?.routes, label: "Kino maršrutai" },
+        ].map((stat) => (
+          <div
+            key={stat.label}
+            style={{ background: "#0a0a0a", padding: "28px 16px", textAlign: "center" }}
+          >
             <div
               style={{
-                width: 332,
-                borderRadius: 12,
-                flexShrink: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "linear-gradient(135deg, #1a1a1a, #111111)",
-                color: "#6b7280",
-                fontSize: 13,
-                textAlign: "center",
-                padding: 12,
-                aspectRatio: "2/3",
+                fontFamily: "Georgia, serif",
+                color: "#c9a84c",
+                fontSize: 32,
+                fontWeight: 700,
+                lineHeight: 1,
+                marginBottom: 8,
               }}
             >
-              Maršrutai bus pridėti netrukus
+              {stat.value != null ? (
+                <>
+                  {stat.value}
+                  <span style={{ fontSize: 20, opacity: 0.7 }}>+</span>
+                </>
+              ) : (
+                <span style={{ fontSize: 20, opacity: 0.4 }}>…</span>
+              )}
             </div>
-          )}
-        </ScrollRow>
+            <div
+              style={{
+                color: "#6b7280",
+                fontSize: 11,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+              }}
+            >
+              {stat.label}
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/*  Kontekstas  */}
+      <section style={{ padding: "48px 48px", maxWidth: 900, margin: "0 auto" }}>
+        <p style={labelStyle}>Kontekstas</p>
+        <p style={{ ...bodyText, textAlign: "center" }}>
+          Kino industrija ir audiovizualinių projektų gamyba yra neatsiejama šiuolaikinės kultūros
+          dalis, turinti tiesioginę įtaką regionų ekonominiam aktyvumui bei turizmo plėtrai. Šis
+          reiškinys - <span style={{ color: "#c9a84c" }}>kino turizmas</span>, transformuoja
+          filmavimo lokacijas į savarankiškus traukos objektus.
+        </p>
+      </section>
+
+      <div style={fullDivider} />
+
+      {/*  Tikslas  */}
+      <section style={{ padding: "48px 48px", maxWidth: 900, margin: "0 auto" }}>
+        <p style={labelStyle}>Tikslas</p>
+        <p style={{ ...bodyText, textAlign: "center" }}>
+          Realizuoti interaktyvią internetinę informacinę sistemą Lietuvoje filmuotų kino projektų
+          lokacijų vizualizavimui ir paieškai, skirtą susieti kino gerbėjus su realaus pasaulio
+          vietomis, kuriose buvo filmuojami jų mėgstami kūriniai. Padėti žmonėms atrasti Lietuvos
+          kino paveldą, planuoti keliones į filmavimo vietas ir geriau pažinti šalies kultūrinę
+          geografiją per kino prizmę.
+        </p>
+      </section>
+
+      <div style={fullDivider} />
+
+      {/* ── Funkcijos ── */}
+      <section style={{ padding: "48px 24px" }}>
+        <p style={labelStyle}>Funkcijos</p>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: 12,
+            maxWidth: 680,
+            margin: "0 auto",
+          }}
+        >
+          {[
+            {
+              icon: (
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#c9a84c"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 22s7-7.5 7-13a7 7 0 1 0-14 0c0 5.5 7 13 7 13Z" />
+                  <circle cx="12" cy="9" r="2.5" />
+                </svg>
+              ),
+              title: "Interaktyvus žemėlapis",
+              desc: "Klasterizuotos lokacijos su filtravimo galimybėmis.",
+            },
+            {
+              icon: (
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#c9a84c"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m21 21-4.35-4.35" />
+                </svg>
+              ),
+              title: "Hibridinė paieška",
+              desc: "Fuzzy paieška pagal filmą, lokaciją ar adresą.",
+            },
+            {
+              icon: (
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#c9a84c"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M3 12h18M3 6l9-3 9 3M3 18l9 3 9-3" />
+                </svg>
+              ),
+              title: "Kino maršrutai",
+              desc: "Paruošti kino maršrutai su navigacijos palaikymu.",
+            },
+            {
+              icon: (
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#c9a84c"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                </svg>
+              ),
+              title: "Išsaugoti mėgstamiausius",
+              desc: "Greita prieiga prie išsaugotų lokacijų ir maršrutų.",
+            },
+          ].map((feat) => (
+            <div
+              key={feat.title}
+              style={{
+                background: "#111111",
+                border: "1px solid #1a1a1a",
+                borderRadius: 14,
+                padding: "20px 16px",
+                textAlign: "center",
+              }}
+            >
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  background: "rgba(201,168,76,0.08)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: "0 auto 12px",
+                }}
+              >
+                {feat.icon}
+              </div>
+              <div style={{ color: "#f5f5f5", fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
+                {feat.title}
+              </div>
+              <div style={{ color: "#6b7280", fontSize: 12, lineHeight: 1.6 }}>{feat.desc}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div style={fullDivider} />
+
+      {/* ── Kaip naudotis ── */}
+      <section style={{ padding: "48px 24px" }}>
+        <p style={labelStyle}>Kaip naudotis</p>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: 16,
+            maxWidth: 680,
+            margin: "0 auto",
+          }}
+        >
+          {[
+            {
+              n: "1",
+              title: "Ieškokite ir naršykite",
+              desc: "Naudokite paiešką, naršykite žemėlapį ar katalogą, kad rastumėte jus dominančius filmus ar lokacijas.",
+            },
+            {
+              n: "2",
+              title: "Atraskite lokacijas",
+              desc: "Spustelėkite ant žymeklių, kad sužinotumėte apie filmavimo vietas ir jose filmuotus kūrinius.",
+            },
+            {
+              n: "3",
+              title: "Planuokite kelionę",
+              desc: "Naudokite kino maršrutus ir navigacijos funkcijas, kad aplankytumėte vietas asmeniškai.",
+            },
+          ].map((step) => (
+            <div key={step.n} style={{ textAlign: "center" }}>
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                  background: "rgba(201,168,76,0.12)",
+                  border: "1px solid rgba(201,168,76,0.3)",
+                  color: "#c9a84c",
+                  fontFamily: "Georgia, serif",
+                  fontSize: 16,
+                  fontWeight: 700,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: "0 auto 12px",
+                }}
+              >
+                {step.n}
+              </div>
+              <div style={{ color: "#f5f5f5", fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
+                {step.title}
+              </div>
+              <div style={{ color: "#6b7280", fontSize: 12, lineHeight: 1.6 }}>{step.desc}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div style={fullDivider} />
+
+      {/* ── Naujumas ── */}
+      <section style={{ padding: "48px 48px", maxWidth: 900, margin: "0 auto" }}>
+        <p style={labelStyle}>Naujumas ir vertė</p>
+        <p style={{ ...bodyText, textAlign: "center" }}>
+          Sistema grindžiama Lietuvos kino lokacijų duomenų apjungimu ir šių lokacijų intelektualiu
+          kuravimu. Pirmą kartą nacionaliniu lygmeniu susisteminama Lietuvos kino paveldo geografinė
+          informacija, dinamiškai siejant lokalius istorinius duomenis su globalia kino metaduomenų
+          baze <span style={{ color: "#c9a84c" }}>TMDB API</span>.
+        </p>
+        <p style={{ ...bodyText, textAlign: "center", marginTop: 16 }}>
+          Sukurta sistema leidžia vizualizuoti sudėtingus ryšius tarp kino lokacijų, filmų ir jų
+          istorinio konteksto.
+        </p>
+      </section>
+
+      <div style={fullDivider} />
+
+      {/* ── CTA ── */}
+      <section
+        style={{
+          margin: "0 16px",
+          borderRadius: 16,
+          background:
+            "linear-gradient(135deg, rgba(201,168,76,0.15) 0%, rgba(201,168,76,0.05) 100%)",
+          border: "1px solid rgba(201,168,76,0.2)",
+          padding: "40px 24px",
+          textAlign: "center",
+        }}
+      >
+        <h2
+          style={{
+            fontFamily: "Georgia, serif",
+            color: "#f5f5f5",
+            fontSize: 20,
+            fontWeight: 700,
+            margin: "0 0 12px",
+          }}
+        >
+          Pradėkite tyrinėti
+        </h2>
+        <p
+          style={{
+            color: "#9ca3af",
+            fontSize: 13,
+            lineHeight: 1.7,
+            margin: "0 0 24px",
+            maxWidth: 360,
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
+        >
+          Atraskite kino lokacijas Lietuvoje: realias vietas, kurios įamžintos didžiuosiuose
+          ekranuose.
+        </p>
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/map" })}
+            style={{
+              background: "#c9a84c",
+              border: "none",
+              borderRadius: 10,
+              padding: "12px 24px",
+              color: "#0a0a0a",
+              fontWeight: 700,
+              fontSize: 13,
+              cursor: "pointer",
+              letterSpacing: "0.04em",
+            }}
+          >
+            Atidaryti žemėlapį
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/" })}
+            style={{
+              background: "transparent",
+              border: "1px solid #333",
+              borderRadius: 10,
+              padding: "12px 24px",
+              color: "#9ca3af",
+              fontSize: 13,
+              cursor: "pointer",
+              letterSpacing: "0.04em",
+            }}
+          >
+            Naršyti turinį
+          </button>
+        </div>
+      </section>
+
+      {/* ── Tech stack ── */}
+      <section style={{ padding: "48px 48px 0", textAlign: "center" }}>
+        <p style={labelStyle}>Techninė informacija</p>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 8,
+            justifyContent: "center",
+            maxWidth: 900,
+            margin: "0 auto",
+          }}
+        >
+          {[
+            "React",
+            "TypeScript",
+            "Vite",
+            "MapLibre GL JS",
+            "Supercluster",
+            "MapTiler",
+            "Zustand",
+            "TanStack Query",
+            "TanStack Router",
+            "Supabase",
+            "PostGIS",
+            "pg_trgm",
+            "TMDB API",
+            "OpenRouteService",
+            "Vercel",
+          ].map((tech) => (
+            <span
+              key={tech}
+              style={{
+                background: "#111111",
+                border: "1px solid #222",
+                borderRadius: 6,
+                padding: "4px 10px",
+                color: "#9ca3af",
+                fontSize: 12,
+              }}
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
       </section>
     </main>
   );
 }
+
+// ── Shared styles ──────────────────────────────────────────────────────────────
+
+const labelStyle: React.CSSProperties = {
+  textTransform: "uppercase",
+  letterSpacing: "0.12em",
+  color: "#c9a84c",
+  fontSize: 11,
+  fontWeight: 600,
+  textAlign: "center",
+  marginBottom: 24,
+};
+
+const bodyText: React.CSSProperties = {
+  color: "#9ca3af",
+  fontSize: 14,
+  lineHeight: 1.9,
+  margin: 0,
+};
+
+const fullDivider: React.CSSProperties = {
+  height: 1,
+  background: "#1a1a1a",
+};
