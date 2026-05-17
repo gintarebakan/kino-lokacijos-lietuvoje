@@ -14,6 +14,7 @@ interface PopularLocation {
   image_url: string | null;
   location_type: string | null;
   film_count: number | null;
+  county: string | null;
 }
 
 function filmCountLabel(count: number): string {
@@ -143,7 +144,7 @@ export default function DiscoverPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("locations_by_film_count")
-        .select("id, name, slug, image_url, location_type, film_count")
+        .select("id, name, slug, image_url, location_type, film_count, county")
         .limit(10);
       if (error) throw error;
       return (data ?? []) as PopularLocation[];
@@ -272,13 +273,31 @@ export default function DiscoverPage() {
                     left: 0,
                     right: 0,
                     padding: 8,
-                    color: "#fff",
-                    fontWeight: 700,
-                    fontSize: 13,
-                    textAlign: "left",
                   }}
                 >
-                  {loc.name}
+                  <div
+                    style={{
+                      color: "#fff",
+                      fontWeight: 700,
+                      fontSize: 13,
+                      textAlign: "left",
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {loc.name}
+                  </div>
+                  {loc.county && (
+                    <div
+                      style={{
+                        color: "#9ca3af",
+                        fontSize: 11,
+                        textAlign: "left",
+                        marginTop: 2,
+                      }}
+                    >
+                      {loc.county.charAt(0).toUpperCase() + loc.county.slice(1).toLowerCase()} apskritis
+                    </div>
+                  )}
                 </div>
               </div>
             </button>
