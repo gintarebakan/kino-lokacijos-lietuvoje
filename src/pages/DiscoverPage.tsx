@@ -130,7 +130,7 @@ function SectionHeader({
         {title}
         <span style={{ fontSize: 16, opacity: 0.7 }}>›</span>
       </button>
-      <p style={{ color: "#f5f5f5", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{description}</p>
+      <p style={{ color: "#6b7280", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{description}</p>
     </div>
   );
 }
