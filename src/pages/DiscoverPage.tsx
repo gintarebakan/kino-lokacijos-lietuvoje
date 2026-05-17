@@ -283,7 +283,7 @@ export default function DiscoverPage() {
             </button>
           ))}
           {locations && locations.length === 0 && (
-            <div style={{ color: "#f5f5f5", fontSize: 13, padding: "8px 0" }}>Nėra lokacijų.</div>
+            <div style={{ color: "#6b7280", fontSize: 13, padding: "8px 0" }}>Nėra lokacijų.</div>
           )}
         </ScrollRow>
       </section>
@@ -344,7 +344,7 @@ export default function DiscoverPage() {
               <div
                 style={{
                   fontSize: 12,
-                  color: "#f5f5f5",
+                  color: "#6b7280",
                   
                   marginTop: 6,
                   lineHeight: 1.3,
@@ -441,7 +441,7 @@ export default function DiscoverPage() {
                 alignItems: "center",
                 justifyContent: "center",
                 background: "linear-gradient(135deg, #1a1a1a, #111111)",
-                color: "#f5f5f5",
+                color: "#6b7280",
                 fontSize: 13,
                 textAlign: "center",
                 padding: 12,
