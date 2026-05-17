@@ -236,13 +236,13 @@ export default function LocationDetailPanel() {
       >✕</button>
 
       {/* Scrollable content */}
-      <div style={{ flex: 1, overflowY: "auto", background: "#0c0c0c" }}>
-        {isLoading && <div style={{ padding: 24, color: "#9ca3af", fontSize: 14 }}>Kraunama…</div>}
-        {error && !isLoading && <div style={{ padding: 24, color: "#f87171", fontSize: 14 }}>Nepavyko įkelti informacijos.</div>}
-        {!isLoading && !error && !data && selectedLocationId && <div style={{ padding: 24, color: "#9ca3af", fontSize: 14 }}>Lokacija nerasta.</div>}
+      <div style={{ flex: 1, overflowY: "auto", background: "#0c0c0c", WebkitOverflowScrolling: "touch" }}>
+        {isLoading && <div style={{ padding: 24, color: "#9ca3af", fontSize: 14, background: "#0c0c0c" }}>Kraunama…</div>}
+        {error && !isLoading && <div style={{ padding: 24, color: "#f87171", fontSize: 14, background: "#0c0c0c" }}>Nepavyko įkelti informacijos.</div>}
+        {!isLoading && !error && !data && selectedLocationId && <div style={{ padding: 24, color: "#9ca3af", fontSize: 14, background: "#0c0c0c" }}>Lokacija nerasta.</div>}
 
         {data && (
-          <>
+          <div style={{ background: "#0c0c0c" }}>
             {/* Hero image */}
             <div style={{ width: "100%", aspectRatio: "16/10", background: "#1a1a1a", position: "relative" }}>
               {data.image_url ? (
@@ -252,7 +252,7 @@ export default function LocationDetailPanel() {
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 40%, rgba(12,12,12,0.95) 100%)" }} />
             </div>
 
-            <div style={{ padding: "16px 20px 96px", background: "#111111" }}>
+            <div style={{ padding: "16px 20px 96px", background: "#0c0c0c" }}>
               {data.location_type && (
                 <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", color: "#c9a84c", marginBottom: 6 }}>
                   {data.location_type}
@@ -382,7 +382,7 @@ export default function LocationDetailPanel() {
                 </Section>
               )}
             </div>
-          </>
+          </div>
         )}
       </div>
 
