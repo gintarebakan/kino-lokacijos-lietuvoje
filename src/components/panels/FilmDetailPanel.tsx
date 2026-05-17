@@ -213,7 +213,7 @@ export default function FilmDetailPanel() {
     left: 0,
     width: 360,
     height: "100%",
-    background: "#111111",
+    background: "#0c0c0c",
     borderRight: "1px solid #222222",
     zIndex: 30,
     overflowY: "auto",
@@ -226,7 +226,7 @@ export default function FilmDetailPanel() {
     left: 0,
     right: 0,
     height: "80vh",
-    background: "#111111",
+    background: "#0c0c0c",
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     zIndex: 40,
@@ -271,7 +271,11 @@ Su 100ms vėlavimu nustatome laukiantį slugą
   //-----Render
 
   return (
-    <aside style={isMobile ? mobileStyle : desktopStyle} aria-label="Filmo informacija">
+    <aside 
+      className="cinemap-scroll-area"
+      style={isMobile ? mobileStyle : desktopStyle} 
+      aria-label="Filmo informacija"
+    >
       {/* filmo viršelio nuotrauka su gradientu */}
       <div
         style={{
@@ -299,7 +303,7 @@ Su 100ms vėlavimu nustatome laukiantį slugą
           style={{
             position: "absolute",
             inset: 0,
-            background: "linear-gradient(to top, #111111, transparent 50%)",
+            background: "linear-gradient(to top, #0c0c0c, transparent 50%)",
             pointerEvents: "none",
           }}
         />
