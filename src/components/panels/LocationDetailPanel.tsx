@@ -3,7 +3,6 @@ import { useMapStore } from "../../stores/mapStore";
 import { useSavedStore } from "../../stores/savedStore";
 import { useLocationDetail } from "../../hooks/useLocationDetail";
 import FilmContextView from "./FilmContextView";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 const SIGNIFICANCE_CONFIG: Record<
   string,
@@ -237,7 +236,14 @@ export default function LocationDetailPanel() {
       >✕</button>
 
       {/* Scrollable content */}
-      <ScrollArea className="flex-1" style={{ background: "#0c0c0c" }}>
+      <div 
+        className="flex-1 cinemap-scroll-area"
+        style={{ 
+          overflowY: "auto",
+          background: "#0c0c0c",
+          WebkitOverflowScrolling: "touch"
+        }}
+      >
         <div style={{ background: "#0c0c0c", minHeight: "100%" }}>
           {isLoading && <div style={{ padding: 24, color: "#9ca3af", fontSize: 14 }}>Kraunama…</div>}
           {error && !isLoading && <div style={{ padding: 24, color: "#f87171", fontSize: 14 }}>Nepavyko įkelti informacijos.</div>}
@@ -387,7 +393,7 @@ export default function LocationDetailPanel() {
           </div>
         )}
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Footer */}
       {data && (

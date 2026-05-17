@@ -372,3 +372,27 @@ body {
   background: rgba(0, 0, 0, 0.8);
   border-color: rgba(201, 168, 76, 0.3);
 }
+
+/* Dark scrollbar for the location detail panel */
+.cinemap-scroll-area {
+  scrollbar-width: thin;
+  scrollbar-color: #222222 #0c0c0c;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+.cinemap-scroll-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cinemap-scroll-area::-webkit-scrollbar-track {
+  background: #0c0c0c;
+}
+
+.cinemap-scroll-area::-webkit-scrollbar-thumb {
+  background: #222222;
+  border-radius: 4px;
+}
+
+.cinemap-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: #333333;
+}
