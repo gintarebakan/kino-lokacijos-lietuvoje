@@ -190,11 +190,12 @@ export default function DiscoverPage() {
 
   return (
     <main
+      className="cinemap-scroll-area"
       style={{
         width: "100%",
         height: "100%",
         overflowY: "auto",
-        background: "#0a0a0a",
+        background: "#0c0c0c",
         paddingBottom: 80,
       }}
     >
@@ -447,14 +448,14 @@ export default function DiscoverPage() {
                   position: "relative",
                 }}
               >
-                <div style={{ width: "100%", aspectRatio: "2/3", position: "relative" }}>
+                <div style={{ width: "100%", aspectRatio: "4/3", position: "relative" }}>
                   {col.cover_url && (
                     <ImageWithFallback
                       src={col.cover_url}
                       alt={col.title}
                       fallbackType="location"
                       width={332}
-                      height={498}
+                      height={249}
                       style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                     />
                   )}
@@ -496,7 +497,7 @@ export default function DiscoverPage() {
                 fontSize: 13,
                 textAlign: "center",
                 padding: 12,
-                aspectRatio: "2/3",
+                aspectRatio: "4/3",
               }}
             >
               Maršrutai bus pridėti netrukus
