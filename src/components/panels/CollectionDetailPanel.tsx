@@ -270,7 +270,7 @@ jei visos jau išsaugotos, pašalina visas. Kitaip išsaugo trūkstamas.
     left: 0,
     width: 360,
     height: "100%",
-    background: "#111111",
+    background: "#0c0c0c",
     borderRight: "1px solid #222222",
     zIndex: 30,
     display: "flex",
@@ -285,7 +285,7 @@ jei visos jau išsaugotos, pašalina visas. Kitaip išsaugo trūkstamas.
     left: 0,
     right: 0,
     height: "80vh",
-    background: "#111111",
+    background: "#0c0c0c",
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     zIndex: 40,
@@ -327,7 +327,7 @@ jei visos jau išsaugotos, pašalina visas. Kitaip išsaugo trūkstamas.
         ✕
       </button>
 
-      <div style={{ flex: 1, overflowY: "auto" }}>
+      <div className="cinemap-scroll-area" style={{ flex: 1, overflowY: "auto" }}>
         {isLoading && (
           <div style={{ padding: 24, color: "#9ca3af", fontSize: 14 }}>Kraunama...</div>
         )}
@@ -358,7 +358,7 @@ jei visos jau išsaugotos, pašalina visas. Kitaip išsaugo trūkstamas.
                 style={{
                   position: "absolute",
                   inset: 0,
-                  background: "linear-gradient(180deg, transparent 50%, rgba(17,17,17,0.95) 100%)",
+                  background: "linear-gradient(180deg, transparent 50%, rgba(12,12,12,0.95) 100%)",
                 }}
               />
             </div>

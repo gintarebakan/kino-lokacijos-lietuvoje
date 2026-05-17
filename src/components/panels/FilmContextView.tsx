@@ -148,7 +148,7 @@ export default function FilmContextView() {
       style={{
         position: "absolute",
         inset: 0,
-        background: "#111111",
+        background: "#0c0c0c",
         display: "flex",
         flexDirection: "column",
         // Įslinkimo animacija iš dešinės kai atidaromas filmo rodinys
@@ -185,7 +185,7 @@ export default function FilmContextView() {
         Atgal
       </button>
 
-      <div style={{ flex: 1, overflowY: "auto" }}>
+      <div className="cinemap-scroll-area" style={{ flex: 1, overflowY: "auto" }}>
         {/* Filmo posteris su gradientu apačioje */}
         <div
           className={film?.poster_url ? "" : "poster-fallback"}
