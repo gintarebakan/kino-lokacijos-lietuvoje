@@ -3,6 +3,10 @@ import { useSavedStore } from "../stores/savedStore";
 import { useMapStore } from "../stores/mapStore";
 import { useNavigate } from "@tanstack/react-router";
 
+function capitalizeCounty(county: string): string {
+  return county.charAt(0).toUpperCase() + county.slice(1);
+}
+
 export default function SavedPage() {
   const [activeTab, setActiveTab] = useState("saved");
   const [dragIdx, setDragIdx] = useState<number | null>(null);
@@ -16,6 +20,8 @@ export default function SavedPage() {
   const handleLocationClick = (id: string) => {
     setPendingLocation(id);
     setSelectedLocation(id);
+    // Force zoom to 14 to ensure individual markers are visible (not clustered)
+    useMapStore.getState().setForceZoom(14);
     navigate({ to: "/map" });
   };
 
@@ -197,7 +203,9 @@ export default function SavedPage() {
                   onClick={() => handleLocationClick(loc.id)}
                 >
                   <div style={{ color: "#f5f5f5", fontWeight: 700, fontSize: 14 }}>{loc.name}</div>
-                  <div style={{ color: "#6b7280", fontSize: 12 }}>{loc.county}</div>
+                  <div style={{ color: "#6b7280", fontSize: 12 }}>
+                    {capitalizeCounty(loc.county)}
+                  </div>
                 </div>
                 <div style={{ display: "flex", gap: 6 }}>
                   <button
@@ -299,7 +307,9 @@ export default function SavedPage() {
                     <div style={{ color: "#f5f5f5", fontSize: 13, fontWeight: 600 }}>
                       {loc.name}
                     </div>
-                    <div style={{ color: "#6b7280", fontSize: 11 }}>{loc.county}</div>
+                    <div style={{ color: "#6b7280", fontSize: 11 }}>
+                      {capitalizeCounty(loc.county)}
+                    </div>
                   </div>
                   <button
                     type="button"
