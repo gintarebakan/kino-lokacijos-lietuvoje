@@ -3,6 +3,7 @@ import { useMapStore } from "../../stores/mapStore";
 import { useSavedStore } from "../../stores/savedStore";
 import { useLocationDetail } from "../../hooks/useLocationDetail";
 import FilmContextView from "./FilmContextView";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const SIGNIFICANCE_CONFIG: Record<
   string,
@@ -236,13 +237,14 @@ export default function LocationDetailPanel() {
       >✕</button>
 
       {/* Scrollable content */}
-      <div style={{ flex: 1, overflowY: "auto", background: "#0c0c0c", WebkitOverflowScrolling: "touch" }}>
-        {isLoading && <div style={{ padding: 24, color: "#9ca3af", fontSize: 14, background: "#0c0c0c" }}>Kraunama…</div>}
-        {error && !isLoading && <div style={{ padding: 24, color: "#f87171", fontSize: 14, background: "#0c0c0c" }}>Nepavyko įkelti informacijos.</div>}
-        {!isLoading && !error && !data && selectedLocationId && <div style={{ padding: 24, color: "#9ca3af", fontSize: 14, background: "#0c0c0c" }}>Lokacija nerasta.</div>}
+      <ScrollArea className="flex-1" style={{ background: "#0c0c0c" }}>
+        <div style={{ background: "#0c0c0c", minHeight: "100%" }}>
+          {isLoading && <div style={{ padding: 24, color: "#9ca3af", fontSize: 14 }}>Kraunama…</div>}
+          {error && !isLoading && <div style={{ padding: 24, color: "#f87171", fontSize: 14 }}>Nepavyko įkelti informacijos.</div>}
+          {!isLoading && !error && !data && selectedLocationId && <div style={{ padding: 24, color: "#9ca3af", fontSize: 14 }}>Lokacija nerasta.</div>}
 
-        {data && (
-          <div style={{ background: "#0c0c0c" }}>
+          {data && (
+            <div style={{ background: "#0c0c0c" }}>
             {/* Hero image */}
             <div style={{ width: "100%", aspectRatio: "16/10", background: "#1a1a1a", position: "relative" }}>
               {data.image_url ? (
@@ -384,7 +386,8 @@ export default function LocationDetailPanel() {
             </div>
           </div>
         )}
-      </div>
+        </div>
+      </ScrollArea>
 
       {/* Footer */}
       {data && (
