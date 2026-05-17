@@ -84,11 +84,12 @@ export default function LocationsPage() {
 
   return (
     <main
+      className="cinemap-scroll-area"
       style={{
         width: "100%",
         height: "100%",
         overflowY: "auto",
-        background: "#0a0a0a",
+        background: "#0c0c0c",
         paddingBottom: 80,
       }}
     >
