@@ -25,6 +25,10 @@ interface PillProps {
   onClick: () => void;
 }
 
+function capitalizeFirstLetter(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 // ═══════════════════════════════════════════════
 // FILTRO MYGTUKAS
 // ═══════════════════════════════════════════════
@@ -136,12 +140,17 @@ export default function SearchBar() {
       const feature = locationsData?.features.find((f) => f.properties.id === slug);
       if (feature && mapInstance) {
         const [lng, lat] = feature.geometry.coordinates as [number, number];
+        const forceZoom = useMapStore.getState().forceZoom;
         mapInstance.easeTo({
           center: [lng, lat], //centralizuoja žemėlapį
-          zoom: Math.max(mapInstance.getZoom(), 13), //priartina (ne mažiau 13)
+          zoom: forceZoom ?? Math.max(mapInstance.getZoom(), 13), //priartina (naudoja forceZoom jei nustatytas, kitaip ne mažiau 13)
           offset: [-160, 0], //pastumia į dešinę dėl skydelio
           duration: 700, //700ms animacija
         });
+        // Clear forceZoom after applying
+        if (forceZoom !== null) {
+          useMapStore.getState().setForceZoom(null);
+        }
       }
       setSelectedLocation(slug); //Zustand atidarys LocationPanel
       return;
@@ -442,7 +451,7 @@ export default function SearchBar() {
               {locationTypes.map((t: string) => (
                 <Pill
                   key={t}
-                  label={t}
+                  label={capitalizeFirstLetter(t)}
                   active={filter.selectedLocationTypes.includes(t)}
                   onClick={() => filter.toggleLocationType(t)}
                 />
