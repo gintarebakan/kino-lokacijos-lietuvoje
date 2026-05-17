@@ -344,7 +344,7 @@ export default function DiscoverPage() {
               <div
                 style={{
                   fontSize: 12,
-                  color: "#6b7280",
+                  color: "#f5f5f5",
                   
                   marginTop: 6,
                   lineHeight: 1.3,
