@@ -295,7 +295,7 @@ export default function DiscoverPage() {
                         marginTop: 2,
                       }}
                     >
-                      {loc.county.charAt(0).toUpperCase() + loc.county.slice(1).toLowerCase()} apskritis
+                      {loc.county.charAt(0).toUpperCase() + loc.county.slice(1).toLowerCase()}
                     </div>
                   )}
                 </div>
