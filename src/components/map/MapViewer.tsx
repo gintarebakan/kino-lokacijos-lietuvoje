@@ -324,11 +324,12 @@ export default function MapViewer() {
       }
 
       const [lng, lat] = feature.geometry.coordinates as [number, number];
+      const forceZoom = useMapStore.getState().forceZoom;
 
       // Sklandžiai perkeliame žemėlapį į lokacijos koordinates
       map.easeTo({
         center: [lng, lat],
-        zoom: Math.max(map.getZoom(), 13), // Priartinama ne mažiau nei iki 13 lygio
+        zoom: forceZoom ?? Math.max(map.getZoom(), 13), // Naudoja forceZoom jei nustatytas, kitaip ne mažiau nei 13
         offset: [-160, 0], // Pastumimas dėl informacinio skydelio
         duration: 500,
       });
@@ -336,6 +337,11 @@ export default function MapViewer() {
       // Atidarome lokacijos skydelį ir valome pending state
       useMapStore.getState().setSelectedLocation(pendingLocationSlug);
       useMapStore.getState().setPendingLocation(null);
+      
+      // Išvalome forceZoom po panaudojimo
+      if (forceZoom !== null) {
+        useMapStore.getState().setForceZoom(null);
+      }
     };
 
     // Jei žemėlapis jau įkeltas, vykdome iš karto, kitaip laukiame
