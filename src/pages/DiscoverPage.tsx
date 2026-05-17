@@ -106,6 +106,11 @@ function SectionHeader({
   linkTo: string;
   navigate: ReturnType<typeof useNavigate>;
 }) {
+  // Split "TOP 10" from the rest of the title
+  const isTop10 = title.startsWith("TOP 10 ");
+  const top10Part = isTop10 ? "TOP 10 " : "";
+  const restPart = isTop10 ? title.slice(7) : title;
+
   return (
     <div style={{ padding: "24px 16px 8px" }}>
       <button
@@ -118,7 +123,6 @@ function SectionHeader({
           cursor: "pointer",
           textTransform: "uppercase",
           letterSpacing: "0.12em",
-          color: "#c9a84c",
           fontSize: 15,
           fontWeight: 700,
           margin: "0 0 8px",
@@ -128,8 +132,15 @@ function SectionHeader({
           gap: 6,
         }}
       >
-        {title}
-        <span style={{ fontSize: 16, opacity: 0.7 }}>›</span>
+        {isTop10 ? (
+          <>
+            <span style={{ color: "#fff" }}>{top10Part}</span>
+            <span style={{ color: "#c9a84c" }}>{restPart}</span>
+          </>
+        ) : (
+          <span style={{ color: "#c9a84c" }}>{title}</span>
+        )}
+        <span style={{ fontSize: 16, opacity: 0.7, color: "#c9a84c" }}>›</span>
       </button>
       <p style={{ color: "#6b7280", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{description}</p>
     </div>
@@ -211,7 +222,7 @@ export default function DiscoverPage() {
       {/* Section 1: Popular Locations */}
       <section>
         <SectionHeader
-          title="Populiarios lokacijos"
+          title="TOP 10 Populiarios lokacijos"
           description="Filmavimo vietos Lietuvoje, kurios dažniausiai įamžintos ekrane. Atraskite lokacijas, kuriose buvo kuriami filmai ir serialai."
           linkTo="/locations"
           navigate={navigate}
@@ -312,7 +323,7 @@ export default function DiscoverPage() {
       {/* Section 2: Popular Films */}
       <section>
         <SectionHeader
-          title="Populiarus turinys"
+          title="TOP 10 Populiarus turinys"
           description="Geriausiai įvertinti kino projektai, kurių scenoms filmuoti buvo pasirinktos Lietuvos lokacijos. Atraskite, kur buvo kuriami jūsų mėgstami filmai ir serialai."
           linkTo="/films"
           navigate={navigate}
