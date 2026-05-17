@@ -338,7 +338,7 @@ export default function LocationDetailPanel() {
               )}
 
               {data.film_locations && data.film_locations.length > 0 && (
-                <Section title="Filmuose">
+                <Section title="Kūriniuose">
                   <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                     {data.film_locations.map((fl) => {
                       const film = fl.films_tmdb;

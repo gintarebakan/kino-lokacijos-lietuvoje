@@ -16,11 +16,11 @@ interface Location {
 }
 
 function filmCountLabel(count: number): string {
-  if (count === 1) return "1 filmas";
+  if (count === 1) return "1 kūrinys";
   const mod10 = count % 10;
   const mod100 = count % 100;
-  if (mod10 >= 2 && mod10 <= 9 && (mod100 < 10 || mod100 >= 20)) return `${count} filmai`;
-  return `${count} filmų`;
+  if (mod10 >= 2 && mod10 <= 9 && (mod100 < 10 || mod100 >= 20)) return `${count} kūriniai`;
+  return `${count} kūrinių`;
 }
 
 function locationsCountLabel(count: number): string {
