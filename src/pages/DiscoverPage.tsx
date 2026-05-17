@@ -195,6 +195,8 @@ export default function DiscoverPage() {
       setTimeout(() => {
         useMapStore.getState().setPendingLocation(slug);
         useMapStore.getState().setSelectedLocationFromDiscover(slug);
+        // Force zoom to 15 to ensure individual markers are visible (not clustered)
+        useMapStore.getState().setForceZoom(15);
       }, 150);
     }
   };

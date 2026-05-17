@@ -25,6 +25,7 @@ interface MapState {
   selectedCollectionId: string | null;
   previousCollectionId: string | null; //Iš kur vartotojas čia atėjo ir ar turime palikti nupieštą maršruto liniją?
   previousFilmDetailId: string | null;
+  forceZoom: number | null; //Priverstinis zoom lygis, kai reikia išskleisti clusterius
   openLocationFromCollection: (locationSlug: string, collectionId: string) => void;
 
   setMap: (map: maplibregl.Map | null) => void;
@@ -42,6 +43,7 @@ interface MapState {
   setSavedLocationIds: (ids: string[]) => void;
   setLayerStyle: (style: LayerStyle) => void;
   setPendingLocation: (slug: string | null) => void;
+  setForceZoom: (zoom: number | null) => void;
 }
 
 const DEFAULT_CENTER: [number, number] = [25.2797, 54.6872];
@@ -64,6 +66,7 @@ export const useMapStore = create<MapState>((set) => ({
   selectedCollectionId: null,
   previousCollectionId: null,
   previousFilmDetailId: null,
+  forceZoom: null,
 
   // Map instance
   setMap: (map) => set({ mapInstance: map }),
@@ -168,6 +171,9 @@ export const useMapStore = create<MapState>((set) => ({
 
   // Pending
   setPendingLocation: (slug) => set({ pendingLocationSlug: slug }),
+
+  // Force zoom (used to break clusters and show individual markers)
+  setForceZoom: (zoom) => set({ forceZoom: zoom }),
 }));
 
 export const DEFAULT_MAP_CENTER = DEFAULT_CENTER;
