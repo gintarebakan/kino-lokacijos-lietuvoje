@@ -241,7 +241,7 @@ export default function AdminCollectionLocations() {
         {isLoading && <div style={{ color: "#9ca3af", marginBottom: 16 }}>Kraunama…</div>}
       </div>
 
-      <div style={{ flex: 1, overflow: "auto", padding: "0 24px 24px" }}>
+      <div style={{ flex: 1, overflow: "auto", padding: "0 24px 24px", minHeight: 0 }}>
         {/* Pridėjimo forma */}
         <div style={{ background: "#111111", border: "1px solid #222", borderRadius: 12, padding: 24, marginBottom: 24 }}>
           <h2 style={{ margin: "0 0 16px", color: "#c9a84c", fontSize: 15 }}>
