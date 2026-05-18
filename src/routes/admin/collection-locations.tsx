@@ -210,242 +210,246 @@ export default function AdminCollectionLocations() {
   //-------Render
 
   return (
-    <div>
-      {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <h1 style={{ margin: 0, color: "#f5f5f5", fontSize: 22, fontFamily: "Georgia, serif" }}>
-          Kolekcijų lokacijos
-        </h1>
-        <span style={{ color: "#6b7280", fontSize: 13 }}>
-          {collectionLocations.length} įrašų iš viso
-        </span>
-      </div>
+    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ padding: "24px 24px 0", flexShrink: 0 }}>
+        {/* Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+          <h1 style={{ margin: 0, color: "#f5f5f5", fontSize: 22, fontFamily: "Georgia, serif" }}>
+            Kolekcijų lokacijos
+          </h1>
+          <span style={{ color: "#6b7280", fontSize: 13 }}>
+            {collectionLocations.length} įrašų iš viso
+          </span>
+        </div>
 
-      {/* Filtravimas pagal kolekciją */}
-      <div style={{ marginBottom: 20 }}>
-        <label style={labelStyle}>Filtruoti pagal kolekciją</label>
-        <select
-          value={filterCollection}
-          onChange={(e) => setFilterCollection(e.target.value)}
-          style={{ ...inputStyle, maxWidth: 320 }}
-        >
-          <option value="">— Visos kolekcijos —</option>
-          {collections.map((c) => (
-            <option key={c.id} value={c.id}>{c.title}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Pridėjimo forma */}
-      <div style={{ background: "#111111", border: "1px solid #222", borderRadius: 12, padding: 24, marginBottom: 24 }}>
-        <h2 style={{ margin: "0 0 16px", color: "#c9a84c", fontSize: 15 }}>
-          Pridėti lokacijas į kolekciją
-        </h2>
-
-        {/* Kolekcijos pasirinkimas */}
-        <div style={{ marginBottom: 16 }}>
-          <label style={labelStyle}>
-            Kolekcija <span style={{ color: "#f87171" }}>*</span>
-          </label>
+        {/* Filtravimas pagal kolekciją */}
+        <div style={{ marginBottom: 20 }}>
+          <label style={labelStyle}>Filtruoti pagal kolekciją</label>
           <select
-            value={addingToCollection}
-            onChange={(e) => setAddingToCollection(e.target.value)}
-            style={{ ...inputStyle, maxWidth: 400 }}
+            value={filterCollection}
+            onChange={(e) => setFilterCollection(e.target.value)}
+            style={{ ...inputStyle, maxWidth: 320 }}
           >
-            <option value="">— Pasirinkti —</option>
+            <option value="">— Visos kolekcijos —</option>
             {collections.map((c) => (
               <option key={c.id} value={c.id}>{c.title}</option>
             ))}
           </select>
         </div>
 
-        {/* Stulpelių antraštės */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 120px 40px", gap: 8, marginBottom: 4 }}>
-          <span style={labelStyle}>Lokacija</span>
-          <span style={labelStyle}>Eiliškumas</span>
-          <span />
-        </div>
-
-        {/* Lokacijų eilutės - galima pridėti kelias iš karto */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
-          {addRows.map((row, idx) => (
-            <div key={idx} style={{ display: "grid", gridTemplateColumns: "1fr 120px 40px", gap: 8, alignItems: "center" }}>
-              <select
-                value={row.location_id}
-                onChange={(e) => updateRow(idx, "location_id", e.target.value)}
-                style={inputStyle}
-              >
-                <option value="">— Pasirinkti lokaciją —</option>
-                {locations.map((l) => (
-                  <option key={l.id} value={l.id}>{l.name}</option>
-                ))}
-              </select>
-
-              <input
-                type="number"
-                min={0}
-                value={row.order_index}
-                onChange={(e) => updateRow(idx, "order_index", e.target.value)}
-                style={inputStyle}
-              />
-
-              {/* Eilutės pašalinimo mygtukas - išjungtas jei tik viena eilutė */}
-              <button
-                type="button"
-                onClick={() => removeRow(idx)}
-                disabled={addRows.length === 1}
-                style={{
-                  background: "transparent", border: "1px solid #333", borderRadius: 6,
-                  color: "#f87171", fontSize: 16,
-                  cursor: addRows.length === 1 ? "not-allowed" : "pointer",
-                  height: 36, width: 36, display: "flex", alignItems: "center", justifyContent: "center",
-                }}
-              >
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
-
-        {/* Naujos eilutės pridėjimas */}
-        <button
-          type="button"
-          onClick={addNewRow}
-          style={{
-            background: "transparent", border: "1px dashed #444", borderRadius: 8,
-            padding: "8px 16px", color: "#9ca3af", fontSize: 13, cursor: "pointer", marginBottom: 16,
-          }}
-        >
-          + Pridėti dar vieną lokaciją
-        </button>
-
-        {/* Klaidos pranešimas */}
-        {bulkAdd.isError && (
-          <div style={{ color: "#f87171", fontSize: 13, marginBottom: 8 }}>
-            {(bulkAdd.error as Error)?.message ?? "Klaida išsaugant."}
-          </div>
-        )}
-
-        {/* Formos valdymo mygtukai */}
-        <div style={{ display: "flex", gap: 8 }}>
-          <button
-            type="button"
-            onClick={() => bulkAdd.mutate()}
-            disabled={bulkAdd.isPending}
-            style={{
-              background: "#c9a84c", border: "none", borderRadius: 8,
-              padding: "10px 20px", color: "#0a0a0a", fontWeight: 700,
-              fontSize: 13, cursor: "pointer", opacity: bulkAdd.isPending ? 0.7 : 1,
-            }}
-          >
-            {bulkAdd.isPending ? "Saugoma…" : "Išsaugoti"}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setAddRows([{ location_id: "", order_index: "0" }]);
-              setAddingToCollection("");
-            }}
-            style={{
-              background: "transparent", border: "1px solid #333", borderRadius: 8,
-              padding: "10px 20px", color: "#9ca3af", fontSize: 13, cursor: "pointer",
-            }}
-          >
-            Išvalyti
-          </button>
-        </div>
+        {/* Krovimo indikatorius */}
+        {isLoading && <div style={{ color: "#9ca3af", marginBottom: 16 }}>Kraunama…</div>}
       </div>
 
-      {/* Krovimo indikatorius */}
-      {isLoading && <div style={{ color: "#9ca3af", marginBottom: 16 }}>Kraunama…</div>}
+      <div style={{ flex: 1, overflow: "auto", padding: "0 24px 24px" }}>
+        {/* Pridėjimo forma */}
+        <div style={{ background: "#111111", border: "1px solid #222", borderRadius: 12, padding: 24, marginBottom: 24 }}>
+          <h2 style={{ margin: "0 0 16px", color: "#c9a84c", fontSize: 15 }}>
+            Pridėti lokacijas į kolekciją
+          </h2>
 
-      {/* Įrašų lentelė */}
-      <div style={{ background: "#111111", border: "1px solid #222", borderRadius: 12, overflow: "hidden" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ borderBottom: "1px solid #222" }}>
-              {["#", "Lokacija", "Kolekcija", "Eiliškumas", ""].map((h) => (
-                <th key={h} style={{
-                  padding: "12px 16px", textAlign: "left", color: "#6b7280",
-                  fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600,
-                }}>
-                  {h}
-                </th>
+          {/* Kolekcijos pasirinkimas */}
+          <div style={{ marginBottom: 16 }}>
+            <label style={labelStyle}>
+              Kolekcija <span style={{ color: "#f87171" }}>*</span>
+            </label>
+            <select
+              value={addingToCollection}
+              onChange={(e) => setAddingToCollection(e.target.value)}
+              style={{ ...inputStyle, maxWidth: 400 }}
+            >
+              <option value="">— Pasirinkti —</option>
+              {collections.map((c) => (
+                <option key={c.id} value={c.id}>{c.title}</option>
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((cl, idx) => (
-              <tr key={cl.id} style={{ borderBottom: "1px solid #1a1a1a" }}>
-                <td style={{ padding: "12px 16px", color: "#6b7280", fontSize: 12, width: 40 }}>
-                  {idx + 1}
-                </td>
-
-                <td style={{ padding: "12px 16px", color: "#f5f5f5", fontSize: 13 }}>
-                  {cl.locations_lt?.name ?? "—"}
-                </td>
-
-                <td style={{ padding: "12px 16px", color: "#9ca3af", fontSize: 13 }}>
-                  {cl.collections_curated?.title ??
-                    collections.find((c) => c.id === cl.collection_id)?.title ?? "—"}
-                </td>
-
-                {/* Eiliškumo redagavimas/ paspaudus skaičių atsidaro inline input */}
-                <td style={{ padding: "12px 16px", width: 140 }}>
-                  {editingOrderId === cl.id ? (
-                    <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
-                      <input
-                        type="number"
-                        min={0}
-                        value={editingOrderValue}
-                        onChange={(e) => setEditingOrderValue(e.target.value)}
-                        onKeyDown={(e) => {
-                          // Enter - išsaugo, Escape - atšaukia
-                          if (e.key === "Enter") updateOrder.mutate({ id: cl.id, order_index: Number(editingOrderValue) });
-                          if (e.key === "Escape") setEditingOrderId(null);
-                        }}
-                        autoFocus
-                        style={{ ...inputStyle, width: 60, padding: "4px 8px" }}
-                      />
-                      <button type="button"
-                        onClick={() => updateOrder.mutate({ id: cl.id, order_index: Number(editingOrderValue) })}
-                        style={{ background: "#c9a84c", border: "none", borderRadius: 4, padding: "4px 8px", color: "#0a0a0a", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-                        ✓
-                      </button>
-                      <button type="button"
-                        onClick={() => setEditingOrderId(null)}
-                        style={{ background: "transparent", border: "1px solid #333", borderRadius: 4, padding: "4px 8px", color: "#9ca3af", fontSize: 11, cursor: "pointer" }}>
-                        ✕
-                      </button>
-                    </div>
-                  ) : (
-                    <button type="button"
-                      onClick={() => { setEditingOrderId(cl.id); setEditingOrderValue(cl.order_index?.toString() ?? "0"); }}
-                      style={{ background: "transparent", border: "1px solid #2a2a2a", borderRadius: 6, padding: "4px 10px", color: "#c9a84c", fontSize: 13, cursor: "pointer", minWidth: 40 }}>
-                      {cl.order_index ?? 0}
-                    </button>
-                  )}
-                </td>
-
-                {/* Įrašo pašalinimas su patvirtinimu */}
-                <td style={{ padding: "12px 16px" }}>
-                  <button type="button"
-                    onClick={() => { if (confirm("Ištrinti šį įrašą?")) remove.mutate(cl.id); }}
-                    style={{ background: "transparent", border: "1px solid #333", borderRadius: 6, padding: "4px 10px", color: "#f87171", fontSize: 12, cursor: "pointer" }}>
-                    Ištrinti
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Tuščio sąrašo pranešimas */}
-        {!isLoading && filtered.length === 0 && (
-          <div style={{ padding: 24, color: "#6b7280", fontSize: 13, textAlign: "center" }}>
-            {filterCollection ? "Pasirinktoje kolekcijoje įrašų nerasta." : "Įrašų nerasta."}
+            </select>
           </div>
-        )}
+
+          {/* Stulpelių antraštės */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 120px 40px", gap: 8, marginBottom: 4 }}>
+            <span style={labelStyle}>Lokacija</span>
+            <span style={labelStyle}>Eiliškumas</span>
+            <span />
+          </div>
+
+          {/* Lokacijų eilutės - galima pridėti kelias iš karto */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
+            {addRows.map((row, idx) => (
+              <div key={idx} style={{ display: "grid", gridTemplateColumns: "1fr 120px 40px", gap: 8, alignItems: "center" }}>
+                <select
+                  value={row.location_id}
+                  onChange={(e) => updateRow(idx, "location_id", e.target.value)}
+                  style={inputStyle}
+                >
+                  <option value="">— Pasirinkti lokaciją —</option>
+                  {locations.map((l) => (
+                    <option key={l.id} value={l.id}>{l.name}</option>
+                  ))}
+                </select>
+
+                <input
+                  type="number"
+                  min={0}
+                  value={row.order_index}
+                  onChange={(e) => updateRow(idx, "order_index", e.target.value)}
+                  style={inputStyle}
+                />
+
+                {/* Eilutės pašalinimo mygtukas - išjungtas jei tik viena eilutė */}
+                <button
+                  type="button"
+                  onClick={() => removeRow(idx)}
+                  disabled={addRows.length === 1}
+                  style={{
+                    background: "transparent", border: "1px solid #333", borderRadius: 6,
+                    color: "#f87171", fontSize: 16,
+                    cursor: addRows.length === 1 ? "not-allowed" : "pointer",
+                    height: 36, width: 36, display: "flex", alignItems: "center", justifyContent: "center",
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Naujos eilutės pridėjimas */}
+          <button
+            type="button"
+            onClick={addNewRow}
+            style={{
+              background: "transparent", border: "1px dashed #444", borderRadius: 8,
+              padding: "8px 16px", color: "#9ca3af", fontSize: 13, cursor: "pointer", marginBottom: 16,
+            }}
+          >
+            + Pridėti dar vieną lokaciją
+          </button>
+
+          {/* Klaidos pranešimas */}
+          {bulkAdd.isError && (
+            <div style={{ color: "#f87171", fontSize: 13, marginBottom: 8 }}>
+              {(bulkAdd.error as Error)?.message ?? "Klaida išsaugant."}
+            </div>
+          )}
+
+          {/* Formos valdymo mygtukai */}
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              type="button"
+              onClick={() => bulkAdd.mutate()}
+              disabled={bulkAdd.isPending}
+              style={{
+                background: "#c9a84c", border: "none", borderRadius: 8,
+                padding: "10px 20px", color: "#0a0a0a", fontWeight: 700,
+                fontSize: 13, cursor: "pointer", opacity: bulkAdd.isPending ? 0.7 : 1,
+              }}
+            >
+              {bulkAdd.isPending ? "Saugoma…" : "Išsaugoti"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setAddRows([{ location_id: "", order_index: "0" }]);
+                setAddingToCollection("");
+              }}
+              style={{
+                background: "transparent", border: "1px solid #333", borderRadius: 8,
+                padding: "10px 20px", color: "#9ca3af", fontSize: 13, cursor: "pointer",
+              }}
+            >
+              Išvalyti
+            </button>
+          </div>
+        </div>
+
+        {/* Įrašų lentelė */}
+        <div style={{ background: "#111111", border: "1px solid #222", borderRadius: 12, overflow: "hidden" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid #222", position: "sticky", top: 0, background: "#111111", zIndex: 1 }}>
+                {["#", "Lokacija", "Kolekcija", "Eiliškumas", ""].map((h) => (
+                  <th key={h} style={{
+                    padding: "12px 16px", textAlign: "left", color: "#6b7280",
+                    fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600,
+                  }}>
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((cl, idx) => (
+                <tr key={cl.id} style={{ borderBottom: "1px solid #1a1a1a" }}>
+                  <td style={{ padding: "12px 16px", color: "#6b7280", fontSize: 12, width: 40 }}>
+                    {idx + 1}
+                  </td>
+
+                  <td style={{ padding: "12px 16px", color: "#f5f5f5", fontSize: 13 }}>
+                    {cl.locations_lt?.name ?? "—"}
+                  </td>
+
+                  <td style={{ padding: "12px 16px", color: "#9ca3af", fontSize: 13 }}>
+                    {cl.collections_curated?.title ??
+                      collections.find((c) => c.id === cl.collection_id)?.title ?? "—"}
+                  </td>
+
+                  {/* Eiliškumo redagavimas/ paspaudus skaičių atsidaro inline input */}
+                  <td style={{ padding: "12px 16px", width: 140 }}>
+                    {editingOrderId === cl.id ? (
+                      <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                        <input
+                          type="number"
+                          min={0}
+                          value={editingOrderValue}
+                          onChange={(e) => setEditingOrderValue(e.target.value)}
+                          onKeyDown={(e) => {
+                            // Enter - išsaugo, Escape - atšaukia
+                            if (e.key === "Enter") updateOrder.mutate({ id: cl.id, order_index: Number(editingOrderValue) });
+                            if (e.key === "Escape") setEditingOrderId(null);
+                          }}
+                          autoFocus
+                          style={{ ...inputStyle, width: 60, padding: "4px 8px" }}
+                        />
+                        <button type="button"
+                          onClick={() => updateOrder.mutate({ id: cl.id, order_index: Number(editingOrderValue) })}
+                          style={{ background: "#c9a84c", border: "none", borderRadius: 4, padding: "4px 8px", color: "#0a0a0a", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                          ✓
+                        </button>
+                        <button type="button"
+                          onClick={() => setEditingOrderId(null)}
+                          style={{ background: "transparent", border: "1px solid #333", borderRadius: 4, padding: "4px 8px", color: "#9ca3af", fontSize: 11, cursor: "pointer" }}>
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <button type="button"
+                        onClick={() => { setEditingOrderId(cl.id); setEditingOrderValue(cl.order_index?.toString() ?? "0"); }}
+                        style={{ background: "transparent", border: "1px solid #2a2a2a", borderRadius: 6, padding: "4px 10px", color: "#c9a84c", fontSize: 13, cursor: "pointer", minWidth: 40 }}>
+                        {cl.order_index ?? 0}
+                      </button>
+                    )}
+                  </td>
+
+                  {/* Įrašo pašalinimas su patvirtinimu */}
+                  <td style={{ padding: "12px 16px" }}>
+                    <button type="button"
+                      onClick={() => { if (confirm("Ištrinti šį įrašą?")) remove.mutate(cl.id); }}
+                      style={{ background: "transparent", border: "1px solid #333", borderRadius: 6, padding: "4px 10px", color: "#f87171", fontSize: 12, cursor: "pointer" }}>
+                      Ištrinti
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {/* Tuščio sąrašo pranešimas */}
+          {!isLoading && filtered.length === 0 && (
+            <div style={{ padding: 24, color: "#6b7280", fontSize: 13, textAlign: "center" }}>
+              {filterCollection ? "Pasirinktoje kolekcijoje įrašų nerasta." : "Įrašų nerasta."}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
