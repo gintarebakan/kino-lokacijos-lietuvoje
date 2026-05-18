@@ -58,7 +58,7 @@ export default function AdminLogin() {
             fontSize: 24,
           }}
         >
-          CineMap TVS
+          KinoLokacijosLT TVS
         </h1>
         <p style={{ margin: "0 0 28px", color: "#6b7280", fontSize: 14 }}>
           Turinio valdymo sistema
