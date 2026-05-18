@@ -264,286 +264,290 @@ export default function AdminLocations() {
   );
 
   return (
-    <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 24,
-        }}
-      >
-        <h1 style={{ margin: 0, color: "#f5f5f5", fontSize: 22, fontFamily: "Georgia, serif" }}>
-          Lokacijos
-        </h1>
-        <button
-          type="button"
-          onClick={() => {
-            setEditing(null);
-            setCreating(true);
-            setForm(EMPTY);
-            setValidationError(null);
-          }}
+    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ padding: "24px 24px 0", flexShrink: 0 }}>
+        <div
           style={{
-            background: "#c9a84c",
-            border: "none",
-            borderRadius: 8,
-            padding: "10px 20px",
-            color: "#0a0a0a",
-            fontWeight: 700,
-            fontSize: 13,
-            cursor: "pointer",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 24,
           }}
         >
-          + Pridėti
-        </button>
+          <h1 style={{ margin: 0, color: "#f5f5f5", fontSize: 22, fontFamily: "Georgia, serif" }}>
+            Lokacijos
+          </h1>
+          <button
+            type="button"
+            onClick={() => {
+              setEditing(null);
+              setCreating(true);
+              setForm(EMPTY);
+              setValidationError(null);
+            }}
+            style={{
+              background: "#c9a84c",
+              border: "none",
+              borderRadius: 8,
+              padding: "10px 20px",
+              color: "#0a0a0a",
+              fontWeight: 700,
+              fontSize: 13,
+              cursor: "pointer",
+            }}
+          >
+            + Pridėti
+          </button>
+        </div>
+
+        <input
+          placeholder="Ieškoti..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ ...inputStyle, marginBottom: 16, maxWidth: 320 }}
+        />
+
+        {isLoading && <div style={{ color: "#9ca3af", marginBottom: 16 }}>Kraunama…</div>}
       </div>
 
-      <input
-        placeholder="Ieškoti..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        style={{ ...inputStyle, marginBottom: 16, maxWidth: 320 }}
-      />
+      <div style={{ flex: 1, overflow: "auto", padding: "0 24px 24px" }}>
+        {(editing || creating) && (
+          <div
+            style={{
+              background: "#111111",
+              border: "1px solid #222",
+              borderRadius: 12,
+              padding: 24,
+              marginBottom: 24,
+            }}
+          >
+            <h2 style={{ margin: "0 0 20px", color: "#c9a84c", fontSize: 16 }}>
+              {editing ? "Redaguoti lokaciją" : "Nauja lokacija"}
+            </h2>
 
-      {isLoading && <div style={{ color: "#9ca3af" }}>Kraunama…</div>}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {/* Name — required */}
+              <div>
+                <label style={labelStyle}>Pavadinimas {required}</label>
+                <input
+                  style={inputStyle}
+                  value={form.name}
+                  onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                />
+              </div>
 
-      {(editing || creating) && (
+              {/* Slug — required */}
+              <div>
+                <label style={labelStyle}>Slug {required}</label>
+                <input
+                  style={inputStyle}
+                  value={form.slug}
+                  onChange={(e) => setForm((p) => ({ ...p, slug: e.target.value }))}
+                />
+              </div>
+
+              {f("address", "Adresas")}
+              {sel("county", "Apskritis", COUNTIES)}
+              {sel("location_type", "Lokacijos tipas", LOCATION_TYPES)}
+              {f("image_url", "Nuotraukos URL")}
+              {f("official_website_url", "Oficialus tinklapis")}
+              {sel("accessibility", "Pasiekiamumas", ACCESSIBILITY_OPTIONS)}
+            </div>
+
+            {/* Coordinates */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
+              <div>
+                <label style={{ ...labelStyle, color: "#c9a84c" }}>
+                  Platuma / Latitude
+                  {creating && <span style={{ color: "#f87171", marginLeft: 4 }}>*</span>}
+                  {editing && (
+                    <span style={{ color: "#6b7280", fontWeight: 400, marginLeft: 6 }}>
+                      (palikti tuščią — nekeisti)
+                    </span>
+                  )}
+                </label>
+                <input
+                  style={inputStyle}
+                  placeholder="pvz. 54.6872"
+                  value={form.lat}
+                  onChange={(e) => setForm((p) => ({ ...p, lat: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label style={{ ...labelStyle, color: "#c9a84c" }}>
+                  Ilguma / Longitude
+                  {creating && <span style={{ color: "#f87171", marginLeft: 4 }}>*</span>}
+                  {editing && (
+                    <span style={{ color: "#6b7280", fontWeight: 400, marginLeft: 6 }}>
+                      (palikti tuščią — nekeisti)
+                    </span>
+                  )}
+                </label>
+                <input
+                  style={inputStyle}
+                  placeholder="pvz. 25.2797"
+                  value={form.lng}
+                  onChange={(e) => setForm((p) => ({ ...p, lng: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
+              <div>
+                <label style={labelStyle}>Aprašymas</label>
+                <textarea
+                  value={form.description}
+                  onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
+                  rows={4}
+                  style={{ ...inputStyle, resize: "vertical" }}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Kuratoriaus pastabos</label>
+                <textarea
+                  value={form.curator_notes}
+                  onChange={(e) => setForm((p) => ({ ...p, curator_notes: e.target.value }))}
+                  rows={4}
+                  style={{ ...inputStyle, resize: "vertical" }}
+                />
+              </div>
+            </div>
+
+            {(validationError || save.isError) && (
+              <div style={{ color: "#f87171", fontSize: 13, marginTop: 8 }}>
+                {validationError ?? (save.error as Error)?.message ?? "Klaida išsaugant."}
+              </div>
+            )}
+
+            <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={save.isPending}
+                style={{
+                  background: "#c9a84c",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "10px 20px",
+                  color: "#0a0a0a",
+                  fontWeight: 700,
+                  fontSize: 13,
+                  cursor: "pointer",
+                }}
+              >
+                {save.isPending ? "Saugoma…" : "Išsaugoti"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditing(null);
+                  setCreating(false);
+                  setValidationError(null);
+                }}
+                style={{
+                  background: "transparent",
+                  border: "1px solid #333",
+                  borderRadius: 8,
+                  padding: "10px 20px",
+                  color: "#9ca3af",
+                  fontSize: 13,
+                  cursor: "pointer",
+                }}
+              >
+                Atšaukti
+              </button>
+            </div>
+          </div>
+        )}
+
         <div
           style={{
             background: "#111111",
             border: "1px solid #222",
             borderRadius: 12,
-            padding: 24,
-            marginBottom: 24,
+            overflow: "hidden",
           }}
         >
-          <h2 style={{ margin: "0 0 20px", color: "#c9a84c", fontSize: 16 }}>
-            {editing ? "Redaguoti lokaciją" : "Nauja lokacija"}
-          </h2>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            {/* Name — required */}
-            <div>
-              <label style={labelStyle}>Pavadinimas {required}</label>
-              <input
-                style={inputStyle}
-                value={form.name}
-                onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-              />
-            </div>
-
-            {/* Slug — required */}
-            <div>
-              <label style={labelStyle}>Slug {required}</label>
-              <input
-                style={inputStyle}
-                value={form.slug}
-                onChange={(e) => setForm((p) => ({ ...p, slug: e.target.value }))}
-              />
-            </div>
-
-            {f("address", "Adresas")}
-            {sel("county", "Apskritis", COUNTIES)}
-            {sel("location_type", "Lokacijos tipas", LOCATION_TYPES)}
-            {f("image_url", "Nuotraukos URL")}
-            {f("official_website_url", "Oficialus tinklapis")}
-            {sel("accessibility", "Pasiekiamumas", ACCESSIBILITY_OPTIONS)}
-          </div>
-
-          {/* Coordinates */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
-            <div>
-              <label style={{ ...labelStyle, color: "#c9a84c" }}>
-                Platuma / Latitude
-                {creating && <span style={{ color: "#f87171", marginLeft: 4 }}>*</span>}
-                {editing && (
-                  <span style={{ color: "#6b7280", fontWeight: 400, marginLeft: 6 }}>
-                    (palikti tuščią — nekeisti)
-                  </span>
-                )}
-              </label>
-              <input
-                style={inputStyle}
-                placeholder="pvz. 54.6872"
-                value={form.lat}
-                onChange={(e) => setForm((p) => ({ ...p, lat: e.target.value }))}
-              />
-            </div>
-            <div>
-              <label style={{ ...labelStyle, color: "#c9a84c" }}>
-                Ilguma / Longitude
-                {creating && <span style={{ color: "#f87171", marginLeft: 4 }}>*</span>}
-                {editing && (
-                  <span style={{ color: "#6b7280", fontWeight: 400, marginLeft: 6 }}>
-                    (palikti tuščią — nekeisti)
-                  </span>
-                )}
-              </label>
-              <input
-                style={inputStyle}
-                placeholder="pvz. 25.2797"
-                value={form.lng}
-                onChange={(e) => setForm((p) => ({ ...p, lng: e.target.value }))}
-              />
-            </div>
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
-            <div>
-              <label style={labelStyle}>Aprašymas</label>
-              <textarea
-                value={form.description}
-                onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
-                rows={4}
-                style={{ ...inputStyle, resize: "vertical" }}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>Kuratoriaus pastabos</label>
-              <textarea
-                value={form.curator_notes}
-                onChange={(e) => setForm((p) => ({ ...p, curator_notes: e.target.value }))}
-                rows={4}
-                style={{ ...inputStyle, resize: "vertical" }}
-              />
-            </div>
-          </div>
-
-          {(validationError || save.isError) && (
-            <div style={{ color: "#f87171", fontSize: 13, marginTop: 8 }}>
-              {validationError ?? (save.error as Error)?.message ?? "Klaida išsaugant."}
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid #222", position: "sticky", top: 0, background: "#111111", zIndex: 1 }}>
+                {["Pavadinimas", "Apskritis", "Tipas", "Slug", ""].map((h) => (
+                  <th
+                    key={h}
+                    style={{
+                      padding: "12px 16px",
+                      textAlign: "left",
+                      color: "#6b7280",
+                      fontSize: 11,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.08em",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((loc) => (
+                <tr key={loc.id} style={{ borderBottom: "1px solid #1a1a1a" }}>
+                  <td style={{ padding: "12px 16px", color: "#f5f5f5", fontSize: 13 }}>{loc.name}</td>
+                  <td style={{ padding: "12px 16px", color: "#9ca3af", fontSize: 13 }}>
+                    {loc.county ?? "—"}
+                  </td>
+                  <td style={{ padding: "12px 16px", color: "#9ca3af", fontSize: 13 }}>
+                    {loc.location_type ?? "—"}
+                  </td>
+                  <td style={{ padding: "12px 16px", color: "#6b7280", fontSize: 12 }}>
+                    {loc.slug ?? "—"}
+                  </td>
+                  <td style={{ padding: "12px 16px" }}>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <button
+                        type="button"
+                        onClick={() => openEdit(loc)}
+                        style={{
+                          background: "transparent",
+                          border: "1px solid #333",
+                          borderRadius: 6,
+                          padding: "4px 10px",
+                          color: "#c9a84c",
+                          fontSize: 12,
+                          cursor: "pointer",
+                        }}
+                      >
+                        Redaguoti
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm("Ištrinti?")) remove.mutate(loc.id);
+                        }}
+                        style={{
+                          background: "transparent",
+                          border: "1px solid #333",
+                          borderRadius: 6,
+                          padding: "4px 10px",
+                          color: "#f87171",
+                          fontSize: 12,
+                          cursor: "pointer",
+                        }}
+                      >
+                        Ištrinti
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {filtered.length === 0 && !isLoading && (
+            <div style={{ padding: 24, color: "#6b7280", fontSize: 13, textAlign: "center" }}>
+              Įrašų nerasta.
             </div>
           )}
-
-          <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={save.isPending}
-              style={{
-                background: "#c9a84c",
-                border: "none",
-                borderRadius: 8,
-                padding: "10px 20px",
-                color: "#0a0a0a",
-                fontWeight: 700,
-                fontSize: 13,
-                cursor: "pointer",
-              }}
-            >
-              {save.isPending ? "Saugoma…" : "Išsaugoti"}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setEditing(null);
-                setCreating(false);
-                setValidationError(null);
-              }}
-              style={{
-                background: "transparent",
-                border: "1px solid #333",
-                borderRadius: 8,
-                padding: "10px 20px",
-                color: "#9ca3af",
-                fontSize: 13,
-                cursor: "pointer",
-              }}
-            >
-              Atšaukti
-            </button>
-          </div>
         </div>
-      )}
-
-      <div
-        style={{
-          background: "#111111",
-          border: "1px solid #222",
-          borderRadius: 12,
-          overflow: "hidden",
-        }}
-      >
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ borderBottom: "1px solid #222" }}>
-              {["Pavadinimas", "Apskritis", "Tipas", "Slug", ""].map((h) => (
-                <th
-                  key={h}
-                  style={{
-                    padding: "12px 16px",
-                    textAlign: "left",
-                    color: "#6b7280",
-                    fontSize: 11,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.08em",
-                    fontWeight: 600,
-                  }}
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((loc) => (
-              <tr key={loc.id} style={{ borderBottom: "1px solid #1a1a1a" }}>
-                <td style={{ padding: "12px 16px", color: "#f5f5f5", fontSize: 13 }}>{loc.name}</td>
-                <td style={{ padding: "12px 16px", color: "#9ca3af", fontSize: 13 }}>
-                  {loc.county ?? "—"}
-                </td>
-                <td style={{ padding: "12px 16px", color: "#9ca3af", fontSize: 13 }}>
-                  {loc.location_type ?? "—"}
-                </td>
-                <td style={{ padding: "12px 16px", color: "#6b7280", fontSize: 12 }}>
-                  {loc.slug ?? "—"}
-                </td>
-                <td style={{ padding: "12px 16px" }}>
-                  <div style={{ display: "flex", gap: 6 }}>
-                    <button
-                      type="button"
-                      onClick={() => openEdit(loc)}
-                      style={{
-                        background: "transparent",
-                        border: "1px solid #333",
-                        borderRadius: 6,
-                        padding: "4px 10px",
-                        color: "#c9a84c",
-                        fontSize: 12,
-                        cursor: "pointer",
-                      }}
-                    >
-                      Redaguoti
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (confirm("Ištrinti?")) remove.mutate(loc.id);
-                      }}
-                      style={{
-                        background: "transparent",
-                        border: "1px solid #333",
-                        borderRadius: 6,
-                        padding: "4px 10px",
-                        color: "#f87171",
-                        fontSize: 12,
-                        cursor: "pointer",
-                      }}
-                    >
-                      Ištrinti
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {filtered.length === 0 && !isLoading && (
-          <div style={{ padding: 24, color: "#6b7280", fontSize: 13, textAlign: "center" }}>
-            Įrašų nerasta.
-          </div>
-        )}
       </div>
     </div>
   );
