@@ -584,7 +584,7 @@ export default function SearchBar() {
                       textOverflow: "ellipsis",
                     }}
                   >
-                    {r.title} //pavadinimas
+                    {r.title}
                   </div>
                   {r.subtitle && (
                     <div
@@ -596,7 +596,7 @@ export default function SearchBar() {
                         textOverflow: "ellipsis",
                       }}
                     >
-                      {r.subtitle} //lokacijai: apskritis, filmui: "2023 · Filmas"
+                      {r.subtitle}
                     </div>
                   )}
                 </div>
